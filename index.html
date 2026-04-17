@@ -8,885 +8,482 @@
   <title>Ashvaren — Games</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="ashvaren.js"></script>
   <style>
-    :root {
-      --bg:       #080c14;
-      --surface:  #0e1420;
-      --surface2: #111926;
-      --border:   #1a2535;
-      --border2:  #243040;
-      --accent:   #2e6fc4;
-      --accent-l: rgba(46,111,196,0.12);
-      --copper:   #c8924a;
-      --ice:      #6aaed4;
-      --orange:   #e05c3a;
-      --blue:     #3a9ee0;
-      --text:     #d8e2f0;
-      --text-dim: #6a7a90;
-      --muted:    #3a4a5a;
-    }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'DM Mono','Courier New',monospace;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-tap-highlight-color: transparent;
-    }
-    button { -webkit-appearance:none; cursor:pointer; font-family:'DM Mono',monospace; }
-    a { text-decoration: none; color: inherit; }
+    :root{--bg:#080c14;--surface:#0e1420;--surface2:#111926;--border:#1a2535;--accent:#2e6fc4;--text:#d8e2f0;--text-dim:#6a7a90;--muted:#3a4a5a;--orange:#e05c3a;--copper:#c8924a;--green:#50c878}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Mono','Courier New',monospace;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
+    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
 
-    /* ─── Hub screen ────────────────────────────────────────────────────── */
-    #hub { min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:48px 20px 60px; }
+    nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,12,20,0.94);backdrop-filter:blur(8px);z-index:50}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:17px;letter-spacing:0.16em;color:var(--text-dim)}
+    .nav-tabs{display:flex;gap:3px}
+    .nav-tab{padding:6px 12px;border-radius:6px;border:none;background:transparent;color:var(--text-dim);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;transition:background 0.15s,color 0.15s}
+    .nav-tab.active{background:var(--surface);color:var(--text);border:1px solid var(--border)}
 
-    .hub-wordmark {
-      font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
-      font-size:13px; letter-spacing:0.28em; color:var(--text-dim); text-transform:uppercase;
-      margin-bottom:6px;
-    }
-    .hub-title {
-      font-family:'Cormorant Garamond',serif; font-weight:600; font-size:52px;
-      letter-spacing:0.03em; line-height:1; margin-bottom:6px; color:var(--text);
-    }
-    .hub-sub {
-      font-size:9px; letter-spacing:0.22em; color:var(--muted); text-transform:uppercase;
-      margin-bottom:52px;
-    }
+    .screen{display:none;padding:24px 18px 60px;max-width:820px;margin:0 auto}
+    .screen.active{display:block}
 
-    .game-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
-      gap:20px; justify-content:center; width:100%; max-width:1080px;
-    }
+    .page-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;letter-spacing:0.03em;margin-bottom:3px}
+    .page-sub{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+    .section-title{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;margin-top:28px}
+    .rule{height:1px;background:var(--border);margin-bottom:14px}
 
-    .game-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
-      position: relative;
-    }
-    .game-card:hover { transform: translateY(-3px); }
-    .game-card[data-game="dots"]:hover   { border-color: var(--orange); box-shadow: 0 8px 32px rgba(224,92,58,0.15); }
-    .game-card[data-game="hex"]:hover    { border-color: var(--copper); box-shadow: 0 8px 32px rgba(200,146,74,0.15); }
-    .game-card[data-game="mines"]:hover  { border-color: var(--accent); box-shadow: 0 8px 32px rgba(46,111,196,0.15); }
+    .game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .game-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s}
+    .game-card:hover{transform:translateY(-2px)}
+    .game-thumb{height:110px;overflow:hidden}
+    .game-thumb svg{width:100%;height:100%}
+    .game-body{padding:12px 14px 14px}
+    .game-tag{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px}
+    .game-name{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;margin-bottom:5px}
+    .game-desc{font-size:10px;color:var(--text-dim);line-height:1.55;margin-bottom:10px}
+    .game-btns{display:flex;gap:6px}
 
-    .card-thumb { width:100%; height:180px; position:relative; overflow:hidden; }
-    .card-thumb svg { position:absolute; inset:0; width:100%; height:100%; }
+    .btn{padding:7px 14px;border-radius:6px;border:none;font-size:10px;font-weight:700;letter-spacing:0.07em;transition:opacity 0.15s,transform 0.1s;cursor:pointer}
+    .btn:hover{opacity:0.82}
+    .btn:active{transform:scale(0.96)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
+    .btn-sm{padding:5px 10px;font-size:9px}
+    .btn-danger{background:#2a0a0a;border:1.5px solid #5a1a1a;color:#ff6060}
 
-    .card-body { padding:20px 22px 22px; }
-    .card-tag {
-      font-size:8px; letter-spacing:0.18em; text-transform:uppercase;
-      color:var(--text-dim); margin-bottom:6px;
-    }
-    .card-name {
-      font-family:'Cormorant Garamond',serif; font-weight:600; font-size:28px;
-      letter-spacing:0.02em; margin-bottom:6px; line-height:1;
-    }
-    .card-desc { font-size:11px; color:var(--text-dim); line-height:1.65; margin-bottom:18px; }
-    .card-actions { display:flex; gap:8px; }
+    .inner-tabs{display:flex;gap:5px;margin-bottom:18px;flex-wrap:wrap}
+    .inner-tab{padding:6px 12px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-size:10px;font-weight:500;letter-spacing:0.07em;transition:border-color 0.15s,background 0.15s,color 0.15s;cursor:pointer}
+    .inner-tab.active{border-color:var(--accent);background:rgba(46,111,196,0.12);color:var(--text)}
+    .inner-panel{display:none}
+    .inner-panel.active{display:block}
 
-    .btn {
-      padding:9px 20px; border-radius:7px; border:none; font-size:11px;
-      font-weight:500; letter-spacing:0.08em; transition:opacity 0.15s, transform 0.1s;
-    }
-    .btn:hover { opacity:0.85; }
-    .btn:active { transform:scale(0.96); }
-    .btn-primary { background:var(--accent); color:#fff; }
-    .btn-ghost   { background:transparent; border:1.5px solid var(--border); color:var(--text-dim); }
-    .btn-copper  { background:var(--copper); color:#fff; }
-    .btn-orange  { background:var(--orange); color:#fff; }
+    .lb{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .lb-head{display:grid;grid-template-columns:30px 1fr 64px 52px 52px 52px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:8px;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted)}
+    .lb-row{display:grid;grid-template-columns:30px 1fr 64px 52px 52px 52px;padding:11px 12px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.12s}
+    .lb-row:last-child{border-bottom:none}
+    .lb-row:hover{background:var(--surface2)}
+    .lb-rank{font-size:11px;font-weight:700;color:var(--muted)}
+    .lb-rank.gold{color:#c8924a} .lb-rank.silver{color:#8899aa} .lb-rank.bronze{color:#7a5a3a}
+    .lb-player{display:flex;align-items:center;gap:8px}
+    .lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .lb-name{font-size:12px;font-weight:500}
+    .lb-streak{font-size:9px;color:var(--orange);margin-top:1px}
+    .lb-elo{font-size:14px;font-weight:700;text-align:right}
+    .lb-cell{font-size:11px;color:var(--text-dim);text-align:right}
+    .lb-cell.w{color:var(--green)}
 
-    /* ─── Detail / instructions screen ─────────────────────────────────── */
-    .detail-screen {
-      display:none; min-height:100vh;
-      flex-direction:column; align-items:center; padding:0 0 60px;
-    }
-    .detail-screen.active { display:flex; }
+    .results-list{display:flex;flex-direction:column;gap:6px}
+    .result-row{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:9px}
+    .result-tag{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 6px;border-radius:3px;font-weight:700;flex-shrink:0}
+    .result-names{flex:1;font-size:11px}
+    .result-winner{font-size:10px;font-weight:700;text-align:right;flex-shrink:0}
+    .result-ago{font-size:9px;color:var(--muted);flex-shrink:0;min-width:48px;text-align:right}
 
-    .detail-hero {
-      width:100%; height:220px; position:relative; overflow:hidden; flex-shrink:0;
-    }
-    .detail-hero svg { width:100%; height:100%; }
-    .detail-hero-overlay {
-      position:absolute; inset:0;
-      background:linear-gradient(to bottom, transparent 30%, var(--bg) 100%);
-    }
-    .detail-hero-text {
-      position:absolute; bottom:24px; left:28px;
-    }
-    .detail-wordmark {
-      font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
-      font-size:11px; letter-spacing:0.22em; color:var(--text-dim); margin-bottom:4px;
-    }
-    .detail-title {
-      font-family:'Cormorant Garamond',serif; font-weight:600; font-size:44px;
-      letter-spacing:0.02em; line-height:1;
-    }
-    .detail-tagline {
-      font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); margin-top:4px;
-    }
+    .h2h-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+    .h2h-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+    .h2h-names{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+    .h2h-name{font-size:12px;font-weight:700}
+    .h2h-vs{font-size:9px;color:var(--muted)}
+    .h2h-stats{display:flex}
+    .h2h-stat{flex:1;text-align:center}
+    .h2h-num{font-size:20px;font-weight:700}
+    .h2h-lbl{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
 
-    .detail-back {
-      position:absolute; top:20px; left:20px;
-      background:rgba(14,20,32,0.8); border:1px solid var(--border); border-radius:6px;
-      color:var(--text-dim); font-size:11px; letter-spacing:0.06em;
-      padding:7px 14px; backdrop-filter:blur(4px);
-    }
+    .player-list{display:flex;flex-direction:column;gap:7px}
+    .player-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 13px;display:flex;align-items:center;gap:11px}
+    .p-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+    .p-name{flex:1;font-size:13px;font-weight:500}
+    .p-elo{font-size:10px;color:var(--text-dim)}
+    .add-form{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
+    .text-in{background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:7px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none}
+    .text-in:focus{border-color:var(--accent)}
+    .col-in{width:34px;height:30px;border-radius:5px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;padding:2px}
 
-    .detail-body { width:100%; max-width:640px; padding:0 20px; }
+    .title-badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 11px;display:flex;align-items:center;gap:7px}
+    .badge-game{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+    .badge-name{font-size:12px;font-weight:700}
 
-    .detail-launch {
-      display:flex; gap:10px; margin:24px 0 36px;
-    }
-    .btn-launch {
-      flex:1; padding:14px; border-radius:10px; border:none; font-size:13px;
-      font-weight:700; letter-spacing:0.07em; color:#fff;
-    }
+    .instr-hero{width:100%;height:140px;border-radius:10px;overflow:hidden;margin-bottom:16px}
+    .instr-hero svg{width:100%;height:100%}
+    .steps{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+    .step{display:flex;gap:12px}
+    .step-num{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px}
+    .step-title{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--text)}
+    .step-desc{font-size:10px;color:var(--text-dim);line-height:1.6}
+    .tip{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 7px 7px 0;padding:10px 13px;font-size:10px;color:var(--text-dim);line-height:1.6;margin-bottom:16px}
 
-    .section-heading {
-      font-family:'Cormorant Garamond',serif; font-weight:600; font-size:22px;
-      letter-spacing:0.03em; margin-bottom:4px; color:var(--text);
-    }
-    .section-rule {
-      height:1px; background:var(--border); margin-bottom:22px;
-    }
+    .empty{text-align:center;padding:28px;color:var(--muted);font-size:11px;letter-spacing:0.05em}
 
-    /* Instruction steps */
-    .steps { display:flex; flex-direction:column; gap:28px; margin-bottom:40px; }
-    .step { display:flex; gap:18px; align-items:flex-start; }
-    .step-num {
-      width:28px; height:28px; border-radius:50%; flex-shrink:0; display:flex;
-      align-items:center; justify-content:center; font-size:11px; font-weight:700;
-      margin-top:2px;
-    }
-    .step-content {}
-    .step-title { font-size:13px; font-weight:700; letter-spacing:0.05em; margin-bottom:4px; color:var(--text); }
-    .step-desc  { font-size:11px; color:var(--text-dim); line-height:1.65; }
-
-    .diagram-wrap {
-      background:var(--surface); border:1px solid var(--border); border-radius:12px;
-      padding:20px; margin-bottom:28px; display:flex; justify-content:center;
-    }
-    .diagram-wrap svg { max-width:100%; }
-
-    .tip-box {
-      background:var(--surface2); border-left:3px solid var(--accent);
-      border-radius:0 8px 8px 0; padding:14px 16px; margin-bottom:28px;
-      font-size:11px; color:var(--text-dim); line-height:1.65;
-    }
-    .tip-box strong { color:var(--text); }
-
-    /* ─── Dots thumb ──────────────────────────────────────────────────── */
-    .thumb-dots-grid { }
-
-    /* ─── Footer ────────────────────────────────────────────────────────── */
-    .hub-footer {
-      margin-top:60px; font-size:10px; letter-spacing:0.12em;
-      color:var(--muted); text-align:center;
+    @media(max-width:500px){
+      .lb-head,.lb-row{grid-template-columns:26px 1fr 56px 44px}
+      .lb-cell.hs,.lb-head .hs{display:none}
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     HUB
-════════════════════════════════════════════════════════════════════════════ -->
-<div id="hub">
-  <div class="hub-wordmark">Ashvaren</div>
-  <h1 class="hub-title">Games</h1>
-  <p class="hub-sub">Strategy · Logic · Nerve</p>
+<nav>
+  <div class="nav-logo">Ashvaren</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="nav('games',this)">Games</button>
+    <button class="nav-tab" onclick="nav('champ',this)">Championship</button>
+    <button class="nav-tab" onclick="nav('players',this)">Players</button>
+  </div>
+</nav>
 
-  <div class="game-grid">
+<!-- GAMES -->
+<div id="s-games" class="screen active">
+  <div style="margin-bottom:20px">
+    <div class="page-title">Games</div>
+    <div class="page-sub">Ashvaren Family Collection</div>
+  </div>
+  <div class="section-title">Current Champions</div>
+  <div id="champ-badges" class="title-badges" style="margin-bottom:24px"></div>
+  <div class="section-title">Play</div>
+  <div class="game-grid" id="game-grid">
 
     <!-- Dots & Boxes -->
-    <div class="game-card" data-game="dots">
-      <div class="card-thumb">
-        <svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-          <rect width="340" height="180" fill="#0e1420"/>
-          <!-- Grid lines background -->
-          <g opacity="0.15" stroke="#d8e2f0" stroke-width="0.5">
-            <line x1="60" y1="40" x2="60" y2="150"/><line x1="120" y1="40" x2="120" y2="150"/>
-            <line x1="180" y1="40" x2="180" y2="150"/><line x1="240" y1="40" x2="240" y2="150"/>
-            <line x1="300" y1="40" x2="300" y2="150"/>
-            <line x1="50" y1="50" x2="310" y2="50"/><line x1="50" y1="100" x2="310" y2="100"/>
-            <line x1="50" y1="150" x2="310" y2="150"/>
-          </g>
-          <!-- Claimed boxes -->
-          <rect x="62" y="52" width="56" height="46" fill="rgba(224,92,58,0.2)" rx="2"/>
-          <rect x="182" y="102" width="56" height="46" fill="rgba(58,158,224,0.2)" rx="2"/>
-          <rect x="122" y="102" width="56" height="46" fill="rgba(224,92,58,0.2)" rx="2"/>
-          <!-- Drawn edges - orange player -->
-          <line x1="60" y1="50" x2="120" y2="50" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <line x1="60" y1="100" x2="120" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <line x1="60" y1="50" x2="60" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <line x1="120" y1="50" x2="120" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <!-- Drawn edges - blue player -->
-          <line x1="180" y1="100" x2="240" y2="100" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <line x1="180" y1="150" x2="240" y2="150" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <line x1="180" y1="100" x2="180" y2="150" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <line x1="240" y1="100" x2="240" y2="150" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <!-- Mixed edges -->
-          <line x1="120" y1="100" x2="180" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <line x1="120" y1="150" x2="180" y2="150" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-          <line x1="120" y1="100" x2="120" y2="150" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <line x1="180" y1="100" x2="180" y2="150" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-          <!-- Initials in boxes -->
-          <text x="91" y="81" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="14" font-weight="700">P1</text>
-          <text x="211" y="131" text-anchor="middle" fill="#3a9ee0" font-family="'DM Mono',monospace" font-size="14" font-weight="700">P2</text>
-          <text x="151" y="131" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="14" font-weight="700">P1</text>
-          <!-- Dots -->
-          <g fill="#c8d0e0">
-            <circle cx="60" cy="50" r="4"/><circle cx="120" cy="50" r="4"/><circle cx="180" cy="50" r="4"/>
-            <circle cx="240" cy="50" r="4"/><circle cx="300" cy="50" r="4"/>
-            <circle cx="60" cy="100" r="4"/><circle cx="120" cy="100" r="4"/><circle cx="180" cy="100" r="4"/>
-            <circle cx="240" cy="100" r="4"/><circle cx="300" cy="100" r="4"/>
-            <circle cx="60" cy="150" r="4"/><circle cx="120" cy="150" r="4"/><circle cx="180" cy="150" r="4"/>
-            <circle cx="240" cy="150" r="4"/><circle cx="300" cy="150" r="4"/>
-          </g>
-          <!-- Hover hint - next line to draw glowing -->
-          <line x1="240" y1="50" x2="300" y2="50" stroke="rgba(58,158,224,0.6)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 3"/>
-        </svg>
-      </div>
-      <div class="card-body">
-        <div class="card-tag">Two Players · Strategy</div>
-        <div class="card-name" style="color:#e05c3a">Dots &amp; Boxes</div>
-        <div class="card-desc">Connect dots to claim boxes. Each completed square scores a point and earns another turn. Most boxes wins.</div>
-        <div class="card-actions">
-          <button class="btn btn-orange" onclick="showDetail('dots')">How to Play</button>
-          <button class="btn btn-ghost" onclick="launchGame('dots')">Play Now →</button>
+    <div class="game-card" onmouseenter="this.style.borderColor='#e05c3a';this.style.boxShadow='0 4px 20px rgba(224,92,58,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <rect x="52" y="18" width="56" height="46" fill="rgba(224,92,58,0.15)" rx="2"/>
+        <rect x="162" y="48" width="56" height="46" fill="rgba(46,111,196,0.15)" rx="2"/>
+        <line x1="50" y1="16" x2="110" y2="16" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="66" x2="110" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="16" x2="50" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="110" y1="16" x2="110" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="46" x2="220" y2="46" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="96" x2="220" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="46" x2="160" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="220" y1="46" x2="220" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <text x="80" y="48" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="12" font-weight="700">P1</text>
+        <text x="190" y="77" text-anchor="middle" fill="#2e6fc4" font-family="'DM Mono',monospace" font-size="12" font-weight="700">P2</text>
+        <g fill="#c8d0e0"><circle cx="50" cy="16" r="3.5"/><circle cx="110" cy="16" r="3.5"/><circle cx="160" cy="16" r="3.5"/><circle cx="220" cy="16" r="3.5"/><circle cx="50" cy="66" r="3.5"/><circle cx="110" cy="66" r="3.5"/><circle cx="160" cy="66" r="3.5"/><circle cx="220" cy="66" r="3.5"/><circle cx="50" cy="96" r="3.5"/><circle cx="110" cy="96" r="3.5"/><circle cx="160" cy="96" r="3.5"/><circle cx="220" cy="96" r="3.5"/></g>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">2 Players · Strategy · vs AI</div>
+        <div class="game-name" style="color:#e05c3a">Dots &amp; Boxes</div>
+        <div class="game-desc">Draw lines to claim boxes. Most boxes wins. Play a friend or the AI.</div>
+        <div class="game-btns">
+          <button class="btn" style="background:#e05c3a;color:#fff" onclick="showInstr('dots')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('dots-and-boxes.html')">Play →</button>
         </div>
       </div>
     </div>
 
     <!-- Hex -->
-    <div class="game-card" data-game="hex">
-      <div class="card-thumb">
-        <svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-          <rect width="340" height="180" fill="#0e1420"/>
-          <defs>
-            <filter id="glow-c"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="glow-i"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <!-- Hex grid 5x5 preview -->
-          <g id="hex-preview">
-            <!-- Row 0 -->
-            <polygon points="80,28 94,20 108,28 108,44 94,52 80,44" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="116,28 130,20 144,28 144,44 130,52 116,44" fill="#c8924a" stroke="#a07030" stroke-width="1.5" filter="url(#glow-c)"/>
-            <polygon points="152,28 166,20 180,28 180,44 166,52 152,44" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="188,28 202,20 216,28 216,44 202,52 188,44" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-            <polygon points="224,28 238,20 252,28 252,44 238,52 224,44" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <!-- Row 1 -->
-            <polygon points="98,56 112,48 126,56 126,72 112,80 98,72" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-            <polygon points="134,56 148,48 162,56 162,72 148,80 134,72" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="170,56 184,48 198,56 198,72 184,80 170,72" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-            <polygon points="206,56 220,48 234,56 234,72 220,80 206,72" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="242,56 256,48 270,56 270,72 256,80 242,72" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-            <!-- Row 2 -->
-            <polygon points="116,84 130,76 144,84 144,100 130,108 116,100" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="152,84 166,76 180,84 180,100 166,108 152,100" fill="#c8924a" stroke="#a07030" stroke-width="1.5" filter="url(#glow-c)"/>
-            <polygon points="188,84 202,76 216,84 216,100 202,108 188,100" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-            <polygon points="224,84 238,76 252,84 252,100 238,108 224,100" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-            <polygon points="260,84 274,76 288,84 288,100 274,108 260,100" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <!-- Row 3 -->
-            <polygon points="134,112 148,104 162,112 162,128 148,136 134,128" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-            <polygon points="170,112 184,104 198,112 198,128 184,136 170,128" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="206,112 220,104 234,112 234,128 220,136 206,128" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-            <polygon points="242,112 256,104 270,112 270,128 256,136 242,128" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="278,112 292,104 306,112 306,128 292,136 278,128" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-            <!-- Row 4 -->
-            <polygon points="152,140 166,132 180,140 180,156 166,164 152,156" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="188,140 202,132 216,140 216,156 202,164 188,156" fill="#c8924a" stroke="#a07030" stroke-width="1.5" filter="url(#glow-c)"/>
-            <polygon points="224,140 238,132 252,140 252,156 238,164 224,156" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <polygon points="260,140 274,132 288,140 288,156 274,164 260,156" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-          </g>
-          <!-- Connection path highlight -->
-          <polyline points="130,36 112,64 166,88 202,92 220,120 202,148" stroke="#c8924a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" stroke-dasharray="5 3"/>
-          <!-- Border labels -->
-          <text x="28" y="92" fill="rgba(200,146,74,0.7)" font-family="'DM Mono',monospace" font-size="9" letter-spacing="0.1em" transform="rotate(-30 28 92)">COPPER</text>
-          <text x="295" y="35" fill="rgba(106,174,212,0.7)" font-family="'DM Mono',monospace" font-size="9" letter-spacing="0.1em">ICE</text>
-        </svg>
-      </div>
-      <div class="card-body">
-        <div class="card-tag">Two Players · Topology</div>
-        <div class="card-name" style="color:var(--copper)">Hex</div>
-        <div class="card-desc">Race to connect your two sides of the board with an unbroken chain of stones. No draws are possible — someone always wins.</div>
-        <div class="card-actions">
-          <button class="btn btn-copper" onclick="showDetail('hex')">How to Play</button>
-          <button class="btn btn-ghost" onclick="launchGame('hex')">Play Now →</button>
+    <div class="game-card" onmouseenter="this.style.borderColor='#c8924a';this.style.boxShadow='0 4px 20px rgba(200,146,74,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <polygon points="50,16 63,8 76,16 76,32 63,40 50,32" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="84,16 97,8 110,16 110,32 97,40 84,32" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="118,16 131,8 144,16 144,32 131,40 118,32" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="152,16 165,8 178,16 178,32 165,40 152,32" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="67,48 80,40 93,48 93,64 80,72 67,64" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="101,48 114,40 127,48 127,64 114,72 101,64" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="135,48 148,40 161,48 161,64 148,72 135,64" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
+        <polygon points="169,48 182,40 195,48 195,64 182,72 169,64" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="84,80 97,72 110,80 110,96 97,104 84,96" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
+        <polygon points="118,80 131,72 144,80 144,96 131,104 118,96" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="152,80 165,72 178,80 178,96 165,104 152,96" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polyline points="63,24 114,56 131,88" stroke="#c8924a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">2 Players · Topology · vs AI</div>
+        <div class="game-name" style="color:#c8924a">Hex</div>
+        <div class="game-desc">Connect your two board edges. No draws possible. Four AI levels.</div>
+        <div class="game-btns">
+          <button class="btn" style="background:#c8924a;color:#fff" onclick="showInstr('hex')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('hex.html')">Play →</button>
         </div>
       </div>
     </div>
 
     <!-- Minesweeper -->
-    <div class="game-card" data-game="mines">
-      <div class="card-thumb">
-        <svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-          <rect width="340" height="180" fill="#0e1420"/>
-          <!-- Grid cells -->
-          <g>
-            <!-- Row 0: mix of hidden and revealed -->
-            <rect x="30" y="20" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="66" y="20" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="102" y="20" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="138" y="20" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="174" y="20" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="210" y="20" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="246" y="20" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="282" y="20" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <!-- Row 1 -->
-            <rect x="30" y="56" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="66" y="56" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="102" y="56" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="138" y="56" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="174" y="56" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="210" y="56" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="246" y="56" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="282" y="56" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <!-- Row 2 -->
-            <rect x="30" y="92" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="66" y="92" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="102" y="92" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="138" y="92" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-            <rect x="174" y="92" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="210" y="92" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="246" y="92" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="282" y="92" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <!-- Row 3 - mostly hidden -->
-            <rect x="30" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="66" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="102" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="138" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="174" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="210" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="246" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-            <rect x="282" y="128" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-          </g>
-          <!-- Numbers on revealed cells -->
-          <text x="83" y="43" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="14" font-weight="700">1</text>
-          <text x="119" y="43" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="14" font-weight="700">2</text>
-          <text x="155" y="43" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="14" font-weight="700">2</text>
-          <text x="191" y="43" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="14" font-weight="700">1</text>
-          <text x="47" y="79" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="14" font-weight="700">1</text>
-          <text x="83" y="79" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="14" font-weight="700">3</text>
-          <text x="119" y="79" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="14" font-weight="700">3</text>
-          <text x="155" y="79" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="14" font-weight="700">3</text>
-          <text x="191" y="79" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="14" font-weight="700">2</text>
-          <text x="47" y="115" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="14" font-weight="700">1</text>
-          <text x="83" y="115" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="14" font-weight="700">2</text>
-          <text x="119" y="115" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="14" font-weight="700">2</text>
-          <text x="155" y="115" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="14" font-weight="700">1</text>
-          <!-- Flags on hidden cells -->
-          <text x="228" y="81" text-anchor="middle" fill="#e05c3a" font-family="serif" font-size="16">⚑</text>
-          <text x="300" y="45" text-anchor="middle" fill="#e05c3a" font-family="serif" font-size="16">⚑</text>
-          <!-- Mine on exploded cell -->
-          <rect x="246" y="92" width="34" height="34" rx="3" fill="#2a0808" stroke="#4a1010" stroke-width="1"/>
-          <text x="263" y="115" text-anchor="middle" font-size="18">💣</text>
-        </svg>
-      </div>
-      <div class="card-body">
-        <div class="card-tag">Solo · Logic · Deduction</div>
-        <div class="card-name" style="color:var(--accent)">Minefield</div>
-        <div class="card-desc">Reveal safe cells using logic and deduction. Flag suspected mines. Clear the entire field without detonating a single one.</div>
-        <div class="card-actions">
-          <button class="btn btn-primary" onclick="showDetail('mines')">How to Play</button>
-          <button class="btn btn-ghost" onclick="launchGame('mines')">Play Now →</button>
+    <div class="game-card" onmouseenter="this.style.borderColor='#2e6fc4';this.style.boxShadow='0 4px 20px rgba(46,111,196,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <rect x="14" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="46" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="78" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="110" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="142" y="12" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="174" y="12" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="14" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="46" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="78" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="110" y="44" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="142" y="44" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="14" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="46" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="78" y="76" width="28" height="28" rx="3" fill="#2a0808" stroke="#4a1010"/>
+        <rect x="110" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <text x="28" y="31" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="60" y="31" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="92" y="31" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="13" font-weight="700">3</text>
+        <text x="124" y="31" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="28" y="63" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="60" y="63" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="92" y="63" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="156" y="31" text-anchor="middle" fill="#e05c3a" font-size="14">⚑</text>
+        <text x="188" y="31" text-anchor="middle" fill="#e05c3a" font-size="14">⚑</text>
+        <text x="92" y="96" text-anchor="middle" font-size="16">💣</text>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">Solo · Logic · Beat Your Best</div>
+        <div class="game-name" style="color:#2e6fc4">Minefield</div>
+        <div class="game-desc">Clear the grid without detonating a mine. Pure logic and nerve.</div>
+        <div class="game-btns">
+          <button class="btn btn-primary" onclick="showInstr('mines')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('minesweeper.html')">Play →</button>
         </div>
       </div>
     </div>
 
   </div>
-  <div class="hub-footer">Ashvaren Advisory Limited · Games Collection</div>
-</div>
 
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     DETAIL: DOTS & BOXES
-════════════════════════════════════════════════════════════════════════════ -->
-<div id="detail-dots" class="detail-screen">
-  <div class="detail-hero">
-    <svg viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="220" fill="#0e1420"/>
-      <g opacity="0.08" stroke="#d8e2f0" stroke-width="0.5">
-        <line x1="100" y1="0" x2="100" y2="220"/><line x1="200" y1="0" x2="200" y2="220"/>
-        <line x1="300" y1="0" x2="300" y2="220"/><line x1="400" y1="0" x2="400" y2="220"/>
-        <line x1="500" y1="0" x2="500" y2="220"/><line x1="600" y1="0" x2="600" y2="220"/>
-        <line x1="700" y1="0" x2="700" y2="220"/>
-        <line x1="0" y1="60" x2="800" y2="60"/><line x1="0" y1="120" x2="800" y2="120"/><line x1="0" y1="180" x2="800" y2="180"/>
-      </g>
-      <!-- Prominent claimed boxes -->
-      <rect x="102" y="62" width="96" height="56" fill="rgba(224,92,58,0.15)" rx="2"/>
-      <rect x="302" y="62" width="96" height="56" fill="rgba(58,158,224,0.15)" rx="2"/>
-      <rect x="202" y="122" width="96" height="56" fill="rgba(224,92,58,0.15)" rx="2"/>
-      <!-- Orange edges -->
-      <line x1="100" y1="60" x2="200" y2="60" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="100" y1="120" x2="200" y2="120" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="100" y1="60" x2="100" y2="120" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="200" y1="60" x2="200" y2="120" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <!-- Blue edges -->
-      <line x1="300" y1="60" x2="400" y2="60" stroke="#3a9ee0" stroke-width="5" stroke-linecap="round"/>
-      <line x1="300" y1="120" x2="400" y2="120" stroke="#3a9ee0" stroke-width="5" stroke-linecap="round"/>
-      <line x1="300" y1="60" x2="300" y2="120" stroke="#3a9ee0" stroke-width="5" stroke-linecap="round"/>
-      <line x1="400" y1="60" x2="400" y2="120" stroke="#3a9ee0" stroke-width="5" stroke-linecap="round"/>
-      <!-- Orange box 2 -->
-      <line x1="200" y1="120" x2="300" y2="120" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="200" y1="180" x2="300" y2="180" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="200" y1="120" x2="200" y2="180" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <line x1="300" y1="120" x2="300" y2="180" stroke="#e05c3a" stroke-width="5" stroke-linecap="round"/>
-      <!-- Initials -->
-      <text x="150" y="97" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="18" font-weight="700" opacity="0.9">P1</text>
-      <text x="350" y="97" text-anchor="middle" fill="#3a9ee0" font-family="'DM Mono',monospace" font-size="18" font-weight="700" opacity="0.9">P2</text>
-      <text x="250" y="157" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="18" font-weight="700" opacity="0.9">P1</text>
-      <!-- Dots -->
-      <g fill="#c8d0e0">
-        <circle cx="100" cy="60" r="5"/><circle cx="200" cy="60" r="5"/><circle cx="300" cy="60" r="5"/>
-        <circle cx="400" cy="60" r="5"/><circle cx="500" cy="60" r="5"/><circle cx="600" cy="60" r="5"/>
-        <circle cx="100" cy="120" r="5"/><circle cx="200" cy="120" r="5"/><circle cx="300" cy="120" r="5"/>
-        <circle cx="400" cy="120" r="5"/><circle cx="500" cy="120" r="5"/><circle cx="600" cy="120" r="5"/>
-        <circle cx="100" cy="180" r="5"/><circle cx="200" cy="180" r="5"/><circle cx="300" cy="180" r="5"/>
-        <circle cx="400" cy="180" r="5"/><circle cx="500" cy="180" r="5"/><circle cx="600" cy="180" r="5"/>
-      </g>
-    </svg>
-    <div class="detail-hero-overlay"></div>
-    <button class="detail-back btn btn-ghost" onclick="showHub()">← Back</button>
-    <div class="detail-hero-text">
-      <div class="detail-wordmark">Ashvaren</div>
-      <div class="detail-title" style="color:#e05c3a">Dots &amp; Boxes</div>
-      <div class="detail-tagline">Two Players · Strategy · Grid</div>
+  <div id="instr-wrap" style="display:none;margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin:0" id="instr-ttl"></div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('instr-wrap').style.display='none'">✕</button>
     </div>
-  </div>
-
-  <div class="detail-body">
-    <div class="detail-launch">
-      <button class="btn-launch btn-primary" style="background:#e05c3a" onclick="launchGame('dots')">Play Dots &amp; Boxes →</button>
-    </div>
-
-    <div class="section-heading">How to play</div>
-    <div class="section-rule"></div>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num" style="background:rgba(224,92,58,0.2);color:#e05c3a">1</div>
-        <div class="step-content">
-          <div class="step-title">Take turns drawing lines</div>
-          <div class="step-desc">Players alternate. On your turn, tap any gap between two adjacent dots to draw a horizontal or vertical line. You can only draw one line per turn.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(224,92,58,0.2);color:#e05c3a">2</div>
-        <div class="step-content">
-          <div class="step-title">Complete a box to score</div>
-          <div class="step-desc">If your line closes the fourth side of a square, you claim that box — your initials appear inside it. You then get a bonus turn and must draw another line immediately.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(224,92,58,0.2);color:#e05c3a">3</div>
-        <div class="step-content">
-          <div class="step-title">Chain your bonus turns</div>
-          <div class="step-desc">If your bonus turn also closes a box, you get another bonus turn. Expert play involves creating long chains of boxes to claim in a single run.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(224,92,58,0.2);color:#e05c3a">4</div>
-        <div class="step-content">
-          <div class="step-title">Most boxes wins</div>
-          <div class="step-desc">When every box is claimed, the player with the most boxes wins. Championship records are tracked across sessions.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-heading">Key diagram</div>
-    <div class="section-rule"></div>
-
-    <div class="diagram-wrap">
-      <svg viewBox="0 0 320 160" width="320" height="160" xmlns="http://www.w3.org/2000/svg">
-        <rect width="320" height="160" fill="#080c14" rx="8"/>
-        <!-- Three boxes: 2 closed, 1 about to close -->
-        <!-- Box 1 (claimed, orange) -->
-        <rect x="30" y="30" width="70" height="70" fill="rgba(224,92,58,0.12)" rx="2"/>
-        <line x1="30" y1="30" x2="100" y2="30" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="30" y1="100" x2="100" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="30" y1="30" x2="30" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="100" y1="30" x2="100" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-        <text x="65" y="72" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="13" font-weight="700">P1</text>
-        <!-- Box 2 (3 sides drawn, about to be taken) -->
-        <rect x="125" y="30" width="70" height="70" fill="rgba(58,158,224,0.06)" rx="2"/>
-        <line x1="125" y1="30" x2="195" y2="30" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-        <line x1="125" y1="30" x2="125" y2="100" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
-        <line x1="195" y1="30" x2="195" y2="100" stroke="#3a9ee0" stroke-width="4" stroke-linecap="round"/>
-        <!-- Missing bottom line — glowing hint -->
-        <line x1="125" y1="100" x2="195" y2="100" stroke="rgba(58,158,224,0.5)" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 4"/>
-        <text x="160" y="72" text-anchor="middle" fill="rgba(58,158,224,0.4)" font-family="'DM Mono',monospace" font-size="11">draw here!</text>
-        <!-- Arrow pointing to gap -->
-        <path d="M 160 118 L 160 106" stroke="#3a9ee0" stroke-width="2" marker-end="url(#arr)" opacity="0.7"/>
-        <defs>
-          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-            <path d="M0,0 L6,3 L0,6 Z" fill="#3a9ee0"/>
-          </marker>
-        </defs>
-        <!-- Labels -->
-        <text x="65" y="125" text-anchor="middle" fill="var(--muted)" font-family="'DM Mono',monospace" font-size="9" letter-spacing="0.08em">CLAIMED</text>
-        <text x="160" y="140" text-anchor="middle" fill="#3a9ee0" font-family="'DM Mono',monospace" font-size="9" letter-spacing="0.08em">3 SIDES DRAWN</text>
-        <!-- Dots -->
-        <g fill="#c8d0e0">
-          <circle cx="30" cy="30" r="4"/><circle cx="100" cy="30" r="4"/><circle cx="30" cy="100" r="4"/><circle cx="100" cy="100" r="4"/>
-          <circle cx="125" cy="30" r="4"/><circle cx="195" cy="30" r="4"/><circle cx="125" cy="100" r="4"/><circle cx="195" cy="100" r="4"/>
-        </g>
-      </svg>
-    </div>
-
-    <div class="tip-box">
-      <strong>Strategy tip:</strong> Avoid drawing the third side of any box — it hands your opponent an easy score. In the mid-game, sacrifice a small chain of two to avoid giving away a larger one.
-    </div>
-
-    <div style="margin-bottom:40px">
-      <div class="section-heading">AI difficulty</div>
-      <div class="section-rule"></div>
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-dim);line-height:1.6">
-        <div><span style="color:var(--text)">Easy</span> — takes boxes when it sees them, otherwise plays randomly.</div>
-        <div><span style="color:var(--text)">Medium</span> — avoids gifting three-sided boxes to you.</div>
-        <div><span style="color:var(--text)">Hard</span> — minimax lookahead to depth 4. Will plan ahead.</div>
-        <div><span style="color:var(--text)">Extreme</span> — depth-7 minimax. Very difficult to beat on a small grid.</div>
-      </div>
-    </div>
-
-    <button class="btn-launch btn-primary" style="background:#e05c3a;width:100%;border-radius:10px;padding:14px;font-size:13px;font-weight:700;letter-spacing:0.07em;color:#fff;border:none;cursor:pointer" onclick="launchGame('dots')">Play Dots &amp; Boxes →</button>
+    <div id="instr-body"></div>
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     DETAIL: HEX
-════════════════════════════════════════════════════════════════════════════ -->
-<div id="detail-hex" class="detail-screen">
-  <div class="detail-hero">
-    <svg viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="220" fill="#0e1420"/>
-      <!-- Large hex grid for hero -->
-      <g>
-        <!-- Row 0 -->
-        <polygon points="100,28 120,16 140,28 140,52 120,64 100,52" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="148,28 168,16 188,28 188,52 168,64 148,52" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="196,28 216,16 236,28 236,52 216,64 196,52" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="244,28 264,16 284,28 284,52 264,64 244,52" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="292,28 312,16 332,28 332,52 312,64 292,52" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="340,28 360,16 380,28 380,52 360,64 340,52" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="388,28 408,16 428,28 428,52 408,64 388,52" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <!-- Row 1 -->
-        <polygon points="124,68 144,56 164,68 164,92 144,104 124,92" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="172,68 192,56 212,68 212,92 192,104 172,92" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="220,68 240,56 260,68 260,92 240,104 220,92" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="268,68 288,56 308,68 308,92 288,104 268,92" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="316,68 336,56 356,68 356,92 336,104 316,92" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="364,68 384,56 404,68 404,92 384,104 364,92" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="412,68 432,56 452,68 452,92 432,104 412,92" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <!-- Row 2 -->
-        <polygon points="148,108 168,96 188,108 188,132 168,144 148,132" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="196,108 216,96 236,108 236,132 216,144 196,132" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="244,108 264,96 284,108 284,132 264,144 244,132" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="292,108 312,96 332,108 332,132 312,144 292,132" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="340,108 360,96 380,108 380,132 360,144 340,132" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="388,108 408,96 428,108 428,132 408,144 388,132" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="436,108 456,96 476,108 476,132 456,144 436,132" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <!-- Row 3 -->
-        <polygon points="172,148 192,136 212,148 212,172 192,184 172,172" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="220,148 240,136 260,148 260,172 240,184 220,172" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="268,148 288,136 308,148 308,172 288,184 268,172" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <polygon points="316,148 336,136 356,148 356,172 336,184 316,172" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="364,148 384,136 404,148 404,172 384,184 364,172" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="412,148 432,136 452,148 452,172 432,184 412,172" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-      </g>
-      <!-- Win path overlay -->
-      <polyline points="120,40 192,72 168,112 264,120 240,160 288,160" stroke="#c8924a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-      <div class="detail-hero-overlay"></div>
-    </svg>
-    <div class="detail-hero-overlay"></div>
-    <button class="detail-back btn btn-ghost" onclick="showHub()">← Back</button>
-    <div class="detail-hero-text">
-      <div class="detail-wordmark">Ashvaren</div>
-      <div class="detail-title" style="color:var(--copper)">Hex</div>
-      <div class="detail-tagline">Two Players · Topology · No Draws</div>
-    </div>
+<!-- CHAMPIONSHIP -->
+<div id="s-champ" class="screen">
+  <div class="page-title">Championship</div>
+  <div class="page-sub">Elo ratings · Win records · Head to head</div>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="itab('champ','lb',this)">Leaderboard</button>
+    <button class="inner-tab" onclick="itab('champ','h2h',this)">Head to Head</button>
+    <button class="inner-tab" onclick="itab('champ','recent',this)">Recent</button>
+    <button class="inner-tab" onclick="itab('champ','bygame',this)">By Game</button>
   </div>
-
-  <div class="detail-body">
-    <div class="detail-launch">
-      <button class="btn-launch" style="flex:1;background:var(--copper);color:#fff;border:none;cursor:pointer;padding:14px;border-radius:10px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.07em" onclick="launchGame('hex')">Play Hex →</button>
-    </div>
-
-    <div class="section-heading">The objective</div>
-    <div class="section-rule"></div>
-
-    <div class="diagram-wrap">
-      <svg viewBox="0 0 320 180" width="320" height="180" xmlns="http://www.w3.org/2000/svg">
-        <rect width="320" height="180" fill="#080c14" rx="8"/>
-        <!-- 5x5 mini board -->
-        <!-- Row 0 -->
-        <polygon points="60,28 76,18 92,28 92,48 76,58 60,48" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="100,28 116,18 132,28 132,48 116,58 100,48" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="140,28 156,18 172,28 172,48 156,58 140,48" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="180,28 196,18 212,28 212,48 196,58 180,48" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="220,28 236,18 252,28 252,48 236,58 220,48" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <!-- Row 1 -->
-        <polygon points="80,62 96,52 112,62 112,82 96,92 80,82" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="120,62 136,52 152,62 152,82 136,92 120,82" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="160,62 176,52 192,62 192,82 176,92 160,82" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="200,62 216,52 232,62 232,82 216,92 200,82" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="240,62 256,52 272,62 272,82 256,92 240,82" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <!-- Row 2 -->
-        <polygon points="100,96 116,86 132,96 132,116 116,126 100,116" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="140,96 156,86 172,96 172,116 156,126 140,116" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="180,96 196,86 212,96 212,116 196,126 180,116" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="220,96 236,86 252,96 252,116 236,126 220,116" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="260,96 276,86 292,96 292,116 276,126 260,116" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <!-- Row 3 -->
-        <polygon points="120,130 136,120 152,130 152,150 136,160 120,150" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
-        <polygon points="160,130 176,120 192,130 192,150 176,160 160,150" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <polygon points="200,130 216,120 232,130 232,150 216,160 200,150" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
-        <polygon points="240,130 256,120 272,130 272,150 256,160 240,150" fill="#111926" stroke="#243040" stroke-width="1"/>
-        <!-- Border strips - copper top/bottom -->
-        <rect x="50" y="8" width="210" height="8" rx="2" fill="rgba(200,146,74,0.3)"/>
-        <rect x="110" y="164" width="210" height="8" rx="2" fill="rgba(200,146,74,0.3)"/>
-        <!-- Border strips - ice left/right -->
-        <rect x="38" y="28" width="8" height="120" rx="2" fill="rgba(106,174,212,0.3)" transform="skewY(-25)"/>
-        <rect x="278" y="28" width="8" height="120" rx="2" fill="rgba(106,174,212,0.3)" transform="skewY(-25)"/>
-        <!-- Labels -->
-        <text x="155" y="14" text-anchor="middle" fill="rgba(200,146,74,0.9)" font-family="'DM Mono',monospace" font-size="8" letter-spacing="0.1em">COPPER: TOP → BOTTOM</text>
-        <text x="20" y="88" text-anchor="middle" fill="rgba(106,174,212,0.9)" font-family="'DM Mono',monospace" font-size="7" transform="rotate(-90 20 88)">ICE: LEFT → RIGHT</text>
-        <!-- Win path -->
-        <polyline points="76,38 136,72 196,106 216,140" stroke="#c8924a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-      </svg>
-    </div>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num" style="background:rgba(200,146,74,0.2);color:var(--copper)">1</div>
-        <div class="step-content">
-          <div class="step-title">Choose your colour</div>
-          <div class="step-desc"><strong style="color:var(--copper)">Copper</strong> must connect the <strong style="color:var(--copper)">top edge to the bottom edge</strong>. <strong style="color:var(--ice)">Ice</strong> must connect the <strong style="color:var(--ice)">left edge to the right edge</strong>. The coloured border strips on the board show your direction.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(200,146,74,0.2);color:var(--copper)">2</div>
-        <div class="step-content">
-          <div class="step-title">Place one stone per turn</div>
-          <div class="step-desc">Players alternate. On your turn, tap any empty hexagon to place your stone there. You cannot move or remove stones once placed.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(200,146,74,0.2);color:var(--copper)">3</div>
-        <div class="step-content">
-          <div class="step-title">Connect edge to edge</div>
-          <div class="step-desc">The winner is the first player to form an unbroken chain of their stones connecting both of their sides. The chain can wind and branch — only connectivity matters.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(200,146,74,0.2);color:var(--copper)">4</div>
-        <div class="step-content">
-          <div class="step-title">There are no draws</div>
-          <div class="step-desc">By mathematical proof, one player must always win. Blocking your opponent directly advances your own connection. Every stone counts.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tip-box">
-      <strong>Strategy tip:</strong> The centre of the board is the most valuable territory. Control the centre and your connection has the shortest possible path. Bridges — pairs of stones with a shared safe connector — are the building blocks of strong Hex play.
-    </div>
-
-    <button style="width:100%;padding:14px;border-radius:10px;background:var(--copper);color:#fff;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.07em" onclick="launchGame('hex')">Play Hex →</button>
+  <div id="champ-lb" class="inner-panel active"></div>
+  <div id="champ-h2h" class="inner-panel"></div>
+  <div id="champ-recent" class="inner-panel"></div>
+  <div id="champ-bygame" class="inner-panel"></div>
+  <div style="margin-top:28px">
+    <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete ALL results and reset Elo ratings?')){ACV.clearAll();renderChamp()}">Reset all records</button>
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     DETAIL: MINESWEEPER
-════════════════════════════════════════════════════════════════════════════ -->
-<div id="detail-mines" class="detail-screen">
-  <div class="detail-hero">
-    <svg viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="220" fill="#0e1420"/>
-      <!-- Grid of cells -->
-      <g>
-        <!-- Hidden cells -->
-        <rect x="20" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="62" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="104" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="146" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="188" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="230" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="272" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="314" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <!-- Row 1 -->
-        <rect x="20" y="62" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="62" y="62" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="104" y="62" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="146" y="62" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="188" y="62" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="230" y="62" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="272" y="62" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="314" y="62" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <!-- Row 2 -->
-        <rect x="20" y="104" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="62" y="104" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="104" y="104" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="146" y="104" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-        <rect x="188" y="104" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="230" y="104" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="272" y="104" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="314" y="104" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <!-- Row 3 hidden -->
-        <rect x="20" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="62" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="104" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="146" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="188" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="230" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="272" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-        <rect x="314" y="146" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-      </g>
-      <!-- Numbers -->
-      <text x="39" y="87" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="16" font-weight="700">1</text>
-      <text x="81" y="87" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="16" font-weight="700">2</text>
-      <text x="123" y="87" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="16" font-weight="700">3</text>
-      <text x="165" y="87" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="16" font-weight="700">2</text>
-      <text x="207" y="87" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="16" font-weight="700">1</text>
-      <text x="39" y="129" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="16" font-weight="700">1</text>
-      <text x="81" y="129" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="16" font-weight="700">2</text>
-      <text x="123" y="129" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="16" font-weight="700">2</text>
-      <text x="165" y="129" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="16" font-weight="700">1</text>
-      <!-- Flags -->
-      <text x="249" y="91" text-anchor="middle" fill="#e05c3a" font-size="20">⚑</text>
-      <text x="291" y="91" text-anchor="middle" fill="#e05c3a" font-size="20">⚑</text>
-      <text x="333" y="49" text-anchor="middle" fill="#e05c3a" font-size="20">⚑</text>
-    </svg>
-    <div class="detail-hero-overlay"></div>
-    <button class="detail-back btn btn-ghost" onclick="showHub()">← Back</button>
-    <div class="detail-hero-text">
-      <div class="detail-wordmark">Ashvaren</div>
-      <div class="detail-title" style="color:var(--accent)">Minefield</div>
-      <div class="detail-tagline">Solo · Logic · Deduction</div>
-    </div>
-  </div>
-
-  <div class="detail-body">
-    <div class="detail-launch">
-      <button class="btn-launch btn-primary" style="background:var(--accent)" onclick="launchGame('mines')">Enter the Minefield →</button>
-    </div>
-
-    <div class="section-heading">How to play</div>
-    <div class="section-rule"></div>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num" style="background:rgba(46,111,196,0.2);color:var(--accent)">1</div>
-        <div class="step-content">
-          <div class="step-title">Click to reveal a cell</div>
-          <div class="step-desc">Left-click any hidden cell to reveal it. The first click is always safe — mines are placed after your first move, keeping a 3×3 safe zone around it.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(46,111,196,0.2);color:var(--accent)">2</div>
-        <div class="step-content">
-          <div class="step-title">Read the numbers</div>
-          <div class="step-desc">Each revealed number tells you exactly how many mines are hidden in its eight neighbouring cells. A blank cell has zero mine neighbours and will automatically flood-reveal the surrounding safe area.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(46,111,196,0.2);color:var(--accent)">3</div>
-        <div class="step-content">
-          <div class="step-title">Flag suspected mines</div>
-          <div class="step-desc">Right-click (or long-press on mobile) to place a flag ⚑ on a cell you believe contains a mine. Flags prevent accidental clicks. The HUD tracks how many mines remain unflagged.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num" style="background:rgba(46,111,196,0.2);color:var(--accent)">4</div>
-        <div class="step-content">
-          <div class="step-title">Clear the field to win</div>
-          <div class="step-desc">Reveal every safe cell without detonating a single mine. Your time is recorded — best times are saved per difficulty so you can beat your personal record.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-heading">Number guide</div>
-    <div class="section-rule"></div>
-
-    <div class="diagram-wrap">
-      <svg viewBox="0 0 320 120" width="320" height="120" xmlns="http://www.w3.org/2000/svg">
-        <rect width="320" height="120" fill="#080c14" rx="8"/>
-        <!-- Number cells with colour coding -->
-        <g>
-          <!-- 1 -->
-          <rect x="20" y="20" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-          <text x="39" y="45" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="20" font-weight="700">1</text>
-          <text x="39" y="75" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="9">1 mine</text>
-          <!-- 2 -->
-          <rect x="68" y="20" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-          <text x="87" y="45" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="20" font-weight="700">2</text>
-          <text x="87" y="75" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="9">2 mines</text>
-          <!-- 3 -->
-          <rect x="116" y="20" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-          <text x="135" y="45" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="20" font-weight="700">3</text>
-          <text x="135" y="75" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="9">3 mines</text>
-          <!-- 4 -->
-          <rect x="164" y="20" width="38" height="38" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
-          <text x="183" y="45" text-anchor="middle" fill="#9b59b6" font-family="'DM Mono',monospace" font-size="20" font-weight="700">4</text>
-          <text x="183" y="75" text-anchor="middle" fill="#9b59b6" font-family="'DM Mono',monospace" font-size="9">4 mines</text>
-          <!-- Flag -->
-          <rect x="222" y="20" width="38" height="38" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
-          <text x="241" y="45" text-anchor="middle" fill="#e05c3a" font-size="18">⚑</text>
-          <text x="241" y="75" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="9">flagged</text>
-          <!-- Mine -->
-          <rect x="270" y="20" width="38" height="38" rx="3" fill="#2a0808" stroke="#4a1010" stroke-width="1"/>
-          <text x="289" y="45" text-anchor="middle" font-size="18">💣</text>
-          <text x="289" y="75" text-anchor="middle" fill="#ff4444" font-family="'DM Mono',monospace" font-size="9">mine!</text>
-        </g>
-        <!-- Bottom rule line -->
-        <line x1="20" y1="90" x2="300" y2="90" stroke="#1a2535" stroke-width="0.5"/>
-        <text x="160" y="108" text-anchor="middle" fill="#3a4a5a" font-family="'DM Mono',monospace" font-size="8" letter-spacing="0.1em">EACH NUMBER = ADJACENT MINE COUNT</text>
-      </svg>
-    </div>
-
-    <div class="tip-box">
-      <strong>Logic tip:</strong> If a revealed "1" has only one unrevealed neighbour, that neighbour must be the mine — flag it. If a revealed number has exactly as many flagged neighbours as its value, all remaining neighbours are safe to reveal.
-    </div>
-
-    <div style="margin-bottom:40px">
-      <div class="section-heading">Difficulties</div>
-      <div class="section-rule"></div>
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-dim);line-height:1.6">
-        <div><span style="color:var(--text)">Cadet</span> — 9×9 grid, 10 mines. Good for learning the logic.</div>
-        <div><span style="color:var(--text)">Field</span> — 16×16 grid, 40 mines. The standard game.</div>
-        <div><span style="color:var(--text)">Expert</span> — 16×30 grid, 99 mines. Requires systematic logic and nerve.</div>
-        <div><span style="color:var(--text)">Custom</span> — set your own rows, columns, and mine count.</div>
-      </div>
-    </div>
-
-    <button style="width:100%;padding:14px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.07em" onclick="launchGame('mines')">Enter the Minefield →</button>
+<!-- PLAYERS -->
+<div id="s-players" class="screen">
+  <div class="page-title">Players</div>
+  <div class="page-sub">Family roster</div>
+  <div id="plist" class="player-list"></div>
+  <div class="add-form">
+    <input class="text-in" id="pname" placeholder="New player name" maxlength="14" style="flex:1;min-width:110px"/>
+    <input type="color" class="col-in" id="pcol" value="#c8924a"/>
+    <button class="btn btn-primary" onclick="addP()">Add</button>
   </div>
 </div>
 
 <script>
-  // ── Navigation ───────────────────────────────────────────────────────────────
-  function showHub() {
-    document.getElementById("hub").style.display = "flex";
-    document.querySelectorAll(".detail-screen").forEach(s => s.classList.remove("active"));
-    window.scrollTo(0, 0);
-  }
+const GL = ACV.GAME_LABELS, GC = ACV.GAME_COLOURS;
 
-  function showDetail(game) {
-    document.getElementById("hub").style.display = "none";
-    document.querySelectorAll(".detail-screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(`detail-${game}`).classList.add("active");
-    window.scrollTo(0, 0);
-  }
+function nav(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='champ')   renderChamp();
+  if(id==='players') renderPlayers();
+  if(id==='games')   renderBadges();
+}
+function go(url){ window.location.href = url; }
+function itab(group,id,el){
+  const p = document.getElementById(group+'-'+id);
+  p.closest('.screen').querySelectorAll('.inner-panel').forEach(x=>x.classList.remove('active'));
+  p.closest('.screen').querySelectorAll('.inner-tab').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active');
+  el.classList.add('active');
+}
 
-  function launchGame(game) {
-    const files = { dots: "dots-and-boxes.html", hex: "hex.html", mines: "minesweeper.html" };
-    window.location.href = files[game];
-  }
+// Badges
+function renderBadges(){
+  const rs = ACV.getResults();
+  const pm = Object.fromEntries(ACV.getPlayers().map(p=>[p.id,p]));
+  const el = document.getElementById('champ-badges');
+  const badges = ['dots','hex','mines'].map(g=>{
+    const last = rs.find(r=>r.game===g&&r.winnerId);
+    if(!last) return null;
+    const p = pm[last.winnerId];
+    return `<div class="badge"><span style="font-size:14px">🏆</span><div><div class="badge-game">${GL[g]}</div><div class="badge-name" style="color:${p?.colour||'var(--text)'}">${p?.name||'?'}</div></div></div>`;
+  }).filter(Boolean);
+  el.innerHTML = badges.length ? badges.join('') : '<div style="font-size:10px;color:var(--muted)">No games recorded yet.</div>';
+}
+
+// Championship
+function renderChamp(){
+  renderLB(); renderH2H(); renderRecent(); renderByGame();
+}
+function rc(i){ return i===0?'gold':i===1?'silver':i===2?'bronze':''; }
+function ri(i){ return i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1; }
+
+function renderLB(){
+  const lb = ACV.leaderboard();
+  const el = document.getElementById('champ-lb');
+  if(!lb.length){el.innerHTML='<div class="empty">No players yet.</div>';return;}
+  el.innerHTML=`<div class="lb">
+    <div class="lb-head"><div>#</div><div>Player</div><div style="text-align:right">Elo</div><div style="text-align:right">W</div><div style="text-align:right" class="hs">L</div><div style="text-align:right" class="hs">D</div></div>
+    ${lb.map((p,i)=>`<div class="lb-row">
+      <div class="lb-rank ${rc(i)}">${ri(i)}</div>
+      <div class="lb-player"><div class="lb-dot" style="background:${p.colour}"></div><div>
+        <div class="lb-name">${p.name}</div>
+        ${p.stats.streak>1?`<div class="lb-streak">🔥 ${p.stats.streak}</div>`:''}
+      </div></div>
+      <div class="lb-elo" style="color:${p.colour}">${p.elo}</div>
+      <div class="lb-cell w">${p.stats.total.w}</div>
+      <div class="lb-cell hs">${p.stats.total.l}</div>
+      <div class="lb-cell hs">${p.stats.total.d}</div>
+    </div>`).join('')}
+  </div>
+  <div style="font-size:9px;color:var(--muted);margin-top:7px;letter-spacing:0.07em">Elo starts at 1000. Updated after every two-player game.</div>`;
+}
+
+function renderH2H(){
+  const players=ACV.getPlayers(), el=document.getElementById('champ-h2h');
+  const pairs=[];
+  for(let i=0;i<players.length;i++)
+    for(let j=i+1;j<players.length;j++){
+      const h=ACV.headToHead(players[i].id,players[j].id);
+      if(h.total>0) pairs.push({a:players[i],b:players[j],h});
+    }
+  if(!pairs.length){el.innerHTML='<div class="empty">Play some games to build head-to-head records.</div>';return;}
+  el.innerHTML=`<div class="h2h-grid">${pairs.map(({a,b,h})=>`
+    <div class="h2h-card">
+      <div class="h2h-names">
+        <span class="h2h-name" style="color:${a.colour}">${a.name}</span>
+        <span class="h2h-vs">vs</span>
+        <span class="h2h-name" style="color:${b.colour}">${b.name}</span>
+        <span style="margin-left:auto;font-size:9px;color:var(--muted)">${h.total}g</span>
+      </div>
+      <div class="h2h-stats">
+        <div class="h2h-stat"><div class="h2h-num" style="color:${a.colour}">${h.wA}</div><div class="h2h-lbl">wins</div></div>
+        <div class="h2h-stat"><div class="h2h-num" style="color:var(--muted)">${h.d}</div><div class="h2h-lbl">draws</div></div>
+        <div class="h2h-stat"><div class="h2h-num" style="color:${b.colour}">${h.wB}</div><div class="h2h-lbl">wins</div></div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderRecent(){
+  const rs=ACV.recentResults(20), el=document.getElementById('champ-recent');
+  const pm=Object.fromEntries(ACV.getPlayers().map(p=>[p.id,p]));
+  if(!rs.length){el.innerHTML='<div class="empty">No games recorded yet.</div>';return;}
+  const ago=ts=>{const s=Math.floor((Date.now()-ts)/1000);return s<60?'just now':s<3600?Math.floor(s/60)+'m':s<86400?Math.floor(s/3600)+'h':Math.floor(s/86400)+'d';};
+  el.innerHTML=`<div class="results-list">${rs.map(r=>{
+    const w=r.winnerId?pm[r.winnerId]:null;
+    const names=r.players.map(id=>pm[id]?.name||id).join(' vs ');
+    return `<div class="result-row">
+      <span class="result-tag" style="background:${GC[r.game]}20;color:${GC[r.game]}">${GL[r.game]||r.game}</span>
+      <span class="result-names">${names}</span>
+      <span class="result-winner" style="color:${w?.colour||'var(--muted)'}">${w?w.name+' won':'Draw'}</span>
+      <span class="result-ago">${ago(r.ts)}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderByGame(){
+  const players=ACV.getPlayers(), el=document.getElementById('champ-bygame');
+  el.innerHTML=['dots','hex','mines'].map(g=>{
+    const rows=players.map(p=>{
+      const s=ACV.statsFor(p.id), gs=s.byGame[g]||{w:0,l:0,d:0};
+      return{p,gs,t:gs.w+gs.l+gs.d};
+    }).filter(r=>r.t>0).sort((a,b)=>b.gs.w-a.gs.w);
+    if(!rows.length) return `<div style="margin-bottom:20px"><div class="section-title" style="color:${GC[g]}">${GL[g]}</div><div class="rule"></div><div class="empty" style="padding:12px">No games yet.</div></div>`;
+    return `<div style="margin-bottom:20px">
+      <div class="section-title" style="color:${GC[g]}">${GL[g]}</div><div class="rule"></div>
+      <div class="lb"><div class="lb-head"><div>#</div><div>Player</div><div style="text-align:right">W</div><div style="text-align:right">L</div><div style="text-align:right" class="hs">D</div><div style="text-align:right" class="hs">Games</div></div>
+      ${rows.map((r,i)=>`<div class="lb-row">
+        <div class="lb-rank ${rc(i)}">${ri(i)}</div>
+        <div class="lb-player"><div class="lb-dot" style="background:${r.p.colour}"></div><div class="lb-name">${r.p.name}</div></div>
+        <div class="lb-cell w">${r.gs.w}</div><div class="lb-cell">${r.gs.l}</div>
+        <div class="lb-cell hs">${r.gs.d}</div><div class="lb-cell hs">${r.t}</div>
+      </div>`).join('')}</div></div>`;
+  }).join('');
+}
+
+// Players
+function renderPlayers(){
+  const pl=ACV.getPlayers(), el=document.getElementById('plist');
+  el.innerHTML=pl.map(p=>`<div class="player-row">
+    <div class="p-dot" style="background:${p.colour}"></div>
+    <div class="p-name">${p.name}</div>
+    <div class="p-elo">Elo ${ACV.playerElo(p.id)}</div>
+    <button class="btn btn-ghost btn-sm" onclick="rmP('${p.id}')">Remove</button>
+  </div>`).join('');
+}
+function rmP(id){if(confirm('Remove player?')){ACV.removePlayer(id);renderPlayers();}}
+function addP(){
+  const n=document.getElementById('pname').value.trim();
+  if(!n) return;
+  ACV.addPlayer(n,document.getElementById('pcol').value);
+  document.getElementById('pname').value='';
+  renderPlayers();
+}
+
+// Instructions
+const INSTRS = {
+  dots:{
+    colour:'#e05c3a',file:'dots-and-boxes.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><rect x="82" y="22" width="66" height="56" fill="rgba(224,92,58,0.15)" rx="2"/><rect x="232" y="62" width="66" height="56" fill="rgba(46,111,196,0.15)" rx="2"/><line x1="80" y1="20" x2="150" y2="20" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="80" x2="150" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="20" x2="80" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="20" x2="150" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="60" x2="300" y2="60" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="120" x2="300" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="60" x2="230" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="300" y1="60" x2="300" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><text x="115" y="57" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="15" font-weight="700">P1</text><text x="265" y="97" text-anchor="middle" fill="#2e6fc4" font-family="'DM Mono',monospace" font-size="15" font-weight="700">P2</text><rect x="152" y="62" width="66" height="56" fill="rgba(224,92,58,0.06)" rx="2"/><line x1="150" y1="60" x2="220" y2="60" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="60" x2="150" y2="120" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="220" y1="60" x2="220" y2="120" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="120" x2="220" y2="120" stroke="rgba(46,111,196,0.4)" stroke-width="4" stroke-linecap="round" stroke-dasharray="7 5"/><text x="185" y="97" text-anchor="middle" fill="rgba(46,111,196,0.4)" font-family="'DM Mono',monospace" font-size="10">tap here!</text><g fill="#c8d0e0"><circle cx="80" cy="20" r="4"/><circle cx="150" cy="20" r="4"/><circle cx="220" cy="20" r="4"/><circle cx="300" cy="20" r="4"/><circle cx="80" cy="80" r="4"/><circle cx="150" cy="80" r="4"/><circle cx="220" cy="80" r="4"/><circle cx="300" cy="80" r="4"/><circle cx="80" cy="120" r="4"/><circle cx="150" cy="120" r="4"/><circle cx="220" cy="120" r="4"/><circle cx="300" cy="120" r="4"/></g></svg>`,
+    steps:[
+      {t:'Take turns drawing one line',d:'Tap any gap between two dots to draw a horizontal or vertical line. One line per turn.'},
+      {t:'Complete a box to score',d:'If your line closes the fourth side of a square, you claim it. Your initial appears inside and you get a bonus turn.'},
+      {t:'Chain your bonus turns',d:'Claiming a box earns another turn. Expert play means sacrificing small chains to avoid handing away larger ones.'},
+      {t:'Most boxes wins',d:'When all boxes are claimed, the player with more wins. Results feed the championship table automatically.'},
+    ],
+    tip:'Avoid drawing the third side of any box — that gifts your opponent an easy score. Sacrifice two to save five.',
+    ai:'Four AI levels available: Easy (random), Medium (avoids gifting boxes), Hard (minimax depth 4), Extreme (minimax depth 7).',
+  },
+  hex:{
+    colour:'#c8924a',file:'hex.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><polygon points="60,20 76,10 92,20 92,40 76,50 60,40" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="100,20 116,10 132,20 132,40 116,50 100,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="140,20 156,10 172,20 172,40 156,50 140,40" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="180,20 196,10 212,20 212,40 196,50 180,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="220,20 236,10 252,20 252,40 236,50 220,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="80,56 96,46 112,56 112,76 96,86 80,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="120,56 136,46 152,56 152,76 136,86 120,76" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="160,56 176,46 192,56 192,76 176,86 160,76" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/><polygon points="200,56 216,46 232,56 232,76 216,86 200,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="240,56 256,46 272,56 272,76 256,86 240,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="100,92 116,82 132,92 132,112 116,122 100,112" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/><polygon points="140,92 156,82 172,92 172,112 156,122 140,112" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="180,92 196,82 212,92 212,112 196,122 180,112" fill="#111926" stroke="#243040" stroke-width="1"/><polyline points="76,30 136,66 156,102" stroke="#c8924a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/><rect x="52" y="2" width="208" height="6" rx="2" fill="rgba(200,146,74,0.3)"/><rect x="92" y="132" width="170" height="6" rx="2" fill="rgba(200,146,74,0.3)"/><text x="330" y="50" fill="rgba(200,146,74,0.8)" font-family="'DM Mono',monospace" font-size="11">Copper: top → bottom</text><text x="330" y="72" fill="rgba(106,174,212,0.7)" font-family="'DM Mono',monospace" font-size="11">Ice: left → right</text><text x="330" y="100" fill="var(--text-dim,#6a7a90)" font-family="'DM Mono',monospace" font-size="10">No draws possible</text></svg>`,
+    steps:[
+      {t:'Pick your colour and direction',d:'Copper connects top to bottom. Ice connects left to right. The coloured border strips on the board show your direction.'},
+      {t:'Place one stone per turn',d:'Tap any empty hexagon to place your stone. Players alternate. Stones cannot be moved or removed once placed.'},
+      {t:'Form an unbroken chain',d:'The first player to connect both their edges with an unbroken chain of their own stones wins.'},
+      {t:'No draws are possible',d:'By mathematical proof, one player must always win. Every stone you place is also a potential block against your opponent.'},
+    ],
+    tip:'The centre of the board gives the shortest path across. Bridges — two stones sharing a safe connecting gap — are the core building blocks of strong play.',
+    ai:'Four AI levels: Easy (random), Medium (greedy defence), Hard (Monte Carlo 300 simulations), Extreme (Monte Carlo 800 simulations).',
+  },
+  mines:{
+    colour:'#2e6fc4',file:'minesweeper.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><rect x="14" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="52" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="90" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="128" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="166" y="14" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="204" y="14" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="14" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="52" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="90" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="128" y="52" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="14" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="52" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="90" y="90" width="34" height="34" rx="3" fill="#2a0808" stroke="#4a1010"/><rect x="128" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><text x="31" y="37" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="69" y="37" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="107" y="37" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="15" font-weight="700">3</text><text x="145" y="37" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="31" y="75" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="69" y="75" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="107" y="75" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="183" y="37" text-anchor="middle" fill="#e05c3a" font-size="16">⚑</text><text x="221" y="37" text-anchor="middle" fill="#e05c3a" font-size="16">⚑</text><text x="107" y="114" text-anchor="middle" font-size="18">💣</text><text x="310" y="45" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="11">1 = one adjacent mine</text><text x="310" y="67" fill="#50c878" font-family="'DM Mono',monospace" font-size="11">2 = two adjacent mines</text><text x="310" y="89" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="11">⚑ = flagged mine</text><text x="310" y="111" fill="#ff4444" font-family="'DM Mono',monospace" font-size="11">💣 = game over</text></svg>`,
+    steps:[
+      {t:'Click to reveal a cell',d:'Left-click any hidden cell to reveal it. Your first click is always safe — mines are placed after, with a safe zone around your click.'},
+      {t:'Read the numbers',d:'Each number tells you how many of its eight neighbours contain mines. A blank cell has no mine neighbours and auto-reveals the surrounding safe area.'},
+      {t:'Flag suspected mines',d:'Right-click (or long-press on mobile) to place a flag ⚑. This prevents accidental clicks. The HUD tracks unflagged mines remaining.'},
+      {t:'Clear the field to win',d:'Reveal every safe cell without detonating anything. Completion times are saved as personal bests per difficulty level.'},
+    ],
+    tip:'If a "1" has only one unrevealed neighbour, flag it immediately. If a number already has as many flags as its value, all other neighbours are safe to click.',
+    ai:null,
+  },
+};
+
+function showInstr(game){
+  const d=INSTRS[game], c=d.colour;
+  document.getElementById('instr-ttl').textContent=`${ACV.GAME_LABELS[game]} — How to Play`;
+  document.getElementById('instr-body').innerHTML=`
+    <div class="instr-hero">${d.hero}</div>
+    <div class="steps">${d.steps.map((s,i)=>`<div class="step">
+      <div class="step-num" style="background:${c}22;color:${c}">${i+1}</div>
+      <div><div class="step-title">${s.t}</div><div class="step-desc">${s.d}</div></div>
+    </div>`).join('')}</div>
+    <div class="tip"><strong>Tip:</strong> ${d.tip}</div>
+    ${d.ai?`<div class="tip" style="border-color:var(--muted)"><strong>AI:</strong> ${d.ai}</div>`:''}
+    <button class="btn" style="background:${c};color:#fff;width:100%;padding:12px;font-size:12px;border-radius:8px" onclick="go('${d.file}')">Play ${ACV.GAME_LABELS[game]} →</button>
+  `;
+  const w=document.getElementById('instr-wrap');
+  w.style.display='block';
+  w.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+renderBadges();
 </script>
 </body>
 </html>

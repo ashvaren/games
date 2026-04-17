@@ -1,719 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Dots &amp; Boxes" />
-  <title>Dots &amp; Boxes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Dots &amp; Boxes — Ashvaren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="ashvaren.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: #080c14; }
-    body { font-family: 'DM Mono','Courier New',monospace; -webkit-tap-highlight-color: transparent; }
-    #root { min-height: 100vh; }
-    input, button { -webkit-appearance: none; }
+    :root{--bg:#080c14;--surface:#0e1420;--surface2:#111926;--border:#1a2535;--accent:#2e6fc4;--text:#d8e2f0;--text-dim:#6a7a90;--muted:#3a4a5a}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg)}
+    body{font-family:'DM Mono','Courier New',monospace;color:var(--text);-webkit-tap-highlight-color:transparent}
+    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
+    .overlay{position:fixed;inset:0;background:rgba(8,12,20,0.96);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 28px;max-width:420px;width:100%;text-align:center}
+    .wm{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--text-dim);margin-bottom:4px}
+    .gtitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;letter-spacing:0.03em;margin-bottom:4px;color:#e05c3a}
+    .gsub{font-size:9px;letter-spacing:0.18em;color:var(--muted);margin-bottom:26px;text-transform:uppercase}
+    .sec-lbl{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;text-align:left}
+    .sec{margin-bottom:18px;text-align:left}
+    .seg-row{display:flex;gap:7px}
+    .seg{flex:1;padding:9px 4px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s,background .15s;cursor:pointer}
+    .seg:hover{border-color:var(--accent)}
+    .seg.on{border-color:var(--accent);background:rgba(46,111,196,.15)}
+    .seg-main{font-weight:700;letter-spacing:.05em}
+    .seg-sub{font-size:8px;color:var(--muted)}
+    .name-row{display:flex;align-items:center;gap:9px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:7px 11px;margin-bottom:7px}
+    .ndot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .nin{background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;flex:1;letter-spacing:.04em}
+    .btn{padding:8px 18px;border-radius:6px;border:none;font-size:11px;font-weight:700;letter-spacing:.07em;transition:opacity .15s;cursor:pointer}
+    .btn:hover{opacity:.82}
+    .btn-p{background:#e05c3a;color:#fff}
+    .btn-a{background:var(--accent);color:#fff}
+    .btn-g{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
+    .btn-lg{width:100%;padding:13px;font-size:12px;border-radius:9px;margin-top:6px}
+    .diff-btn{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-family:'DM Mono',monospace;text-align:left;transition:border-color .15s,background .15s;margin-bottom:6px;width:100%}
+    .diff-btn.on{border-color:var(--accent);background:rgba(46,111,196,.14)}
+    .diff-lbl{font-size:11px;font-weight:700;color:var(--text);letter-spacing:.05em;min-width:58px}
+    .diff-desc{font-size:9px;color:var(--muted);letter-spacing:.03em}
+    #game{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px 40px;gap:10px}
+    .turn-banner{color:#fff;font-size:13px;font-weight:700;letter-spacing:.07em;padding:11px 30px;border-radius:40px;transition:background .3s,box-shadow .3s;text-align:center;min-width:200px}
+    .score-row{display:flex;gap:10px}
+    .score-card{border:2px solid;border-radius:10px;overflow:hidden;min-width:130px;position:relative;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+    .sc-bar{height:3px;transition:opacity .2s}
+    .sc-inner{padding:8px 12px;display:flex;align-items:center;gap:8px}
+    .sc-name{color:var(--text-dim);font-size:10px;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .sc-tag{font-size:8px;color:#3a6e9e;letter-spacing:.05em;margin-top:1px}
+    .sc-num{font-size:22px;font-weight:700;line-height:1}
+    .sc-arr{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:8px;opacity:.6}
+    .svg-wrap{display:flex;justify-content:center}
+    .footer{display:flex;gap:8px;margin-top:2px}
+    .back-link{font-size:10px;color:var(--text-dim);letter-spacing:.06em;cursor:pointer;background:none;border:none;margin-bottom:4px}
+    .back-link:hover{color:var(--text)}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-  <script type="text/babel">
-    const { useState, useCallback, useRef, useEffect } = React;
 
-// ── Constants ──────────────────────────────────────────────────────────────────
-const GRID_SIZES = {
-  small:  { dots: 4, label: "Small",  sub: "3 × 3" },
-  medium: { dots: 6, label: "Medium", sub: "5 × 5" },
-  large:  { dots: 8, label: "Large",  sub: "7 × 7" },
-};
-const CELL_SIZES = { small: 80, medium: 66, large: 54 };
-const P_COLORS   = ["#e05c3a", "#3a9ee0"];
-const P_LIGHTS   = ["#e05c3a28", "#3a9ee028"];
+<!-- SETUP OVERLAY -->
+<div class="overlay" id="setup-overlay">
+  <div class="card">
+    <button class="back-link" onclick="window.location.href='index.html'">← Hub</button>
+    <div class="wm">Ashvaren</div>
+    <div class="gtitle">Dots &amp; Boxes</div>
+    <div class="gsub">Strategy · Grid · Championship</div>
 
-const AI_LEVELS = {
-  easy:    { label: "Easy",        desc: "Greedy — takes boxes, otherwise random" },
-  medium:  { label: "Medium",      desc: "Avoids gifting boxes to opponent" },
-  hard:    { label: "Hard",        desc: "Minimax lookahead (depth 4)" },
-  extreme: { label: "Extreme",     desc: "Minimax lookahead (depth 7)" },
-};
+    <!-- Step 0: mode -->
+    <div id="step0">
+      <div class="sec"><div class="sec-lbl">Game mode</div>
+        <div class="seg-row">
+          <button class="seg on" id="mode-hvh" onclick="setMode('hvh')"><span class="seg-main">Two Players</span><span class="seg-sub">Local</span></button>
+          <button class="seg" id="mode-hvc" onclick="setMode('hvc')"><span class="seg-main">vs Computer</span><span class="seg-sub">AI</span></button>
+        </div>
+      </div>
+      <div class="sec"><div class="sec-lbl">Grid size</div>
+        <div class="seg-row" id="size-segs">
+          <button class="seg" data-size="4" onclick="setSz(this)"><span class="seg-main">Small</span><span class="seg-sub">3×3</span></button>
+          <button class="seg on" data-size="6" onclick="setSz(this)"><span class="seg-main">Medium</span><span class="seg-sub">5×5</span></button>
+          <button class="seg" data-size="8" onclick="setSz(this)"><span class="seg-main">Large</span><span class="seg-sub">7×7</span></button>
+        </div>
+      </div>
+      <button class="btn btn-p btn-lg" onclick="goStep1()">Next →</button>
+    </div>
 
-// ── Game logic helpers ─────────────────────────────────────────────────────────
-function initEdges(size) {
-  return {
-    h: Array.from({ length: size },     () => Array(size - 1).fill(null)),
-    v: Array.from({ length: size - 1 }, () => Array(size).fill(null)),
-  };
-}
-function initBoxes(size) {
-  return Array.from({ length: size - 1 }, () => Array(size - 1).fill(null));
-}
-function checkBox(edges, r, c) {
-  return edges.h[r][c] !== null && edges.h[r+1][c] !== null &&
-         edges.v[r][c] !== null && edges.v[r][c+1]  !== null;
-}
-function cloneEdges(e) {
-  return { h: e.h.map(r => [...r]), v: e.v.map(r => [...r]) };
-}
-function cloneBoxes(b) {
-  return b.map(r => [...r]);
-}
-function applyMove(edges, boxes, move, player, gs) {
-  const ne = cloneEdges(edges);
-  const nb = cloneBoxes(boxes);
-  if (move.type === "h") ne.h[move.r][move.c] = player;
-  else ne.v[move.r][move.c] = player;
-  let claimed = 0;
-  for (let r = 0; r < gs-1; r++)
-    for (let c = 0; c < gs-1; c++)
-      if (nb[r][c] === null && checkBox(ne, r, c)) { nb[r][c] = player; claimed++; }
-  return { ne, nb, claimed };
-}
-function getLegalMoves(edges, gs) {
-  const moves = [];
-  for (let r = 0; r < gs; r++)
-    for (let c = 0; c < gs-1; c++)
-      if (edges.h[r][c] === null) moves.push({ type:"h", r, c });
-  for (let r = 0; r < gs-1; r++)
-    for (let c = 0; c < gs; c++)
-      if (edges.v[r][c] === null) moves.push({ type:"v", r, c });
-  return moves;
-}
-function sideCount(edges, r, c) {
-  return (edges.h[r][c]!==null?1:0) + (edges.h[r+1][c]!==null?1:0) +
-         (edges.v[r][c]!==null?1:0) + (edges.v[r][c+1]!==null?1:0);
-}
-function scorePosition(boxes, gs) {
-  let s = 0;
-  for (let r = 0; r < gs-1; r++)
-    for (let c = 0; c < gs-1; c++)
-      if (boxes[r][c] === 1) s++;
-      else if (boxes[r][c] === 0) s--;
-  return s;
-}
+    <!-- Step 1: players + ai level -->
+    <div id="step1" style="display:none">
+      <div class="sec"><div class="sec-lbl">Player names</div>
+        <div class="name-row"><div class="ndot" style="background:#e05c3a"></div>
+          <select class="nin" id="p1sel" style="cursor:pointer"></select>
+        </div>
+        <div class="name-row" id="p2-row"><div class="ndot" style="background:#3a9ee0"></div>
+          <select class="nin" id="p2sel" style="cursor:pointer"></select>
+        </div>
+      </div>
+      <div class="sec" id="ai-sec" style="display:none"><div class="sec-lbl">AI difficulty</div>
+        <button class="diff-btn" data-lv="easy" onclick="setLv(this)"><span class="diff-lbl">Easy</span><span class="diff-desc">Greedy — takes boxes, otherwise random</span></button>
+        <button class="diff-btn on" data-lv="medium" onclick="setLv(this)"><span class="diff-lbl">Medium</span><span class="diff-desc">Avoids gifting boxes to you</span></button>
+        <button class="diff-btn" data-lv="hard" onclick="setLv(this)"><span class="diff-lbl">Hard</span><span class="diff-desc">Minimax lookahead, depth 4</span></button>
+        <button class="diff-btn" data-lv="extreme" onclick="setLv(this)"><span class="diff-lbl">Extreme</span><span class="diff-desc">Minimax lookahead, depth 7</span></button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g" onclick="goStep0()" style="flex:0 0 auto">← Back</button>
+        <button class="btn btn-p btn-lg" style="flex:1" onclick="launchGame()">Start Game</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-// ── AI implementations ─────────────────────────────────────────────────────────
+<!-- WIN OVERLAY -->
+<div class="overlay" id="win-overlay" style="display:none">
+  <div class="card">
+    <div class="wm" style="margin-bottom:8px">Result</div>
+    <div id="win-icon" style="font-size:40px;margin-bottom:8px"></div>
+    <div id="win-name" style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;margin-bottom:4px"></div>
+    <div id="win-sub" style="font-size:10px;color:var(--text-dim);margin-bottom:20px;letter-spacing:.06em"></div>
+    <div style="display:flex;gap:9px;justify-content:center">
+      <button class="btn btn-p" onclick="rematch()">Rematch</button>
+      <button class="btn btn-a" onclick="newSetup()">New Game</button>
+      <button class="btn btn-g" onclick="window.location.href='index.html'">Hub</button>
+    </div>
+  </div>
+</div>
 
-// Easy: claim if available, otherwise random (may gift boxes)
-function aiEasy(edges, boxes, gs) {
-  const moves = getLegalMoves(edges, gs);
-  for (const m of moves) {
-    const { claimed } = applyMove(edges, boxes, m, 1, gs);
-    if (claimed > 0) return m;
-  }
-  return moves[Math.floor(Math.random() * moves.length)] || null;
+<!-- GAME -->
+<div id="game" style="display:none">
+  <button class="back-link" onclick="newSetup()">← Menu</button>
+  <div class="turn-banner" id="turn-banner">—</div>
+  <div class="score-row" id="score-row"></div>
+  <div class="svg-wrap"><svg id="board"></svg></div>
+  <div class="footer">
+    <button class="btn btn-p" onclick="rematch()">New Game</button>
+    <button class="btn btn-g" onclick="window.location.href='index.html'">Hub 🏆</button>
+  </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const GRID_SIZES={small:4,medium:6,large:8};
+const CELL_SIZES={4:80,6:66,8:54};
+let cfg={mode:'hvh',gs:6,aiLevel:'medium',players:[]};
+let currentCfg=null;
+
+// ── Game state ──────────────────────────────────────────────────────────────
+let edges,boxes,current,scores,gameOver,hovered,aiThinking;
+let boxesRef,scoresRef;
+
+// ── Setup helpers ───────────────────────────────────────────────────────────
+function setMode(m){
+  cfg.mode=m;
+  ['hvh','hvc'].forEach(x=>document.getElementById('mode-'+x).classList.toggle('on',x===m));
+  document.getElementById('p2-row').style.display=m==='hvc'?'none':'flex';
+  document.getElementById('ai-sec').style.display=m==='hvc'?'block':'none';
 }
-
-// Medium: claim if available, otherwise avoid gifting 3-sided boxes
-function aiMedium(edges, boxes, gs) {
-  const moves = getLegalMoves(edges, gs);
-  // 1. take any completing move
-  for (const m of moves) {
-    const { claimed } = applyMove(edges, boxes, m, 1, gs);
-    if (claimed > 0) return m;
-  }
-  // 2. avoid moves that complete a box for opponent (3-sided)
-  const safe = moves.filter(m => {
-    const { ne } = applyMove(edges, boxes, m, 1, gs);
-    for (let r = 0; r < gs-1; r++)
-      for (let c = 0; c < gs-1; c++)
-        if (boxes[r][c] === null && sideCount(ne, r, c) === 3) return false;
-    return true;
+function setSz(btn){
+  cfg.gs=+btn.dataset.size;
+  document.querySelectorAll('#size-segs .seg').forEach(b=>b.classList.toggle('on',b===btn));
+}
+function setLv(btn){
+  cfg.aiLevel=btn.dataset.lv;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.toggle('on',b===btn));
+}
+function populateSelects(){
+  const players=ACV.getPlayers();
+  ['p1sel','p2sel'].forEach((id,i)=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML=players.map(p=>`<option value="${p.id}" style="background:#0e1420">${p.name}</option>`).join('');
+    if(players[i]) sel.value=players[i].id;
   });
-  const pool = safe.length ? safe : moves;
-  return pool[Math.floor(Math.random() * pool.length)];
+}
+function goStep1(){document.getElementById('step0').style.display='none';document.getElementById('step1').style.display='block';populateSelects();}
+function goStep0(){document.getElementById('step1').style.display='none';document.getElementById('step0').style.display='block';}
+
+function launchGame(){
+  const players=ACV.getPlayers();
+  const pmap=Object.fromEntries(players.map(p=>[p.id,p]));
+  const p1id=document.getElementById('p1sel').value;
+  const p1=pmap[p1id]||players[0];
+  const pColors=['#e05c3a','#3a9ee0'];
+  if(cfg.mode==='hvc'){
+    cfg.players=[
+      {...p1,colour:pColors[0],light:pColors[0]+'28'},
+      {id:'cpu',name:'Computer',colour:pColors[1],light:pColors[1]+'28',initial:'CPU'},
+    ];
+  } else {
+    const p2id=document.getElementById('p2sel').value;
+    const p2=pmap[p2id]||players[1]||players[0];
+    cfg.players=[
+      {...p1,colour:pColors[0],light:pColors[0]+'28'},
+      {...p2,colour:pColors[1],light:pColors[1]+'28'},
+    ];
+  }
+  cfg.players.forEach((p,i)=>{if(!p.initial)p.initial=p.name.slice(0,3).toUpperCase();});
+  currentCfg={...cfg,players:[...cfg.players]};
+  startGame();
 }
 
-// Minimax with alpha-beta pruning
-function minimax(edges, boxes, gs, depth, alpha, beta, isAI, totalBoxes) {
-  const filled = boxes.flat().filter(v => v !== null).length;
-  if (depth === 0 || filled === totalBoxes) return scorePosition(boxes, gs);
+function newSetup(){
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('game').style.display='none';
+  document.getElementById('step0').style.display='block';
+  document.getElementById('step1').style.display='none';
+  document.getElementById('setup-overlay').style.display='flex';
+}
+function rematch(){ if(currentCfg){cfg={...currentCfg,players:[...currentCfg.players]};startGame();} }
 
-  const moves = getLegalMoves(edges, gs);
-  if (moves.length === 0) return scorePosition(boxes, gs);
+// ── Game logic ──────────────────────────────────────────────────────────────
+function initEdges(s){return{h:Array.from({length:s},()=>Array(s-1).fill(null)),v:Array.from({length:s-1},()=>Array(s).fill(null))};}
+function initBoxes(s){return Array.from({length:s-1},()=>Array(s-1).fill(null));}
+function checkBox(e,r,c){return e.h[r][c]!==null&&e.h[r+1][c]!==null&&e.v[r][c]!==null&&e.v[r][c+1]!==null;}
+function clone(e){return{h:e.h.map(r=>[...r]),v:e.v.map(r=>[...r])};}
 
-  if (isAI) {
-    let best = -Infinity;
-    for (const m of moves) {
-      const { ne, nb, claimed } = applyMove(edges, boxes, m, 1, gs);
-      const val = minimax(ne, nb, gs, depth - 1, alpha, beta, claimed > 0 ? true : false, totalBoxes);
-      best = Math.max(best, val);
-      alpha = Math.max(alpha, val);
-      if (beta <= alpha) break;
+function startGame(){
+  document.getElementById('setup-overlay').style.display='none';
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('game').style.display='flex';
+  const gs=cfg.gs;
+  boxesRef=initBoxes(gs); scoresRef=[0,0];
+  edges=initEdges(gs); boxes=boxesRef;
+  current=0; scores=[0,0]; gameOver=false; hovered=null; aiThinking=false;
+  renderScoreRow();
+  renderBoard();
+  updateBanner();
+}
+
+function processMove(ne,pidx){
+  const gs=cfg.gs, nb=boxesRef.map(r=>[...r]);
+  let claimed=0;
+  for(let r=0;r<gs-1;r++) for(let c=0;c<gs-1;c++)
+    if(nb[r][c]===null&&checkBox(ne,r,c)){nb[r][c]=pidx;claimed++;}
+  const ns=[...scoresRef]; ns[pidx]+=claimed;
+  boxesRef=nb; scoresRef=ns;
+  boxes=nb; scores=[...ns];
+  renderBoard(); updateScores();
+  if(ns[0]+ns[1]===(gs-1)*(gs-1)){
+    gameOver=true;
+    const winner=ns[0]>ns[1]?0:ns[1]>ns[0]?1:-1;
+    // Record result
+    const pl=cfg.players;
+    if(pl[0].id!=='cpu'&&pl[1].id!=='cpu'){
+      ACV.recordResult({game:'dots',players:[{id:pl[0].id,name:pl[0].name},{id:pl[1].id,name:pl[1].name}],winnerId:winner===-1?null:pl[winner].id});
     }
+    setTimeout(()=>showWin(winner),400);
+    return{next:pidx,done:true};
+  }
+  const next=claimed>0?pidx:1-pidx;
+  current=next; updateBanner(); updateScores();
+  return{next,done:false};
+}
+
+function runAI(curEdges,delay){
+  setTimeout(()=>{
+    const mv=getAIMove(curEdges,boxesRef,cfg.gs,cfg.aiLevel);
+    if(!mv){aiThinking=false;return;}
+    const ae=clone(curEdges);
+    if(mv.type==='h')ae.h[mv.r][mv.c]=1; else ae.v[mv.r][mv.c]=1;
+    edges=ae;
+    const{next,done}=processMove(ae,1);
+    if(done){aiThinking=false;return;}
+    if(next===1)runAI(ae,320); else aiThinking=false;
+  },delay);
+}
+
+function handleEdge(type,r,c){
+  if(gameOver||aiThinking)return;
+  if(cfg.mode==='hvc'&&current===1)return;
+  const arr=type==='h'?edges.h:edges.v;
+  if(arr[r][c]!==null)return;
+  const ne=clone(edges); edges=ne;
+  if(type==='h')ne.h[r][c]=current; else ne.v[r][c]=current;
+  const{next,done}=processMove(ne,current);
+  if(!done&&cfg.mode==='hvc'&&next===1){aiThinking=true;runAI(ne,440);}
+}
+
+// ── AI ──────────────────────────────────────────────────────────────────────
+function countNew(e,b,gs){let n=0;for(let r=0;r<gs-1;r++)for(let c=0;c<gs-1;c++)if(b[r][c]===null&&checkBox(e,r,c))n++;return n;}
+function giveOpp(e,b,gs){for(let r=0;r<gs-1;r++)for(let c=0;c<gs-1;c++)if(b[r][c]===null){const s=(e.h[r][c]!==null?1:0)+(e.h[r+1][c]!==null?1:0)+(e.v[r][c]!==null?1:0)+(e.v[r][c+1]!==null?1:0);if(s===3)return true;}return false;}
+function getMoves(e,gs){const m=[];for(let r=0;r<gs;r++)for(let c=0;c<gs-1;c++)if(e.h[r][c]===null)m.push({type:'h',r,c});for(let r=0;r<gs-1;r++)for(let c=0;c<gs;c++)if(e.v[r][c]===null)m.push({type:'v',r,c});return m;}
+function applyM(e,b,m,p,gs){const ne=clone(e),nb=b.map(r=>[...r]);if(m.type==='h')ne.h[m.r][m.c]=p;else ne.v[m.r][m.c]=p;let cl=0;for(let r=0;r<gs-1;r++)for(let c=0;c<gs-1;c++)if(nb[r][c]===null&&checkBox(ne,r,c)){nb[r][c]=p;cl++;}return{ne,nb,cl};}
+function scoreP(b,gs){let s=0;for(let r=0;r<gs-1;r++)for(let c=0;c<gs-1;c++){if(b[r][c]===1)s++;else if(b[r][c]===0)s--;}return s;}
+
+function minimax(e,b,gs,depth,alpha,beta,isAI,total){
+  const filled=b.flat().filter(v=>v!==null).length;
+  if(depth===0||filled===total)return scoreP(b,gs);
+  const moves=getMoves(e,gs);
+  if(!moves.length)return scoreP(b,gs);
+  if(isAI){
+    let best=-Infinity;
+    for(const m of moves){const{ne,nb,cl}=applyM(e,b,m,1,gs);const v=minimax(ne,nb,gs,depth-1,alpha,beta,cl>0,total);best=Math.max(best,v);alpha=Math.max(alpha,v);if(beta<=alpha)break;}
     return best;
   } else {
-    let best = Infinity;
-    for (const m of moves) {
-      const { ne, nb, claimed } = applyMove(edges, boxes, m, 0, gs);
-      const val = minimax(ne, nb, gs, depth - 1, alpha, beta, claimed > 0 ? false : true, totalBoxes);
-      best = Math.min(best, val);
-      beta = Math.min(beta, val);
-      if (beta <= alpha) break;
-    }
+    let best=Infinity;
+    for(const m of moves){const{ne,nb,cl}=applyM(e,b,m,0,gs);const v=minimax(ne,nb,gs,depth-1,alpha,beta,cl>0?false:true,total);best=Math.min(best,v);beta=Math.min(beta,v);if(beta<=alpha)break;}
     return best;
   }
 }
 
-function aiMinimax(edges, boxes, gs, depth) {
-  const totalBoxes = (gs-1)*(gs-1);
-  const moves = getLegalMoves(edges, gs);
-  if (!moves.length) return null;
-
-  // Always take a completing move immediately without searching
-  for (const m of moves) {
-    const { claimed } = applyMove(edges, boxes, m, 1, gs);
-    if (claimed > 0) return m;
-  }
-
-  let bestVal = -Infinity, bestMove = null;
-  for (const m of moves) {
-    const { ne, nb, claimed } = applyMove(edges, boxes, m, 1, gs);
-    const val = minimax(ne, nb, gs, depth - 1, -Infinity, Infinity, claimed > 0, totalBoxes);
-    if (val > bestVal) { bestVal = val; bestMove = m; }
-  }
-  return bestMove;
+function getAIMove(e,b,gs,level){
+  const moves=getMoves(e,gs);
+  if(!moves.length)return null;
+  for(const m of moves){const{cl}=applyM(e,b,m,1,gs);if(cl>0)return m;}
+  if(level==='easy'){return moves[Math.floor(Math.random()*moves.length)];}
+  if(level==='medium'){const safe=moves.filter(m=>{const{ne}=applyM(e,b,m,1,gs);return!giveOpp(ne,b,gs);});return(safe.length?safe:moves)[Math.floor(Math.random()*(safe.length||moves.length))];}
+  const depth=level==='hard'?4:7;
+  const total=(gs-1)*(gs-1);
+  let best=-Infinity,bestM=null;
+  for(const m of moves){const{ne,nb,cl}=applyM(e,b,m,1,gs);const v=minimax(ne,nb,gs,depth-1,-Infinity,Infinity,cl>0,total);if(v>best){best=v;bestM=m;}}
+  return bestM;
 }
 
-function getAIMove(edges, boxes, gs, level) {
-  if (level === "easy")    return aiEasy(edges, boxes, gs);
-  if (level === "medium")  return aiMedium(edges, boxes, gs);
-  if (level === "hard")    return aiMinimax(edges, boxes, gs, 4);
-  if (level === "extreme") return aiMinimax(edges, boxes, gs, 7);
-  return aiMedium(edges, boxes, gs);
-}
-
-// ── Championship storage ───────────────────────────────────────────────────────
-const CHAMP_KEY = "championship-records";
-
-function loadChampionship() {
-  try {
-    const raw = localStorage.getItem(CHAMP_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch { return {}; }
-}
-function saveChampionship(data) {
-  try { localStorage.setItem(CHAMP_KEY, JSON.stringify(data)); } catch {}
-}
-function pairKey(n1, n2) {
-  return [n1, n2].sort().join("|||");
-}
-function recordResult(champ, name1, name2, winnerName) {
-  const key = pairKey(name1, name2);
-  if (!champ[key]) champ[key] = { players: [name1, name2].sort(), wins: {}, draws: 0 };
-  if (winnerName === null) {
-    champ[key].draws = (champ[key].draws || 0) + 1;
-  } else {
-    champ[key].wins[winnerName] = (champ[key].wins[winnerName] || 0) + 1;
-  }
-  return { ...champ };
-}
-
-// ── Setup screen ───────────────────────────────────────────────────────────────
-function SetupScreen({ onStart, onShowChampionship }) {
-  const [gridSize, setGridSize] = useState("medium");
-  const [mode, setMode]         = useState(null);
-  const [aiLevel, setAiLevel]   = useState("medium");
-  const [p1Name, setP1Name]     = useState("");
-  const [p2Name, setP2Name]     = useState("");
-  const [step, setStep]         = useState(0); // 0=home 1=configure
-
-  const proceed = (m) => { setMode(m); setStep(1); };
-
-  const launch = () => {
-    const n1    = p1Name.trim() || "Player 1";
-    const n2    = mode === "hvc" ? "Computer" : (p2Name.trim() || "Player 2");
-    const init1 = n1.slice(0,3).toUpperCase();
-    const init2 = mode === "hvc" ? "CPU" : n2.slice(0,3).toUpperCase();
-    onStart({ mode, gridSize, aiLevel, players: [
-      { name: n1, initial: init1, color: P_COLORS[0], light: P_LIGHTS[0] },
-      { name: n2, initial: init2, color: P_COLORS[1], light: P_LIGHTS[1] },
-    ]});
-  };
-
-  if (step === 0) return (
-    <div style={S.root}>
-      <div style={S.card}>
-        <div style={S.dotRow}>
-          {[0,1,2,3].map(i => <span key={i} style={{...S.titleDot, background:i%2===0?"#e05c3a":"#3a9ee0"}} />)}
-        </div>
-        <h1 style={S.title}>DOTS &amp; BOXES</h1>
-        <p style={S.subtitle}>Classic grid strategy. Claim the boxes. Most wins.</p>
-        <div style={{...S.btnGroup, marginTop:32}}>
-          <button style={{...S.btn, background:"#e05c3a"}} onClick={() => proceed("hvh")}>
-            <span style={S.btnMain}>Two Players</span>
-            <span style={S.btnSub}>Play against a friend</span>
-          </button>
-          <button style={{...S.btn, background:"#3a9ee0"}} onClick={() => proceed("hvc")}>
-            <span style={S.btnMain}>vs Computer</span>
-            <span style={S.btnSub}>Challenge the AI</span>
-          </button>
-        </div>
-        <button style={S.champLink} onClick={onShowChampionship}>
-          🏆 Championship table
-        </button>
+// ── Render ──────────────────────────────────────────────────────────────────
+function renderScoreRow(){
+  const el=document.getElementById('score-row');
+  el.innerHTML=cfg.players.map((p,i)=>`
+    <div class="score-card" id="sc${i}" style="border-color:${i===current?p.colour:'#1a2535'};background:${i===current?p.light:'#0e1420'};transform:${i===current?'scale(1.04)':'scale(1)'}">
+      <div class="sc-bar" style="background:${p.colour};opacity:${i===current?1:0.3}"></div>
+      <div class="sc-inner">
+        <div style="flex:1;min-width:0"><div class="sc-name">${p.name}</div>${cfg.mode==='hvc'&&i===1?`<div class="sc-tag">${cfg.aiLevel}</div>`:''}</div>
+        <div class="sc-num" style="color:${p.colour}" id="sc-num${i}">${scores[i]}</div>
       </div>
-    </div>
-  );
-
-  return (
-    <div style={S.root}>
-      <div style={{...S.card, maxWidth:440}}>
-        <button style={S.backBtn} onClick={() => setStep(0)}>← Back</button>
-        <h2 style={{...S.title, fontSize:19, marginBottom:22}}>SET UP GAME</h2>
-
-        {/* Grid size */}
-        <div style={S.section}>
-          <div style={S.sectionLabel}>Grid size</div>
-          <div style={S.segGroup}>
-            {Object.entries(GRID_SIZES).map(([key, val]) => (
-              <button key={key} style={{...S.seg, ...(gridSize===key?S.segActive:{})}} onClick={() => setGridSize(key)}>
-                <span style={S.segMain}>{val.label}</span>
-                <span style={S.segSub}>{val.sub}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Player names */}
-        <div style={S.section}>
-          <div style={S.sectionLabel}>Player names</div>
-          <div style={S.nameList}>
-            <div style={S.nameField}>
-              <div style={{...S.nameDot, background:P_COLORS[0]}} />
-              <input style={S.nameInput} placeholder="Player 1" value={p1Name}
-                maxLength={12} onChange={e => setP1Name(e.target.value)} />
-            </div>
-            {mode === "hvh" && (
-              <div style={S.nameField}>
-                <div style={{...S.nameDot, background:P_COLORS[1]}} />
-                <input style={S.nameInput} placeholder="Player 2" value={p2Name}
-                  maxLength={12} onChange={e => setP2Name(e.target.value)} />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* AI difficulty */}
-        {mode === "hvc" && (
-          <div style={S.section}>
-            <div style={S.sectionLabel}>AI difficulty</div>
-            <div style={{display:"flex", flexDirection:"column", gap:6}}>
-              {Object.entries(AI_LEVELS).map(([key, val]) => (
-                <button key={key}
-                  style={{...S.diffBtn, ...(aiLevel===key ? S.diffBtnActive : {})}}
-                  onClick={() => setAiLevel(key)}
-                >
-                  <span style={S.diffLabel}>{val.label}</span>
-                  <span style={S.diffDesc}>{val.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <button style={{...S.btn, background:"#2e6fc4"}} onClick={launch}>
-          <span style={S.btnMain}>Start Game</span>
-        </button>
-      </div>
-    </div>
-  );
+      ${i===current&&!gameOver?`<div class="sc-arr" style="color:${p.colour}">▶</div>`:''}
+    </div>`).join('');
+}
+function updateScores(){
+  cfg.players.forEach((p,i)=>{
+    const card=document.getElementById('sc'+i);
+    if(!card)return;
+    card.style.borderColor=i===current&&!gameOver?p.colour:'#1a2535';
+    card.style.background=i===current&&!gameOver?p.light:'#0e1420';
+    card.style.transform=i===current&&!gameOver?'scale(1.04)':'scale(1)';
+    const arr=card.querySelector('.sc-arr');
+    if(arr)arr.style.display=i===current&&!gameOver?'block':'none';
+    const numEl=document.getElementById('sc-num'+i);
+    if(numEl)numEl.textContent=scores[i];
+  });
+}
+function updateBanner(){
+  const el=document.getElementById('turn-banner');
+  const p=cfg.players[current];
+  if(gameOver)return;
+  el.style.background=p.colour;
+  el.style.boxShadow=`0 0 24px ${p.colour}44`;
+  el.textContent=aiThinking?`${cfg.players[1].name} thinking…`:`${p.name}'s turn`;
 }
 
-// ── Championship screen ────────────────────────────────────────────────────────
-function ChampionshipScreen({ onBack, onClear }) {
-  const champ = loadChampionship();
-  const pairs = Object.values(champ);
-
-  return (
-    <div style={S.root}>
-      <div style={{...S.card, maxWidth:480, textAlign:"left"}}>
-        <button style={S.backBtn} onClick={onBack}>← Back</button>
-        <h2 style={{...S.title, fontSize:19, marginBottom:4}}>🏆 CHAMPIONSHIP</h2>
-        <p style={{...S.subtitle, marginBottom:22}}>Head-to-head records across all games played</p>
-
-        {pairs.length === 0 ? (
-          <p style={{color:"#5a6880", fontSize:13, textAlign:"center", padding:"24px 0"}}>
-            No games recorded yet. Play some games to build the championship table.
-          </p>
-        ) : (
-          <div style={{display:"flex", flexDirection:"column", gap:10}}>
-            {pairs.map((pair, i) => {
-              const [p1, p2] = pair.players;
-              const w1 = pair.wins[p1] || 0;
-              const w2 = pair.wins[p2] || 0;
-              const draws = pair.draws || 0;
-              const total = w1 + w2 + draws;
-              const leader = w1 > w2 ? p1 : w2 > w1 ? p2 : null;
-              return (
-                <div key={i} style={S.champCard}>
-                  <div style={S.champHeader}>
-                    <span style={{...S.champName, color:P_COLORS[0]}}>{p1}</span>
-                    <span style={S.champVs}>vs</span>
-                    <span style={{...S.champName, color:P_COLORS[1]}}>{p2}</span>
-                    <span style={S.champGames}>{total} game{total!==1?"s":""}</span>
-                  </div>
-                  <div style={S.champRow}>
-                    <div style={S.champStat}>
-                      <span style={{...S.champStatNum, color:P_COLORS[0]}}>{w1}</span>
-                      <span style={S.champStatLabel}>wins</span>
-                    </div>
-                    <div style={S.champStat}>
-                      <span style={{...S.champStatNum, color:"#5a6880"}}>{draws}</span>
-                      <span style={S.champStatLabel}>draws</span>
-                    </div>
-                    <div style={S.champStat}>
-                      <span style={{...S.champStatNum, color:P_COLORS[1]}}>{w2}</span>
-                      <span style={S.champStatLabel}>wins</span>
-                    </div>
-                  </div>
-                  {leader && (
-                    <div style={S.champLeader}>
-                      Leading: <span style={{color: w1>w2?P_COLORS[0]:P_COLORS[1], fontWeight:700}}>{leader}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {pairs.length > 0 && (
-          <button style={{...S.footerBtn, ...S.ghostBtn, marginTop:20, width:"100%", justifyContent:"center"}}
-            onClick={() => { if (window.confirm("Clear all championship records?")) onClear(); }}>
-            Clear records
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Game screen ────────────────────────────────────────────────────────────────
-export default function DotsAndBoxes() {
-  const [screen, setScreen]         = useState("setup"); // setup | game | championship
-  const [config, setConfig]         = useState(null);
-  const [edges, setEdges]           = useState(null);
-  const [boxes, setBoxes]           = useState(null);
-  const [current, setCurrent]       = useState(0);
-  const [scores, setScores]         = useState([0, 0]);
-  const [gameOver, setGameOver]     = useState(false);
-  const [hovered, setHovered]       = useState(null);
-  const [aiThinking, setAiThinking] = useState(false);
-  const [champ, setChamp]           = useState(() => loadChampionship());
-  const boxesRef  = useRef(null);
-  const scoresRef = useRef(null);
-  const configRef = useRef(null);
-
-  const startGame = (cfg) => {
-    const gs = GRID_SIZES[cfg.gridSize].dots;
-    boxesRef.current  = initBoxes(gs);
-    scoresRef.current = [0, 0];
-    configRef.current = { ...cfg, gs };
-    setConfig(configRef.current);
-    setEdges(initEdges(gs));
-    setBoxes(boxesRef.current);
-    setCurrent(0);
-    setScores([0, 0]);
-    setGameOver(false);
-    setHovered(null);
-    setAiThinking(false);
-    setScreen("game");
-  };
-
-  const processMove = useCallback((newEdges, pidx) => {
-    const gs = configRef.current.gs;
-    const nb = boxesRef.current.map(r => [...r]);
-    let claimed = 0;
-    for (let r = 0; r < gs-1; r++)
-      for (let c = 0; c < gs-1; c++)
-        if (nb[r][c] === null && checkBox(newEdges, r, c)) { nb[r][c] = pidx; claimed++; }
-    const ns = [...scoresRef.current];
-    ns[pidx] += claimed;
-    boxesRef.current  = nb;
-    scoresRef.current = ns;
-    setBoxes([...nb]);
-    setScores([...ns]);
-    const total = ns[0] + ns[1];
-    if (total === (gs-1)*(gs-1)) {
-      setGameOver(true);
-      // Record championship result
-      const cfg = configRef.current;
-      const n1 = cfg.players[0].name;
-      const n2 = cfg.players[1].name;
-      const winnerName = ns[0] > ns[1] ? n1 : ns[1] > ns[0] ? n2 : null;
-      const updated = recordResult(loadChampionship(), n1, n2, winnerName);
-      saveChampionship(updated);
-      setChamp(updated);
-      return { next: pidx, done: true };
+function renderBoard(){
+  const svg=document.getElementById('board');
+  const gs=cfg.gs, CELL=CELL_SIZES[gs]||66, DOT=7, PAD=28, ET=5, CZ=20;
+  const sz=PAD*2+CELL*(gs-1);
+  svg.setAttribute('width',sz); svg.setAttribute('height',sz);
+  svg.innerHTML='';
+  // Box fills
+  boxes.forEach((row,r)=>row.forEach((owner,c)=>{
+    if(owner===null)return;
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',PAD+c*CELL+ET/2); rect.setAttribute('y',PAD+r*CELL+ET/2);
+    rect.setAttribute('width',CELL-ET); rect.setAttribute('height',CELL-ET);
+    rect.setAttribute('fill',cfg.players[owner].light); rect.setAttribute('rx',3);
+    svg.appendChild(rect);
+  }));
+  // H edges
+  edges.h.forEach((row,r)=>row.forEach((owner,c)=>{
+    const x1=PAD+c*CELL+DOT/2,x2=PAD+(c+1)*CELL-DOT/2,y=PAD+r*CELL;
+    const hov=hovered?.type==='h'&&hovered.r===r&&hovered.c===c;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y);line.setAttribute('x2',x2);line.setAttribute('y2',y);
+    line.setAttribute('stroke',owner!==null?cfg.players[owner].colour:hov?cfg.players[current].colour:'#1e2a3a');
+    line.setAttribute('stroke-width',owner!==null?ET:hov?ET-1:2);
+    line.setAttribute('stroke-linecap','round');
+    svg.appendChild(line);
+    if(owner===null&&!gameOver&&!(cfg.mode==='hvc'&&current===1)&&!aiThinking){
+      const hit=document.createElementNS('http://www.w3.org/2000/svg','line');
+      hit.setAttribute('x1',x1);hit.setAttribute('y1',y);hit.setAttribute('x2',x2);hit.setAttribute('y2',y);
+      hit.setAttribute('stroke','transparent');hit.setAttribute('stroke-width',CZ);hit.style.cursor='pointer';
+      hit.addEventListener('mouseenter',()=>{hovered={type:'h',r,c};renderBoard();});
+      hit.addEventListener('mouseleave',()=>{hovered=null;renderBoard();});
+      hit.addEventListener('click',()=>handleEdge('h',r,c));
+      svg.appendChild(hit);
     }
-    const next = claimed > 0 ? pidx : 1 - pidx;
-    setCurrent(next);
-    return { next, done: false };
-  }, []);
-
-  const runAI = useCallback((currentEdges, delay) => {
-    setTimeout(() => {
-      const cfg    = configRef.current;
-      const aiMove = getAIMove(currentEdges, boxesRef.current, cfg.gs, cfg.aiLevel);
-      if (!aiMove) { setAiThinking(false); return; }
-      const ae = cloneEdges(currentEdges);
-      if (aiMove.type === "h") ae.h[aiMove.r][aiMove.c] = 1;
-      else ae.v[aiMove.r][aiMove.c] = 1;
-      setEdges(ae);
-      const { next, done } = processMove(ae, 1);
-      if (done) { setAiThinking(false); return; }
-      if (next === 1) { runAI(ae, 350); }
-      else { setAiThinking(false); }
-    }, delay);
-  }, [processMove]);
-
-  const handleEdge = useCallback((type, r, c) => {
-    if (!config || gameOver || aiThinking) return;
-    if (config.mode === "hvc" && current === 1) return;
-    const arr = type === "h" ? edges.h : edges.v;
-    if (arr[r][c] !== null) return;
-    const ne = cloneEdges(edges);
-    if (type === "h") ne.h[r][c] = current; else ne.v[r][c] = current;
-    setEdges(ne);
-    const { next, done } = processMove(ne, current);
-    if (!done && config.mode === "hvc" && next === 1) {
-      setAiThinking(true);
-      runAI(ne, 450);
+  }));
+  // V edges
+  edges.v.forEach((row,r)=>row.forEach((owner,c)=>{
+    const x=PAD+c*CELL,y1=PAD+r*CELL+DOT/2,y2=PAD+(r+1)*CELL-DOT/2;
+    const hov=hovered?.type==='v'&&hovered.r===r&&hovered.c===c;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x);line.setAttribute('y1',y1);line.setAttribute('x2',x);line.setAttribute('y2',y2);
+    line.setAttribute('stroke',owner!==null?cfg.players[owner].colour:hov?cfg.players[current].colour:'#1e2a3a');
+    line.setAttribute('stroke-width',owner!==null?ET:hov?ET-1:2);
+    line.setAttribute('stroke-linecap','round');
+    svg.appendChild(line);
+    if(owner===null&&!gameOver&&!(cfg.mode==='hvc'&&current===1)&&!aiThinking){
+      const hit=document.createElementNS('http://www.w3.org/2000/svg','line');
+      hit.setAttribute('x1',x);hit.setAttribute('y1',y1);hit.setAttribute('x2',x);hit.setAttribute('y2',y2);
+      hit.setAttribute('stroke','transparent');hit.setAttribute('stroke-width',CZ);hit.style.cursor='pointer';
+      hit.addEventListener('mouseenter',()=>{hovered={type:'v',r,c};renderBoard();});
+      hit.addEventListener('mouseleave',()=>{hovered=null;renderBoard();});
+      hit.addEventListener('click',()=>handleEdge('v',r,c));
+      svg.appendChild(hit);
     }
-  }, [config, edges, current, gameOver, aiThinking, processMove, runAI]);
-
-  const clearChampionship = () => {
-    saveChampionship({});
-    setChamp({});
-  };
-
-  // ── Screens ──
-  if (screen === "championship") return (
-    <ChampionshipScreen
-      onBack={() => setScreen("setup")}
-      onClear={clearChampionship}
-    />
-  );
-
-  if (screen === "setup") return (
-    <SetupScreen
-      onStart={startGame}
-      onShowChampionship={() => setScreen("championship")}
-    />
-  );
-
-  // ── Game ──
-  const { gs, players, mode, aiLevel } = config;
-  const sizeKey = Object.keys(GRID_SIZES).find(k => GRID_SIZES[k].dots === gs);
-  const CELL = CELL_SIZES[sizeKey] || 66;
-  const DOT = 7, PAD = 28, ET = 5, CZ = 20;
-  const svgSz = PAD * 2 + CELL * (gs - 1);
-
-  const winner = gameOver
-    ? scores[0] > scores[1] ? 0 : scores[1] > scores[0] ? 1 : -1
-    : null;
-  const ap = players[current];
-
-  // championship record for these two players
-  const champKey   = pairKey(players[0].name, players[1].name);
-  const champEntry = champ[champKey];
-
-  return (
-    <div style={S.root}>
-      <div style={S.gameWrap}>
-
-        {/* Turn banner */}
-        <div style={{
-          ...S.turnBanner,
-          background: gameOver
-            ? (winner===-1 ? "#2a3a4a" : players[winner].color)
-            : ap.color,
-          boxShadow: gameOver
-            ? (winner===-1 ? "none" : `0 0 28px ${players[winner].color}44`)
-            : `0 0 28px ${ap.color}44`,
-        }}>
-          {gameOver
-            ? winner===-1 ? "It's a draw!" : `${players[winner].name} wins! 🎉`
-            : aiThinking ? `${players[1].name} thinking…`
-            : `${ap.name}'s turn`}
-        </div>
-
-        {/* Score cards */}
-        <div style={S.scoreRow}>
-          {players.map((p, i) => {
-            const isActive = current===i && !gameOver;
-            const w = champEntry ? (champEntry.wins[p.name] || 0) : 0;
-            return (
-              <div key={i} style={{
-                ...S.scoreCard,
-                borderColor: isActive ? p.color : "#1e2a3a",
-                background:  isActive ? p.light : "#0e1420",
-                transform:   isActive ? "scale(1.04)" : "scale(1)",
-                boxShadow:   isActive ? `0 4px 18px ${p.color}30` : "none",
-              }}>
-                <div style={{...S.scoreBar, background:p.color, opacity:isActive?1:0.3}} />
-                <div style={S.scoreInner}>
-                  <div style={{flex:1, minWidth:0}}>
-                    <div style={S.scoreName}>{p.name}</div>
-                    {mode==="hvc" && i===1 && (
-                      <div style={S.aiLevelTag}>{AI_LEVELS[aiLevel]?.label}</div>
-                    )}
-                    {champEntry && (
-                      <div style={S.champWins}>{w} championship win{w!==1?"s":""}</div>
-                    )}
-                  </div>
-                  <div style={{...S.scoreNum, color:p.color}}>{scores[i]}</div>
-                </div>
-                {isActive && !gameOver && <div style={{...S.activeArrow, color:p.color}}>▶</div>}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* SVG grid */}
-        <div style={S.svgWrap}>
-          <svg width={svgSz} height={svgSz} style={{display:"block", touchAction:"manipulation"}}>
-
-            {boxes.map((row,r) => row.map((owner,c) => owner!==null ? (
-              <rect key={`bf-${r}-${c}`}
-                x={PAD+c*CELL+ET/2} y={PAD+r*CELL+ET/2}
-                width={CELL-ET} height={CELL-ET}
-                fill={players[owner].light} rx={3} />
-            ) : null))}
-
-            {edges.h.map((row,r) => row.map((owner,c) => {
-              const x1=PAD+c*CELL+DOT/2, x2=PAD+(c+1)*CELL-DOT/2, y=PAD+r*CELL;
-              const hov = hovered?.type==="h" && hovered.r===r && hovered.c===c;
-              const can = owner===null && !gameOver && !(mode==="hvc"&&current===1) && !aiThinking;
-              return (
-                <g key={`h-${r}-${c}`}>
-                  <line x1={x1} y1={y} x2={x2} y2={y}
-                    stroke={owner!==null?players[owner].color:hov?ap.color:"#1e2a3a"}
-                    strokeWidth={owner!==null?ET:hov?ET-1:2} strokeLinecap="round"
-                    style={{transition:"stroke 0.1s,stroke-width 0.1s"}} />
-                  {can && <line x1={x1} y1={y} x2={x2} y2={y}
-                    stroke="transparent" strokeWidth={CZ} style={{cursor:"pointer"}}
-                    onMouseEnter={() => setHovered({type:"h",r,c})}
-                    onMouseLeave={() => setHovered(null)}
-                    onClick={() => handleEdge("h",r,c)} />}
-                </g>
-              );
-            }))}
-
-            {edges.v.map((row,r) => row.map((owner,c) => {
-              const x=PAD+c*CELL, y1=PAD+r*CELL+DOT/2, y2=PAD+(r+1)*CELL-DOT/2;
-              const hov = hovered?.type==="v" && hovered.r===r && hovered.c===c;
-              const can = owner===null && !gameOver && !(mode==="hvc"&&current===1) && !aiThinking;
-              return (
-                <g key={`v-${r}-${c}`}>
-                  <line x1={x} y1={y1} x2={x} y2={y2}
-                    stroke={owner!==null?players[owner].color:hov?ap.color:"#1e2a3a"}
-                    strokeWidth={owner!==null?ET:hov?ET-1:2} strokeLinecap="round"
-                    style={{transition:"stroke 0.1s,stroke-width 0.1s"}} />
-                  {can && <line x1={x} y1={y1} x2={x} y2={y2}
-                    stroke="transparent" strokeWidth={CZ} style={{cursor:"pointer"}}
-                    onMouseEnter={() => setHovered({type:"v",r,c})}
-                    onMouseLeave={() => setHovered(null)}
-                    onClick={() => handleEdge("v",r,c)} />}
-                </g>
-              );
-            }))}
-
-            {boxes.map((row,r) => row.map((owner,c) => owner!==null ? (
-              <text key={`bi-${r}-${c}`}
-                x={PAD+c*CELL+CELL/2} y={PAD+r*CELL+CELL/2+5}
-                textAnchor="middle" fill={players[owner].color}
-                fontSize={Math.max(9, Math.floor(CELL*0.23))}
-                fontFamily="'DM Mono',monospace" fontWeight="700"
-                style={{userSelect:"none",pointerEvents:"none"}}>
-                {players[owner].initial}
-              </text>
-            ) : null))}
-
-            {Array.from({length:gs},(_,r) => Array.from({length:gs},(_,c) => (
-              <circle key={`d-${r}-${c}`}
-                cx={PAD+c*CELL} cy={PAD+r*CELL} r={DOT/2} fill="#c8d0e0" />
-            )))}
-          </svg>
-        </div>
-
-        {/* Footer */}
-        <div style={S.footer}>
-          <button style={S.footerBtn} onClick={() => startGame(config)}>New Game</button>
-          <button style={{...S.footerBtn, ...S.ghostBtn}} onClick={() => setScreen("setup")}>Menu</button>
-          <button style={{...S.footerBtn, ...S.ghostBtn}} onClick={() => setScreen("championship")}>🏆</button>
-        </div>
-
-      </div>
-    </div>
-  );
+  }));
+  // Initials
+  boxes.forEach((row,r)=>row.forEach((owner,c)=>{
+    if(owner===null)return;
+    const CELL2=CELL_SIZES[gs]||66;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',PAD+c*CELL2+CELL2/2); t.setAttribute('y',PAD+r*CELL2+CELL2/2+5);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('fill',cfg.players[owner].colour);
+    t.setAttribute('font-size',Math.max(9,Math.floor(CELL2*0.22)));
+    t.setAttribute('font-family',"'DM Mono',monospace"); t.setAttribute('font-weight','700');
+    t.style.userSelect='none'; t.style.pointerEvents='none';
+    t.textContent=cfg.players[owner].initial;
+    svg.appendChild(t);
+  }));
+  // Dots
+  for(let r=0;r<gs;r++) for(let c=0;c<gs;c++){
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',PAD+c*CELL); circle.setAttribute('cy',PAD+r*CELL);
+    circle.setAttribute('r',DOT/2); circle.setAttribute('fill','#c8d0e0');
+    svg.appendChild(circle);
+  }
 }
 
-// ── Styles ─────────────────────────────────────────────────────────────────────
-const S = {
-  root: { minHeight:"100vh", background:"#080c14", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Mono','Courier New',monospace", padding:"16px", boxSizing:"border-box" },
-  card: { background:"#0e1420", border:"1px solid #1e2a3a", borderRadius:16, padding:"36px 32px", maxWidth:360, width:"100%", textAlign:"center" },
-  dotRow:   { display:"flex", justifyContent:"center", gap:10, marginBottom:16 },
-  titleDot: { width:10, height:10, borderRadius:"50%", display:"inline-block" },
-  title:    { color:"#e8edf5", fontSize:24, fontWeight:700, letterSpacing:"0.12em", margin:"0 0 8px", fontFamily:"'DM Mono',monospace" },
-  subtitle: { color:"#5a6880", fontSize:12, margin:0, letterSpacing:"0.04em" },
-  btnGroup: { display:"flex", flexDirection:"column", gap:10 },
-  btn: { padding:"14px 20px", borderRadius:10, border:"none", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:3, fontFamily:"'DM Mono',monospace", width:"100%" },
-  btnMain: { fontSize:14, fontWeight:700, color:"#fff", letterSpacing:"0.07em" },
-  btnSub:  { fontSize:11, color:"rgba(255,255,255,0.65)", letterSpacing:"0.03em" },
-  champLink: { marginTop:16, background:"none", border:"none", color:"#3a6e9e", fontSize:12, cursor:"pointer", fontFamily:"'DM Mono',monospace", letterSpacing:"0.04em", textDecoration:"underline" },
-  backBtn: { background:"none", border:"none", color:"#5a6880", cursor:"pointer", fontSize:12, fontFamily:"'DM Mono',monospace", marginBottom:14, letterSpacing:"0.05em", display:"block", textAlign:"left" },
-  section: { marginBottom:20, textAlign:"left" },
-  sectionLabel: { color:"#5a6880", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:7 },
-  segGroup: { display:"flex", gap:7 },
-  seg: { flex:1, padding:"9px 4px", borderRadius:8, border:"1.5px solid #1e2a3a", background:"#080c14", cursor:"pointer", fontFamily:"'DM Mono',monospace", display:"flex", flexDirection:"column", alignItems:"center", gap:2, transition:"border-color 0.15s,background 0.15s" },
-  segActive: { borderColor:"#2e6fc4", background:"#2e6fc422" },
-  segMain: { fontSize:11, fontWeight:700, color:"#e8edf5", letterSpacing:"0.05em" },
-  segSub:  { fontSize:9, color:"#5a6880" },
-  nameList: { display:"flex", flexDirection:"column", gap:8 },
-  nameField: { display:"flex", alignItems:"center", gap:10, background:"#080c14", border:"1.5px solid #1e2a3a", borderRadius:8, padding:"8px 12px" },
-  nameDot:   { width:8, height:8, borderRadius:"50%", flexShrink:0 },
-  nameInput: { background:"none", border:"none", outline:"none", color:"#e8edf5", fontSize:13, fontFamily:"'DM Mono',monospace", flex:1, letterSpacing:"0.04em" },
-  diffBtn: { display:"flex", alignItems:"center", gap:10, padding:"9px 12px", borderRadius:8, border:"1.5px solid #1e2a3a", background:"#080c14", cursor:"pointer", fontFamily:"'DM Mono',monospace", textAlign:"left", transition:"border-color 0.15s,background 0.15s" },
-  diffBtnActive: { borderColor:"#2e6fc4", background:"#2e6fc422" },
-  diffLabel: { fontSize:12, fontWeight:700, color:"#e8edf5", letterSpacing:"0.06em", minWidth:60 },
-  diffDesc:  { fontSize:10, color:"#5a6880", letterSpacing:"0.03em" },
-  // game
-  gameWrap: { display:"flex", flexDirection:"column", alignItems:"center", gap:12, padding:"8px 0" },
-  turnBanner: { color:"#fff", fontSize:14, fontWeight:700, letterSpacing:"0.07em", padding:"12px 32px", borderRadius:40, transition:"background 0.3s,box-shadow 0.3s", userSelect:"none", minWidth:200, textAlign:"center" },
-  scoreRow: { display:"flex", gap:10 },
-  scoreCard: { border:"2px solid", borderRadius:12, overflow:"hidden", minWidth:130, position:"relative", transition:"transform 0.2s,box-shadow 0.2s,background 0.2s,border-color 0.2s" },
-  scoreBar:  { height:3, transition:"opacity 0.2s" },
-  scoreInner:{ padding:"9px 12px", display:"flex", alignItems:"center", gap:8 },
-  scoreName: { color:"#8899aa", fontSize:11, letterSpacing:"0.05em", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" },
-  aiLevelTag: { color:"#3a6e9e", fontSize:9, letterSpacing:"0.06em", marginTop:2 },
-  champWins:  { color:"#4a5a6a", fontSize:9, letterSpacing:"0.04em", marginTop:1 },
-  scoreNum:  { fontSize:24, fontWeight:700, lineHeight:1 },
-  activeArrow: { position:"absolute", right:7, top:"50%", transform:"translateY(-50%)", fontSize:8, opacity:0.6 },
-  svgWrap: { display:"flex", justifyContent:"center" },
-  footer: { display:"flex", gap:8, marginTop:2 },
-  footerBtn: { padding:"8px 18px", background:"#2e6fc4", color:"#fff", border:"none", borderRadius:7, cursor:"pointer", fontSize:11, fontWeight:700, letterSpacing:"0.07em", fontFamily:"'DM Mono',monospace" },
-  ghostBtn: { background:"transparent", border:"1.5px solid #2a3a4a", color:"#6a7a90" },
-  // championship
-  champCard: { background:"#0e1420", border:"1px solid #1e2a3a", borderRadius:10, padding:"14px 16px" },
-  champHeader: { display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" },
-  champName: { fontWeight:700, fontSize:13, letterSpacing:"0.04em" },
-  champVs:   { color:"#3a4a5a", fontSize:11 },
-  champGames:{ color:"#3a4a5a", fontSize:10, marginLeft:"auto" },
-  champRow:  { display:"flex", justifyContent:"space-around", marginBottom:6 },
-  champStat: { display:"flex", flexDirection:"column", alignItems:"center", gap:2 },
-  champStatNum:   { fontSize:22, fontWeight:700 },
-  champStatLabel: { fontSize:9, color:"#5a6880", letterSpacing:"0.08em", textTransform:"uppercase" },
-  champLeader: { fontSize:10, color:"#5a6880", textAlign:"center", letterSpacing:"0.04em" },
-};
+function showWin(winner){
+  const el=document.getElementById('win-overlay');
+  const nm=document.getElementById('win-name');
+  const ic=document.getElementById('win-icon');
+  const sb=document.getElementById('win-sub');
+  if(winner===-1){ic.textContent='🤝';nm.textContent='Draw';nm.style.color='var(--text-dim)';sb.textContent=`${scores[0]} — ${scores[1]}`;}
+  else{ic.textContent='🏆';nm.textContent=cfg.players[winner].name;nm.style.color=cfg.players[winner].colour;sb.textContent=`Won ${scores[winner]}–${scores[1-winner]}`;}
+  const ban=document.getElementById('turn-banner');
+  ban.style.background=winner===-1?'#2a3a4a':cfg.players[winner].colour;
+  ban.textContent=winner===-1?'Draw!':`${cfg.players[winner].name} wins!`;
+  el.style.display='flex';
+}
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<DotsAndBoxes />);
-  </script>
+// init
+setMode('hvh');
+</script>
 </body>
 </html>

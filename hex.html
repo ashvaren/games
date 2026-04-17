@@ -4,475 +4,463 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="Hex — Ashvaren"/>
   <title>Hex — Ashvaren</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="ashvaren.js"></script>
   <style>
-    :root {
-      --bg:       #080c14;
-      --surface:  #0e1420;
-      --surface2: #131b28;
-      --border:   #1a2535;
-      --accent:   #2e6fc4;
-      --copper:   #c8924a;
-      --copper-l: rgba(200,146,74,0.18);
-      --ice:      #6aaed4;
-      --ice-l:    rgba(106,174,212,0.18);
-      --muted:    #4a5a72;
-      --text:     #d8e2f0;
-      --text-dim: #6a7a90;
-    }
+    :root{--bg:#080c14;--surface:#0e1420;--surface2:#111926;--border:#1a2535;--accent:#2e6fc4;--copper:#c8924a;--ice:#6aaed4;--text:#d8e2f0;--text-dim:#6a7a90;--muted:#3a4a5a}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background:var(--bg);overflow-x:hidden}
+    html,body{height:100%;background:var(--bg)}
     body{font-family:'DM Mono','Courier New',monospace;color:var(--text);-webkit-tap-highlight-color:transparent}
     button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
-
-    /* ── Layout ── */
-    #app{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:0}
-
-    /* ── Wordmark ── */
-    .wordmark{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:13px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;user-select:none}
-    .game-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:42px;letter-spacing:0.04em;color:var(--text);line-height:1;margin-bottom:6px}
-    .game-subtitle{font-size:10px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:28px}
-
-    /* ── Score bar ── */
-    .score-bar{display:flex;gap:12px;margin-bottom:20px;width:100%;max-width:540px}
-    .score-card{flex:1;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s,transform 0.2s;position:relative}
-    .score-card.active-copper{border-color:var(--copper);box-shadow:0 0 20px rgba(200,146,74,0.2);transform:scale(1.03)}
-    .score-card.active-ice{border-color:var(--ice);box-shadow:0 0 20px rgba(106,174,212,0.2);transform:scale(1.03)}
-    .score-bar-top{height:3px}
-    .score-card-inner{padding:10px 14px;display:flex;align-items:center;gap:10px}
-    .score-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-    .score-name{flex:1;font-size:11px;letter-spacing:0.07em;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .score-dir{font-size:9px;letter-spacing:0.06em;color:var(--muted);margin-top:2px}
-    .score-wins{font-size:22px;font-weight:500;line-height:1}
-
-    /* ── Status banner ── */
-    .status-banner{font-size:12px;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:16px;height:18px;text-align:center;transition:color 0.3s}
-
-    /* ── SVG board ── */
-    #board-wrap{position:relative}
-    svg#board{display:block;overflow:visible}
-
-    /* ── Hex cells ── */
-    .hex-cell{transition:fill 0.15s,stroke 0.15s}
-    .hex-cell.empty{fill:var(--surface2);stroke:var(--border);stroke-width:1.2;cursor:pointer}
-    .hex-cell.empty:hover{fill:#1a2840;stroke:var(--accent)}
-    .hex-cell.copper{fill:var(--copper);stroke:#a07030;stroke-width:1.5;cursor:default}
-    .hex-cell.ice{fill:var(--ice);stroke:#4a8eaa;stroke-width:1.5;cursor:default}
-    .hex-cell.win-copper{fill:#e0a050;stroke:#c07828;stroke-width:2;animation:pulse-copper 1s ease-in-out infinite alternate}
-    .hex-cell.win-ice{fill:#8ad0f0;stroke:#5090b8;stroke-width:2;animation:pulse-ice 1s ease-in-out infinite alternate}
-
-    @keyframes pulse-copper{from{filter:brightness(1)}to{filter:brightness(1.25) drop-shadow(0 0 6px rgba(200,146,74,0.8))}}
-    @keyframes pulse-ice{from{filter:brightness(1)}to{filter:brightness(1.25) drop-shadow(0 0 6px rgba(106,174,212,0.8))}}
-
-    /* ── Border strips ── */
-    .border-strip-copper{fill:rgba(200,146,74,0.12);stroke:rgba(200,146,74,0.3);stroke-width:1}
-    .border-strip-ice{fill:rgba(106,174,212,0.12);stroke:rgba(106,174,212,0.3);stroke-width:1}
-
-    /* ── Controls ── */
-    .controls{display:flex;gap:10px;margin-top:20px}
-    .btn{padding:9px 22px;border-radius:7px;border:none;font-size:11px;font-weight:500;letter-spacing:0.08em;transition:opacity 0.15s}
-    .btn-primary{background:var(--accent);color:#fff}
-    .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
-    .btn:hover{opacity:0.8}
-
-    /* ── Setup overlay ── */
-    #setup{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
-    .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;max-width:380px;width:100%;text-align:center}
-    .setup-section{text-align:left;margin-bottom:22px}
-    .setup-label{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-    .seg-row{display:flex;gap:8px}
-    .seg{flex:1;padding:10px 6px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color 0.15s,background 0.15s}
+    .overlay{position:fixed;inset:0;background:rgba(8,12,20,0.96);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:30px 26px;max-width:420px;width:100%;text-align:center}
+    .wm{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--text-dim);margin-bottom:4px}
+    .gtitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;letter-spacing:0.03em;margin-bottom:4px;color:var(--copper)}
+    .gsub{font-size:9px;letter-spacing:0.18em;color:var(--muted);margin-bottom:24px;text-transform:uppercase}
+    .sec{margin-bottom:16px;text-align:left}
+    .sec-lbl{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px}
+    .seg-row{display:flex;gap:6px}
+    .seg{flex:1;padding:8px 4px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s,background .15s;cursor:pointer}
     .seg:hover{border-color:var(--accent)}
-    .seg.active{border-color:var(--accent);background:rgba(46,111,196,0.15)}
-    .seg-main{font-weight:700;letter-spacing:0.05em}
-    .seg-sub{font-size:9px;color:var(--muted)}
-    .name-field{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:8px}
-    .name-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .name-input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;flex:1;letter-spacing:0.04em}
-    .start-btn{width:100%;padding:15px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:'DM Mono',monospace;font-size:14px;font-weight:700;letter-spacing:0.07em;margin-top:8px}
-    .start-btn:hover{opacity:0.9}
-
-    /* ── Rules panel ── */
-    .rules{font-size:10px;color:var(--muted);letter-spacing:0.04em;line-height:1.7;margin-top:18px;text-align:left;border-top:1px solid var(--border);padding-top:14px}
-
-    /* ── Win overlay ── */
-    #win-overlay{position:fixed;inset:0;background:rgba(8,12,20,0.85);display:none;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(4px)}
-    #win-overlay.show{display:flex}
-    .win-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;max-width:320px}
-    .win-label{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;letter-spacing:0.2em;color:var(--muted);margin-bottom:8px}
-    .win-name{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;margin-bottom:20px}
-    .win-desc{font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-bottom:24px}
+    .seg.on{border-color:var(--accent);background:rgba(46,111,196,.15)}
+    .seg-main{font-weight:700;letter-spacing:.05em}
+    .seg-sub{font-size:8px;color:var(--muted)}
+    .name-row{display:flex;align-items:center;gap:9px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:7px 11px;margin-bottom:7px}
+    .ndot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .nin{background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;flex:1;letter-spacing:.04em;cursor:pointer}
+    .btn{padding:8px 18px;border-radius:6px;border:none;font-size:11px;font-weight:700;letter-spacing:.07em;transition:opacity .15s;cursor:pointer}
+    .btn:hover{opacity:.82}
+    .btn-c{background:var(--copper);color:#fff}
+    .btn-a{background:var(--accent);color:#fff}
+    .btn-g{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
+    .btn-lg{width:100%;padding:12px;font-size:12px;border-radius:9px;margin-top:4px}
+    .diff-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-family:'DM Mono',monospace;text-align:left;transition:border-color .15s,background .15s;margin-bottom:6px;width:100%}
+    .diff-btn.on{border-color:var(--copper);background:rgba(200,146,74,.1)}
+    .diff-lbl{font-size:11px;font-weight:700;color:var(--text);letter-spacing:.05em;min-width:62px}
+    .diff-desc{font-size:9px;color:var(--muted)}
+    #game{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 16px 40px;gap:10px}
+    .turn-banner{color:#fff;font-size:13px;font-weight:700;letter-spacing:.07em;padding:11px 30px;border-radius:40px;transition:background .3s,box-shadow .3s;text-align:center;min-width:200px}
+    .score-row{display:flex;gap:10px}
+    .score-card{border:2px solid;border-radius:10px;overflow:hidden;min-width:130px;position:relative;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+    .sc-bar{height:3px}
+    .sc-inner{padding:8px 12px;display:flex;align-items:center;gap:8px}
+    .sc-name{color:var(--text-dim);font-size:10px;letter-spacing:.05em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sc-dir{font-size:8px;color:var(--muted);margin-top:1px;letter-spacing:.04em}
+    .sc-tag{font-size:8px;color:#3a6e9e;margin-top:1px}
+    .sc-num{font-size:22px;font-weight:700;line-height:1}
+    .sc-arr{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:8px;opacity:.6}
+    .svg-wrap{display:flex;justify-content:center;overflow-x:auto;max-width:100%}
+    .footer{display:flex;gap:8px}
+    .back-link{font-size:10px;color:var(--text-dim);letter-spacing:.06em;cursor:pointer;background:none;border:none}
+    .back-link:hover{color:var(--text)}
+    /* hex cells via CSS */
+    .hex-cell{transition:fill .12s,stroke .12s}
   </style>
 </head>
 <body>
-<div id="setup">
-  <div class="setup-card">
-    <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--muted);margin-bottom:6px">ASHVAREN</div>
-    <h1 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:38px;margin-bottom:4px">Hex</h1>
-    <p style="font-size:10px;letter-spacing:0.14em;color:var(--muted);margin-bottom:28px">CONNECT · STRATEGY · TOPOLOGY</p>
 
-    <div class="setup-section">
-      <div class="setup-label">Board size</div>
-      <div class="seg-row" id="size-seg">
-        <button class="seg" data-size="7"><span class="seg-main">Small</span><span class="seg-sub">7 × 7</span></button>
-        <button class="seg active" data-size="11"><span class="seg-main">Standard</span><span class="seg-sub">11 × 11</span></button>
-        <button class="seg" data-size="13"><span class="seg-main">Large</span><span class="seg-sub">13 × 13</span></button>
+<!-- SETUP -->
+<div class="overlay" id="setup-overlay">
+  <div class="card">
+    <button class="back-link" onclick="window.location.href='index.html'">← Hub</button>
+    <div class="wm">Ashvaren</div>
+    <div class="gtitle">Hex</div>
+    <div class="gsub">Connect · Strategy · No Draws</div>
+
+    <div id="step0">
+      <div class="sec"><div class="sec-lbl">Game mode</div>
+        <div class="seg-row">
+          <button class="seg on" id="mode-hvh" onclick="setMode('hvh')"><span class="seg-main">Two Players</span><span class="seg-sub">Local</span></button>
+          <button class="seg" id="mode-hvc" onclick="setMode('hvc')"><span class="seg-main">vs Computer</span><span class="seg-sub">AI</span></button>
+        </div>
       </div>
+      <div class="sec"><div class="sec-lbl">Board size</div>
+        <div class="seg-row" id="sz-segs">
+          <button class="seg" data-n="7" onclick="setSz(this)"><span class="seg-main">Small</span><span class="seg-sub">7×7</span></button>
+          <button class="seg on" data-n="11" onclick="setSz(this)"><span class="seg-main">Standard</span><span class="seg-sub">11×11</span></button>
+          <button class="seg" data-n="13" onclick="setSz(this)"><span class="seg-main">Large</span><span class="seg-sub">13×13</span></button>
+        </div>
+      </div>
+      <button class="btn btn-c btn-lg" onclick="goStep1()">Next →</button>
     </div>
 
-    <div class="setup-section">
-      <div class="setup-label">Players</div>
-      <div class="name-field">
-        <div class="name-dot" style="background:var(--copper)"></div>
-        <input class="name-input" id="p1-input" placeholder="Player 1 (Copper)" maxlength="14"/>
+    <div id="step1" style="display:none">
+      <div class="sec"><div class="sec-lbl">Players</div>
+        <div class="name-row"><div class="ndot" style="background:var(--copper)"></div>
+          <select class="nin" id="p1sel"></select>
+          <span style="font-size:9px;color:var(--muted);white-space:nowrap">Top → Bottom</span>
+        </div>
+        <div class="name-row" id="p2-row"><div class="ndot" style="background:var(--ice)"></div>
+          <select class="nin" id="p2sel"></select>
+          <span style="font-size:9px;color:var(--muted);white-space:nowrap">Left → Right</span>
+        </div>
       </div>
-      <div class="name-field">
-        <div class="name-dot" style="background:var(--ice)"></div>
-        <input class="name-input" id="p2-input" placeholder="Player 2 (Ice)" maxlength="14"/>
+      <div class="sec" id="ai-sec" style="display:none"><div class="sec-lbl">AI difficulty</div>
+        <button class="diff-btn" data-lv="easy" onclick="setLv(this)"><span class="diff-lbl">Easy</span><span class="diff-desc">Random moves</span></button>
+        <button class="diff-btn on" data-lv="medium" onclick="setLv(this)"><span class="diff-lbl">Medium</span><span class="diff-desc">Greedy — prefers centre and connectivity</span></button>
+        <button class="diff-btn" data-lv="hard" onclick="setLv(this)"><span class="diff-lbl">Hard</span><span class="diff-desc">Monte Carlo (300 simulations)</span></button>
+        <button class="diff-btn" data-lv="extreme" onclick="setLv(this)"><span class="diff-lbl">Extreme</span><span class="diff-desc">Monte Carlo (800 simulations)</span></button>
       </div>
-    </div>
-
-    <button class="start-btn" id="start-btn">Begin Game</button>
-
-    <div class="rules">
-      <strong style="color:var(--text-dim)">How to play</strong><br/>
-      Copper connects top to bottom. Ice connects left to right.<br/>
-      Players alternate placing a stone on any empty cell.<br/>
-      First to form an unbroken chain across the board wins.<br/>
-      <em>No draws are possible.</em>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g" onclick="goStep0()">← Back</button>
+        <button class="btn btn-c btn-lg" style="flex:1;margin-top:0" onclick="launchGame()">Start Game</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="win-overlay">
-  <div class="win-card">
-    <div class="win-label">Victory</div>
-    <div class="win-name" id="win-name"></div>
-    <div class="win-desc" id="win-desc"></div>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <button class="btn btn-primary" id="rematch-btn">Rematch</button>
-      <button class="btn btn-ghost" id="menu-btn">Menu</button>
+<!-- WIN -->
+<div class="overlay" id="win-overlay" style="display:none">
+  <div class="card">
+    <div class="wm">Victory</div>
+    <div id="win-name" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;margin:8px 0"></div>
+    <div id="win-sub" style="font-size:10px;color:var(--text-dim);margin-bottom:20px;letter-spacing:.06em"></div>
+    <div style="display:flex;gap:9px;justify-content:center">
+      <button class="btn btn-c" onclick="rematch()">Rematch</button>
+      <button class="btn btn-a" onclick="newSetup()">New Game</button>
+      <button class="btn btn-g" onclick="window.location.href='index.html'">Hub 🏆</button>
     </div>
   </div>
 </div>
 
-<div id="app">
-  <div class="wordmark">Ashvaren</div>
-  <div class="game-title">Hex</div>
-  <div class="game-subtitle">Connect · Strategy · Topology</div>
-
-  <div class="score-bar" id="score-bar">
-    <div class="score-card" id="card-0">
-      <div class="score-bar-top" style="background:var(--copper)"></div>
-      <div class="score-card-inner">
-        <div class="score-dot" style="background:var(--copper)"></div>
-        <div style="flex:1">
-          <div class="score-name" id="sname-0">Copper</div>
-          <div class="score-dir">Top → Bottom</div>
-        </div>
-        <div class="score-wins" style="color:var(--copper)" id="swins-0">0</div>
-      </div>
-    </div>
-    <div class="score-card" id="card-1">
-      <div class="score-bar-top" style="background:var(--ice)"></div>
-      <div class="score-card-inner">
-        <div class="score-dot" style="background:var(--ice)"></div>
-        <div style="flex:1">
-          <div class="score-name" id="sname-1">Ice</div>
-          <div class="score-dir">Left → Right</div>
-        </div>
-        <div class="score-wins" style="color:var(--ice)" id="swins-1">0</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="status-banner" id="status"></div>
-  <div id="board-wrap"><svg id="board"></svg></div>
-
-  <div class="controls">
-    <button class="btn btn-primary" id="new-game-btn">New Game</button>
-    <button class="btn btn-ghost" id="show-menu-btn">Menu</button>
+<!-- GAME -->
+<div id="game" style="display:none">
+  <button class="back-link" onclick="newSetup()">← Menu</button>
+  <div class="turn-banner" id="turn-banner">—</div>
+  <div class="score-row" id="score-row"></div>
+  <div class="svg-wrap"><svg id="board"></svg></div>
+  <div class="footer">
+    <button class="btn btn-c" onclick="rematch()">New Game</button>
+    <button class="btn btn-g" onclick="window.location.href='index.html'">Hub 🏆</button>
   </div>
 </div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────────
-let N = 11;
-let grid = [];        // 0=empty, 1=copper, 2=ice
-let currentPlayer = 1;
-let gameOver = false;
-let wins = [0, 0];
-let players = ["Player 1", "Player 2"];
-let selectedSize = 11;
+// ── Config ──────────────────────────────────────────────────────────────────
+let cfg={mode:'hvh',N:11,aiLevel:'medium',players:[]};
+let currentCfg=null;
+// ── State ───────────────────────────────────────────────────────────────────
+let grid=[],currentPlayer=1,gameOver=false,wins=[0,0];
 
-// ── Hex geometry ───────────────────────────────────────────────────────────────
-const HEX_SIZE = () => Math.min(26, Math.floor((Math.min(window.innerWidth - 40, 520)) / (N * 1.55)));
-
-function hexCorners(cx, cy, size) {
-  const pts = [];
-  for (let i = 0; i < 6; i++) {
-    const a = Math.PI / 180 * (60 * i + 30);
-    pts.push([cx + size * Math.cos(a), cy + size * Math.sin(a)]);
-  }
-  return pts.map(p => p.join(",")).join(" ");
+function setMode(m){
+  cfg.mode=m;
+  ['hvh','hvc'].forEach(x=>document.getElementById('mode-'+x).classList.toggle('on',x===m));
+  document.getElementById('p2-row').style.display=m==='hvc'?'none':'flex';
+  document.getElementById('ai-sec').style.display=m==='hvc'?'block':'none';
 }
-
-function hexCenter(row, col, size) {
-  const w = Math.sqrt(3) * size;
-  const h = 2 * size;
-  const x = col * w + row * w / 2 + size * 2;
-  const y = row * (h * 0.75) + size * 1.2;
-  return [x, y];
+function setSz(btn){cfg.N=+btn.dataset.n;document.querySelectorAll('#sz-segs .seg').forEach(b=>b.classList.toggle('on',b===btn));}
+function setLv(btn){cfg.aiLevel=btn.dataset.lv;document.querySelectorAll('.diff-btn').forEach(b=>b.classList.toggle('on',b===btn));}
+function populateSels(){
+  const pl=ACV.getPlayers();
+  ['p1sel','p2sel'].forEach((id,i)=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML=pl.map(p=>`<option value="${p.id}" style="background:#0e1420">${p.name}</option>`).join('');
+    if(pl[i])sel.value=pl[i].id;
+  });
 }
+function goStep1(){document.getElementById('step0').style.display='none';document.getElementById('step1').style.display='block';populateSels();}
+function goStep0(){document.getElementById('step1').style.display='none';document.getElementById('step0').style.display='block';}
 
-// ── Init ───────────────────────────────────────────────────────────────────────
-function initGame() {
-  grid = Array.from({length: N}, () => Array(N).fill(0));
-  currentPlayer = 1;
-  gameOver = false;
-  renderBoard();
-  updateStatus();
-  document.getElementById("win-overlay").classList.remove("show");
-}
-
-// ── Render ─────────────────────────────────────────────────────────────────────
-function renderBoard() {
-  const svg = document.getElementById("board");
-  svg.innerHTML = "";
-  const size = HEX_SIZE();
-  const w = Math.sqrt(3) * size;
-  const h = 2 * size;
-  const totalW = (N - 1) * w + (N - 1) * w / 2 + size * 4;
-  const totalH = (N - 1) * (h * 0.75) + h + size * 0.4;
-  svg.setAttribute("width", totalW);
-  svg.setAttribute("height", totalH);
-  svg.setAttribute("viewBox", `0 0 ${totalW} ${totalH}`);
-
-  // Border strips
-  drawBorderStrips(svg, size, w, h);
-
-  // Cells
-  for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
-      const [cx, cy] = hexCenter(r, c, size);
-      const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-      poly.setAttribute("points", hexCorners(cx, cy, size * 0.92));
-      poly.setAttribute("class", `hex-cell ${['empty','copper','ice'][grid[r][c]]}`);
-      poly.dataset.r = r;
-      poly.dataset.c = c;
-      if (grid[r][c] === 0 && !gameOver) {
-        poly.addEventListener("click", onCellClick);
-        poly.addEventListener("mouseenter", onCellHover);
-        poly.addEventListener("mouseleave", onCellLeave);
-      }
-      svg.appendChild(poly);
-    }
-  }
-}
-
-function drawBorderStrips(svg, size, w, h) {
-  // Copper: top and bottom edges
-  for (let c = 0; c < N; c++) {
-    const [cx, cy] = hexCenter(0, c, size);
-    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-    strip.setAttribute("points", hexCorners(cx, cy - h * 0.82, size * 0.5));
-    strip.setAttribute("class","border-strip-copper");
-    svg.appendChild(strip);
-  }
-  for (let c = 0; c < N; c++) {
-    const [cx, cy] = hexCenter(N-1, c, size);
-    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-    strip.setAttribute("points", hexCorners(cx, cy + h * 0.82, size * 0.5));
-    strip.setAttribute("class","border-strip-copper");
-    svg.appendChild(strip);
-  }
-  // Ice: left and right edges
-  for (let r = 0; r < N; r++) {
-    const [cx, cy] = hexCenter(r, 0, size);
-    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-    strip.setAttribute("points", hexCorners(cx - w * 0.92, cy, size * 0.5));
-    strip.setAttribute("class","border-strip-ice");
-    svg.appendChild(strip);
-  }
-  for (let r = 0; r < N; r++) {
-    const [cx, cy] = hexCenter(r, N-1, size);
-    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-    strip.setAttribute("points", hexCorners(cx + w * 0.92, cy, size * 0.5));
-    strip.setAttribute("class","border-strip-ice");
-    svg.appendChild(strip);
-  }
-}
-
-// ── Interaction ────────────────────────────────────────────────────────────────
-let hoverCell = null;
-function onCellHover(e) {
-  hoverCell = e.target;
-  e.target.style.fill = currentPlayer === 1 ? "rgba(200,146,74,0.35)" : "rgba(106,174,212,0.35)";
-  e.target.style.stroke = currentPlayer === 1 ? "var(--copper)" : "var(--ice)";
-}
-function onCellLeave(e) {
-  if (grid[e.target.dataset.r][e.target.dataset.c] === 0) {
-    e.target.style.fill = "";
-    e.target.style.stroke = "";
-  }
-}
-
-function onCellClick(e) {
-  if (gameOver) return;
-  const r = +e.target.dataset.r, c = +e.target.dataset.c;
-  if (grid[r][c] !== 0) return;
-  grid[r][c] = currentPlayer;
-  e.target.setAttribute("class", `hex-cell ${currentPlayer===1?"copper":"ice"}`);
-  e.target.style.fill = "";
-  e.target.style.stroke = "";
-  e.target.removeEventListener("click", onCellClick);
-  e.target.removeEventListener("mouseenter", onCellHover);
-  e.target.removeEventListener("mouseleave", onCellLeave);
-
-  const winPath = checkWin(currentPlayer);
-  if (winPath) {
-    gameOver = true;
-    highlightWinPath(winPath);
-    wins[currentPlayer - 1]++;
-    document.getElementById(`swins-${currentPlayer-1}`).textContent = wins[currentPlayer-1];
-    setTimeout(() => showWin(currentPlayer), 600);
+function launchGame(){
+  const pl=ACV.getPlayers(), pm=Object.fromEntries(pl.map(p=>[p.id,p]));
+  const p1=pm[document.getElementById('p1sel').value]||pl[0];
+  if(cfg.mode==='hvc'){
+    cfg.players=[
+      {...p1,colour:'#c8924a',light:'rgba(200,146,74,0.18)',dir:'Top → Bottom'},
+      {id:'cpu',name:'Computer',colour:'#6aaed4',light:'rgba(106,174,212,0.18)',initial:'CPU',dir:'Left → Right'},
+    ];
   } else {
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    updateStatus();
-    updateActiveCard();
+    const p2=pm[document.getElementById('p2sel').value]||pl[1]||pl[0];
+    cfg.players=[
+      {...p1,colour:'#c8924a',light:'rgba(200,146,74,0.18)',dir:'Top → Bottom'},
+      {...p2,colour:'#6aaed4',light:'rgba(106,174,212,0.18)',dir:'Left → Right'},
+    ];
   }
+  currentCfg={...cfg,players:[...cfg.players]};
+  wins=[0,0];
+  startGame();
 }
 
-// ── Win detection (BFS) ────────────────────────────────────────────────────────
-function neighbors(r, c) {
-  return [[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0]]
-    .map(([dr,dc]) => [r+dr, c+dc])
-    .filter(([nr,nc]) => nr>=0&&nr<N&&nc>=0&&nc<N);
+function newSetup(){document.getElementById('win-overlay').style.display='none';document.getElementById('game').style.display='none';document.getElementById('step0').style.display='block';document.getElementById('step1').style.display='none';document.getElementById('setup-overlay').style.display='flex';}
+function rematch(){if(currentCfg){cfg={...currentCfg,players:[...currentCfg.players]};startGame();}}
+
+// ── Hex geometry ─────────────────────────────────────────────────────────────
+function hexCorners(cx,cy,size){
+  const pts=[];
+  for(let i=0;i<6;i++){const a=Math.PI/180*(60*i+30);pts.push([cx+size*Math.cos(a),cy+size*Math.sin(a)]);}
+  return pts.map(p=>p.join(',')).join(' ');
 }
+function hexCenter(r,c,size){
+  const w=Math.sqrt(3)*size, h=2*size;
+  return[c*w+r*w/2+size*2, r*(h*0.75)+size*1.2];
+}
+function hexSize(){return Math.min(24,Math.floor((Math.min(window.innerWidth-40,480))/(cfg.N*1.55)));}
 
-function checkWin(player) {
-  // Copper: connects row 0 to row N-1
-  // Ice: connects col 0 to col N-1
-  const starts = [];
-  if (player === 1) {
-    for (let c = 0; c < N; c++) if (grid[0][c]===1) starts.push([0,c]);
-  } else {
-    for (let r = 0; r < N; r++) if (grid[r][0]===2) starts.push([r,0]);
-  }
-  const visited = new Set();
-  const prev = new Map();
-  const queue = [...starts];
-  starts.forEach(([r,c]) => { visited.add(`${r},${c}`); prev.set(`${r},${c}`, null); });
-
-  while (queue.length) {
-    const [r, c] = queue.shift();
-    if ((player===1 && r===N-1) || (player===2 && c===N-1)) {
-      return tracePath(prev, r, c);
-    }
-    for (const [nr,nc] of neighbors(r,c)) {
-      const key = `${nr},${nc}`;
-      if (!visited.has(key) && grid[nr][nc]===player) {
-        visited.add(key);
-        prev.set(key, [r,c]);
-        queue.push([nr,nc]);
-      }
-    }
+// ── BFS win check ─────────────────────────────────────────────────────────────
+function neighbors(r,c){
+  return[[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0]].map(([dr,dc])=>[r+dr,c+dc]).filter(([nr,nc])=>nr>=0&&nr<cfg.N&&nc>=0&&nc<cfg.N);
+}
+function checkWin(player){
+  const starts=[];
+  if(player===1)for(let c=0;c<cfg.N;c++){if(grid[0][c]===1)starts.push([0,c]);}
+  else for(let r=0;r<cfg.N;r++){if(grid[r][0]===2)starts.push([r,0]);}
+  const vis=new Set(), prev=new Map(), queue=[...starts];
+  starts.forEach(([r,c])=>{const k=`${r},${c}`;vis.add(k);prev.set(k,null);});
+  while(queue.length){
+    const[r,c]=queue.shift();
+    if((player===1&&r===cfg.N-1)||(player===2&&c===cfg.N-1)){return tracePath(prev,r,c);}
+    for(const[nr,nc]of neighbors(r,c)){const k=`${nr},${nc}`;if(!vis.has(k)&&grid[nr][nc]===player){vis.add(k);prev.set(k,[r,c]);queue.push([nr,nc]);}}
   }
   return null;
 }
-
-function tracePath(prev, r, c) {
-  const path = [];
-  let cur = `${r},${c}`;
-  while (cur !== null) {
-    const [pr, pc] = cur.split(",").map(Number);
-    path.push([pr, pc]);
-    cur = prev.get(cur) ? `${prev.get(cur)[0]},${prev.get(cur)[1]}` : null;
-  }
+function tracePath(prev,r,c){
+  const path=[];let cur=`${r},${c}`;
+  while(cur!==null){const[pr,pc]=cur.split(',').map(Number);path.push([pr,pc]);const p=prev.get(cur);cur=p?`${p[0]},${p[1]}`:null;}
   return path;
 }
 
-function highlightWinPath(path) {
-  const cls = currentPlayer === 1 ? "win-copper" : "win-ice";
-  path.forEach(([r,c]) => {
-    const cells = document.querySelectorAll(`.hex-cell`);
-    cells.forEach(cell => {
-      if (+cell.dataset.r===r && +cell.dataset.c===c) {
-        cell.setAttribute("class", `hex-cell ${cls}`);
+// ── AI ────────────────────────────────────────────────────────────────────────
+// Easy: random
+function aiEasy(){
+  const moves=[];
+  for(let r=0;r<cfg.N;r++)for(let c=0;c<cfg.N;c++)if(grid[r][c]===0)moves.push([r,c]);
+  return moves.length?moves[Math.floor(Math.random()*moves.length)]:null;
+}
+// Medium: greedy — prefer centre cells and cells adjacent to own stones
+function aiMedium(){
+  const N=cfg.N, mid=Math.floor(N/2);
+  const moves=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(grid[r][c]===0){
+    let score=0;
+    // Prefer centre
+    score-=Math.abs(r-mid)+Math.abs(c-mid);
+    // Prefer adjacent to own stones
+    for(const[nr,nc]of neighbors(r,c))if(nr>=0&&nr<N&&nc>=0&&nc<N&&grid[nr][nc]===2)score+=3;
+    // Block opponent connections
+    for(const[nr,nc]of neighbors(r,c))if(nr>=0&&nr<N&&nc>=0&&nc<N&&grid[nr][nc]===1)score+=1;
+    moves.push({r,c,score});
+  }
+  if(!moves.length)return null;
+  moves.sort((a,b)=>b.score-a.score);
+  // Top 3 with some randomness
+  const top=moves.slice(0,Math.min(3,moves.length));
+  const pick=top[Math.floor(Math.random()*top.length)];
+  return[pick.r,pick.c];
+}
+// MCTS for hard/extreme
+function mctsSimulate(r,c,player,sims){
+  const N=cfg.N;
+  let wins=0;
+  for(let s=0;s<sims;s++){
+    const g=grid.map(row=>[...row]);
+    g[r][c]=player;
+    const empty=[];
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(g[i][j]===0)empty.push([i,j]);
+    // shuffle
+    for(let i=empty.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[empty[i],empty[j]]=[empty[j],empty[i]];}
+    let p=player===1?2:1;
+    for(const[er,ec]of empty){g[er][ec]=p;p=p===1?2:1;}
+    // Check if player 2 (AI) wins
+    const starts2=[];
+    for(let i=0;i<N;i++)if(g[i][0]===2)starts2.push([i,0]);
+    const vis=new Set(); const q=[...starts2];
+    starts2.forEach(([sr,sc])=>vis.add(`${sr},${sc}`));
+    let won=false;
+    while(q.length&&!won){
+      const[qr,qc]=q.shift();
+      if(qc===N-1){won=true;break;}
+      for(const[nr,nc]of[[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0]].map(([dr,dc])=>[qr+dr,qc+dc]).filter(([nr2,nc2])=>nr2>=0&&nr2<N&&nc2>=0&&nc2<N)){
+        const k=`${nr},${nc}`;if(!vis.has(k)&&g[nr][nc]===2){vis.add(k);q.push([nr,nc]);}
       }
+    }
+    if(won)wins++;
+  }
+  return wins;
+}
+function aiMCTS(sims){
+  const N=cfg.N;
+  const moves=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(grid[r][c]===0)moves.push([r,c]);
+  if(!moves.length)return null;
+  let best=-1,bestM=null;
+  for(const[r,c]of moves){
+    const w=mctsSimulate(r,c,2,sims);
+    if(w>best){best=w;bestM=[r,c];}
+  }
+  return bestM;
+}
+
+function getAIMove(){
+  if(cfg.aiLevel==='easy')return aiEasy();
+  if(cfg.aiLevel==='medium')return aiMedium();
+  if(cfg.aiLevel==='hard')return aiMCTS(300);
+  return aiMCTS(800);
+}
+
+// ── Game flow ─────────────────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('setup-overlay').style.display='none';
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('game').style.display='flex';
+  grid=Array.from({length:cfg.N},()=>Array(cfg.N).fill(0));
+  currentPlayer=1; gameOver=false;
+  renderScoreRow(); renderBoard(); updateBanner();
+}
+
+function onCellClick(r,c){
+  if(gameOver)return;
+  if(cfg.mode==='hvc'&&currentPlayer===2)return;
+  if(grid[r][c]!==0)return;
+  placeStone(r,c,currentPlayer);
+}
+
+function placeStone(r,c,player){
+  grid[r][c]=player;
+  renderBoard();
+  const path=checkWin(player);
+  if(path){
+    gameOver=true;
+    wins[player-1]++;
+    renderScoreRow();
+    highlightPath(path,player);
+    const pl=cfg.players;
+    if(pl[0].id!=='cpu'&&pl[1].id!=='cpu'){
+      ACV.recordResult({game:'hex',players:[{id:pl[0].id,name:pl[0].name},{id:pl[1].id,name:pl[1].name}],winnerId:pl[player-1].id});
+    }
+    setTimeout(()=>showWin(player),700);
+    return;
+  }
+  currentPlayer=currentPlayer===1?2:1;
+  updateBanner(); renderScoreRow();
+  if(cfg.mode==='hvc'&&currentPlayer===2){
+    setTimeout(()=>{
+      const mv=getAIMove();
+      if(mv)placeStone(mv[0],mv[1],2);
+    },cfg.aiLevel==='extreme'?100:60);
+  }
+}
+
+function highlightPath(path,player){
+  const svg=document.getElementById('board');
+  const size=hexSize();
+  const cls=player===1?'win-copper':'win-ice';
+  const fillCol=player===1?'#e0a050':'#8ad0f0';
+  path.forEach(([r,c])=>{
+    const[cx,cy]=hexCenter(r,c,size);
+    svg.querySelectorAll(`[data-r="${r}"][data-c="${c}"]`).forEach(el=>{
+      el.setAttribute('fill',fillCol);
+      el.style.filter=`drop-shadow(0 0 5px ${fillCol})`;
+      el.style.animation=player===1?'pulse-c 0.9s ease-in-out infinite alternate':'pulse-i 0.9s ease-in-out infinite alternate';
     });
   });
 }
 
-// ── UI helpers ─────────────────────────────────────────────────────────────────
-function updateStatus() {
-  const el = document.getElementById("status");
-  const name = players[currentPlayer - 1];
-  const colour = currentPlayer === 1 ? "var(--copper)" : "var(--ice)";
-  el.innerHTML = `<span style="color:${colour}">${name}</span><span style="color:var(--muted)"> to play</span>`;
-  updateActiveCard();
+// ── Render ─────────────────────────────────────────────────────────────────
+function renderBoard(){
+  const svg=document.getElementById('board');
+  const size=hexSize(), N=cfg.N;
+  const w=Math.sqrt(3)*size, h=2*size;
+  const totalW=(N-1)*w+(N-1)*w/2+size*4;
+  const totalH=(N-1)*(h*0.75)+h+size*0.4;
+  svg.setAttribute('width',totalW); svg.setAttribute('height',totalH);
+  svg.setAttribute('viewBox',`0 0 ${totalW} ${totalH}`);
+  // Only rebuild DOM if needed (first render or size change)
+  if(svg.dataset.n!=N||svg.dataset.size!=size){
+    svg.innerHTML=`<style>
+      @keyframes pulse-c{from{filter:brightness(1)}to{filter:brightness(1.3) drop-shadow(0 0 6px rgba(200,146,74,0.9))}}
+      @keyframes pulse-i{from{filter:brightness(1)}to{filter:brightness(1.3) drop-shadow(0 0 6px rgba(106,174,212,0.9))}}
+    </style>`;
+    svg.dataset.n=N; svg.dataset.size=size;
+    // Border strips
+    for(let c=0;c<N;c++){
+      const[cx,cy]=hexCenter(0,c,size);
+      ['top','bot'].forEach((pos,j)=>{
+        const strip=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+        const dy=j===0?-(h*0.82):(h*0.82)*(N-1)+h*0.82*0+h*0.75*(N-1)-h*0.82*(N-2);
+        // Simpler: just offset slightly
+        const[bx,by]=hexCenter(j===0?-0.5:N-0.5,c+(j===0?0:0.5),size);
+        strip.setAttribute('points',hexCorners(j===0?cx:hexCenter(N-1,c,size)[0],j===0?cy-h*0.82:hexCenter(N-1,c,size)[1]+h*0.82,size*0.45));
+        strip.setAttribute('fill','rgba(200,146,74,0.12)');strip.setAttribute('stroke','rgba(200,146,74,0.28)');strip.setAttribute('stroke-width','1');
+        svg.appendChild(strip);
+      });
+    }
+    for(let r=0;r<N;r++){
+      const[cx,cy]=hexCenter(r,0,size);
+      const[cx2,cy2]=hexCenter(r,N-1,size);
+      const sl=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      sl.setAttribute('points',hexCorners(cx-w*0.88,cy,size*0.45));
+      sl.setAttribute('fill','rgba(106,174,212,0.12)');sl.setAttribute('stroke','rgba(106,174,212,0.28)');sl.setAttribute('stroke-width','1');
+      svg.appendChild(sl);
+      const sr=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      sr.setAttribute('points',hexCorners(cx2+w*0.88,cy2,size*0.45));
+      sr.setAttribute('fill','rgba(106,174,212,0.12)');sr.setAttribute('stroke','rgba(106,174,212,0.28)');sr.setAttribute('stroke-width','1');
+      svg.appendChild(sr);
+    }
+    // Cells
+    for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+      const[cx,cy]=hexCenter(r,c,size);
+      const poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      poly.setAttribute('points',hexCorners(cx,cy,size*0.9));
+      poly.dataset.r=r; poly.dataset.c=c;
+      poly.setAttribute('class','hex-cell');
+      poly.addEventListener('click',()=>onCellClick(r,c));
+      poly.addEventListener('mouseenter',()=>{if(grid[r][c]===0&&!gameOver&&!(cfg.mode==='hvc'&&currentPlayer===2)){poly.style.fill=currentPlayer===1?'rgba(200,146,74,0.35)':'rgba(106,174,212,0.35)';poly.style.stroke=currentPlayer===1?'#c8924a':'#6aaed4';}});
+      poly.addEventListener('mouseleave',()=>{if(grid[r][c]===0){poly.style.fill='';poly.style.stroke='';}});
+      svg.appendChild(poly);
+    }
+  }
+  // Update fills only
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    const el=svg.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+    if(!el)continue;
+    const v=grid[r][c];
+    if(v===0){el.setAttribute('fill','#111926');el.setAttribute('stroke','#1a2535');el.setAttribute('stroke-width','1.2');el.style.cursor=(!gameOver&&!(cfg.mode==='hvc'&&currentPlayer===2))?'pointer':'default';el.style.animation='';}
+    else if(v===1){el.setAttribute('fill','#c8924a');el.setAttribute('stroke','#a07030');el.setAttribute('stroke-width','1.5');el.style.cursor='default';}
+    else{el.setAttribute('fill','#6aaed4');el.setAttribute('stroke','#4a8eaa');el.setAttribute('stroke-width','1.5');el.style.cursor='default';}
+  }
 }
 
-function updateActiveCard() {
-  ["card-0","card-1"].forEach((id, i) => {
-    const card = document.getElementById(id);
-    card.className = "score-card" + (i === currentPlayer-1
-      ? (i===0?" active-copper":" active-ice") : "");
-  });
+function renderScoreRow(){
+  const el=document.getElementById('score-row');
+  const cp=currentPlayer-1;
+  el.innerHTML=cfg.players.map((p,i)=>`
+    <div class="score-card" style="border-color:${i===cp&&!gameOver?p.colour:'#1a2535'};background:${i===cp&&!gameOver?p.light:'#0e1420'};transform:${i===cp&&!gameOver?'scale(1.04)':'scale(1)'};box-shadow:${i===cp&&!gameOver?`0 4px 16px ${p.colour}30`:'none'}">
+      <div class="sc-bar" style="background:${p.colour};opacity:${i===cp&&!gameOver?1:0.3}"></div>
+      <div class="sc-inner">
+        <div style="flex:1;min-width:0">
+          <div class="sc-name">${p.name}</div>
+          <div class="sc-dir" style="color:${p.colour};opacity:0.7">${p.dir}</div>
+          ${cfg.mode==='hvc'&&i===1?`<div class="sc-tag">${cfg.aiLevel}</div>`:''}
+        </div>
+        <div class="sc-num" style="color:${p.colour}">${wins[i]}</div>
+      </div>
+      ${i===cp&&!gameOver?`<div class="sc-arr" style="color:${p.colour}">▶</div>`:''}
+    </div>`).join('');
 }
 
-function showWin(player) {
-  const overlay = document.getElementById("win-overlay");
-  const nameEl = document.getElementById("win-name");
-  const descEl = document.getElementById("win-desc");
-  nameEl.textContent = players[player - 1];
-  nameEl.style.color = player===1 ? "var(--copper)" : "var(--ice)";
-  descEl.textContent = player===1
-    ? "Connected top to bottom"
-    : "Connected left to right";
-  overlay.classList.add("show");
-  document.getElementById("status").innerHTML =
-    `<span style="color:${player===1?"var(--copper)":"var(--ice)"}">${players[player-1]} wins</span>`;
+function updateBanner(){
+  const el=document.getElementById('turn-banner');
+  const p=cfg.players[currentPlayer-1];
+  if(gameOver)return;
+  el.style.background=p.colour;
+  el.style.boxShadow=`0 0 24px ${p.colour}44`;
+  el.textContent=cfg.mode==='hvc'&&currentPlayer===2?`${p.name} thinking…`:`${p.name}'s turn`;
 }
 
-// ── Setup ──────────────────────────────────────────────────────────────────────
-document.getElementById("size-seg").addEventListener("click", e => {
-  const btn = e.target.closest("[data-size]");
-  if (!btn) return;
-  selectedSize = +btn.dataset.size;
-  document.querySelectorAll("#size-seg .seg").forEach(b => b.classList.toggle("active", b===btn));
-});
+function showWin(player){
+  const p=cfg.players[player-1];
+  document.getElementById('win-name').textContent=p.name;
+  document.getElementById('win-name').style.color=p.colour;
+  document.getElementById('win-sub').textContent=player===1?'Connected top to bottom':'Connected left to right';
+  const ban=document.getElementById('turn-banner');
+  ban.style.background=p.colour; ban.textContent=`${p.name} wins!`;
+  document.getElementById('win-overlay').style.display='flex';
+}
 
-document.getElementById("start-btn").addEventListener("click", () => {
-  const n1 = document.getElementById("p1-input").value.trim() || "Copper";
-  const n2 = document.getElementById("p2-input").value.trim() || "Ice";
-  players = [n1, n2];
-  N = selectedSize;
-  wins = [0, 0];
-  document.getElementById("sname-0").textContent = n1;
-  document.getElementById("sname-1").textContent = n2;
-  document.getElementById("swins-0").textContent = "0";
-  document.getElementById("swins-1").textContent = "0";
-  document.getElementById("setup").style.display = "none";
-  initGame();
-  updateStatus();
-});
-
-document.getElementById("new-game-btn").addEventListener("click", () => { initGame(); updateStatus(); });
-document.getElementById("show-menu-btn").addEventListener("click", () => {
-  document.getElementById("setup").style.display = "flex";
-  document.getElementById("win-overlay").classList.remove("show");
-});
-document.getElementById("rematch-btn").addEventListener("click", () => { initGame(); updateStatus(); });
-document.getElementById("menu-btn").addEventListener("click", () => {
-  document.getElementById("win-overlay").classList.remove("show");
-  document.getElementById("setup").style.display = "flex";
-});
-
-window.addEventListener("resize", () => { if (grid.length) renderBoard(); });
+window.addEventListener('resize',()=>{if(grid.length){const svg=document.getElementById('board');svg.dataset.n='';renderBoard();}});
+setMode('hvh');
 </script>
 </body>
 </html>
