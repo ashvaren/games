@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Hex — Ashvaren"/>
+  <title>Hex — Ashvaren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #080c14;
+      --surface:  #0e1420;
+      --surface2: #131b28;
+      --border:   #1a2535;
+      --accent:   #2e6fc4;
+      --copper:   #c8924a;
+      --copper-l: rgba(200,146,74,0.18);
+      --ice:      #6aaed4;
+      --ice-l:    rgba(106,174,212,0.18);
+      --muted:    #4a5a72;
+      --text:     #d8e2f0;
+      --text-dim: #6a7a90;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);overflow-x:hidden}
+    body{font-family:'DM Mono','Courier New',monospace;color:var(--text);-webkit-tap-highlight-color:transparent}
+    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
+
+    /* ── Layout ── */
+    #app{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:0}
+
+    /* ── Wordmark ── */
+    .wordmark{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:13px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;user-select:none}
+    .game-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:42px;letter-spacing:0.04em;color:var(--text);line-height:1;margin-bottom:6px}
+    .game-subtitle{font-size:10px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:28px}
+
+    /* ── Score bar ── */
+    .score-bar{display:flex;gap:12px;margin-bottom:20px;width:100%;max-width:540px}
+    .score-card{flex:1;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s,transform 0.2s;position:relative}
+    .score-card.active-copper{border-color:var(--copper);box-shadow:0 0 20px rgba(200,146,74,0.2);transform:scale(1.03)}
+    .score-card.active-ice{border-color:var(--ice);box-shadow:0 0 20px rgba(106,174,212,0.2);transform:scale(1.03)}
+    .score-bar-top{height:3px}
+    .score-card-inner{padding:10px 14px;display:flex;align-items:center;gap:10px}
+    .score-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .score-name{flex:1;font-size:11px;letter-spacing:0.07em;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .score-dir{font-size:9px;letter-spacing:0.06em;color:var(--muted);margin-top:2px}
+    .score-wins{font-size:22px;font-weight:500;line-height:1}
+
+    /* ── Status banner ── */
+    .status-banner{font-size:12px;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:16px;height:18px;text-align:center;transition:color 0.3s}
+
+    /* ── SVG board ── */
+    #board-wrap{position:relative}
+    svg#board{display:block;overflow:visible}
+
+    /* ── Hex cells ── */
+    .hex-cell{transition:fill 0.15s,stroke 0.15s}
+    .hex-cell.empty{fill:var(--surface2);stroke:var(--border);stroke-width:1.2;cursor:pointer}
+    .hex-cell.empty:hover{fill:#1a2840;stroke:var(--accent)}
+    .hex-cell.copper{fill:var(--copper);stroke:#a07030;stroke-width:1.5;cursor:default}
+    .hex-cell.ice{fill:var(--ice);stroke:#4a8eaa;stroke-width:1.5;cursor:default}
+    .hex-cell.win-copper{fill:#e0a050;stroke:#c07828;stroke-width:2;animation:pulse-copper 1s ease-in-out infinite alternate}
+    .hex-cell.win-ice{fill:#8ad0f0;stroke:#5090b8;stroke-width:2;animation:pulse-ice 1s ease-in-out infinite alternate}
+
+    @keyframes pulse-copper{from{filter:brightness(1)}to{filter:brightness(1.25) drop-shadow(0 0 6px rgba(200,146,74,0.8))}}
+    @keyframes pulse-ice{from{filter:brightness(1)}to{filter:brightness(1.25) drop-shadow(0 0 6px rgba(106,174,212,0.8))}}
+
+    /* ── Border strips ── */
+    .border-strip-copper{fill:rgba(200,146,74,0.12);stroke:rgba(200,146,74,0.3);stroke-width:1}
+    .border-strip-ice{fill:rgba(106,174,212,0.12);stroke:rgba(106,174,212,0.3);stroke-width:1}
+
+    /* ── Controls ── */
+    .controls{display:flex;gap:10px;margin-top:20px}
+    .btn{padding:9px 22px;border-radius:7px;border:none;font-size:11px;font-weight:500;letter-spacing:0.08em;transition:opacity 0.15s}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
+    .btn:hover{opacity:0.8}
+
+    /* ── Setup overlay ── */
+    #setup{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+    .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;max-width:380px;width:100%;text-align:center}
+    .setup-section{text-align:left;margin-bottom:22px}
+    .setup-label{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .seg-row{display:flex;gap:8px}
+    .seg{flex:1;padding:10px 6px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color 0.15s,background 0.15s}
+    .seg:hover{border-color:var(--accent)}
+    .seg.active{border-color:var(--accent);background:rgba(46,111,196,0.15)}
+    .seg-main{font-weight:700;letter-spacing:0.05em}
+    .seg-sub{font-size:9px;color:var(--muted)}
+    .name-field{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:8px}
+    .name-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .name-input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;flex:1;letter-spacing:0.04em}
+    .start-btn{width:100%;padding:15px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:'DM Mono',monospace;font-size:14px;font-weight:700;letter-spacing:0.07em;margin-top:8px}
+    .start-btn:hover{opacity:0.9}
+
+    /* ── Rules panel ── */
+    .rules{font-size:10px;color:var(--muted);letter-spacing:0.04em;line-height:1.7;margin-top:18px;text-align:left;border-top:1px solid var(--border);padding-top:14px}
+
+    /* ── Win overlay ── */
+    #win-overlay{position:fixed;inset:0;background:rgba(8,12,20,0.85);display:none;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(4px)}
+    #win-overlay.show{display:flex}
+    .win-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;max-width:320px}
+    .win-label{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;letter-spacing:0.2em;color:var(--muted);margin-bottom:8px}
+    .win-name{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;margin-bottom:20px}
+    .win-desc{font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-bottom:24px}
+  </style>
+</head>
+<body>
+<div id="setup">
+  <div class="setup-card">
+    <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--muted);margin-bottom:6px">ASHVAREN</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:38px;margin-bottom:4px">Hex</h1>
+    <p style="font-size:10px;letter-spacing:0.14em;color:var(--muted);margin-bottom:28px">CONNECT · STRATEGY · TOPOLOGY</p>
+
+    <div class="setup-section">
+      <div class="setup-label">Board size</div>
+      <div class="seg-row" id="size-seg">
+        <button class="seg" data-size="7"><span class="seg-main">Small</span><span class="seg-sub">7 × 7</span></button>
+        <button class="seg active" data-size="11"><span class="seg-main">Standard</span><span class="seg-sub">11 × 11</span></button>
+        <button class="seg" data-size="13"><span class="seg-main">Large</span><span class="seg-sub">13 × 13</span></button>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label">Players</div>
+      <div class="name-field">
+        <div class="name-dot" style="background:var(--copper)"></div>
+        <input class="name-input" id="p1-input" placeholder="Player 1 (Copper)" maxlength="14"/>
+      </div>
+      <div class="name-field">
+        <div class="name-dot" style="background:var(--ice)"></div>
+        <input class="name-input" id="p2-input" placeholder="Player 2 (Ice)" maxlength="14"/>
+      </div>
+    </div>
+
+    <button class="start-btn" id="start-btn">Begin Game</button>
+
+    <div class="rules">
+      <strong style="color:var(--text-dim)">How to play</strong><br/>
+      Copper connects top to bottom. Ice connects left to right.<br/>
+      Players alternate placing a stone on any empty cell.<br/>
+      First to form an unbroken chain across the board wins.<br/>
+      <em>No draws are possible.</em>
+    </div>
+  </div>
+</div>
+
+<div id="win-overlay">
+  <div class="win-card">
+    <div class="win-label">Victory</div>
+    <div class="win-name" id="win-name"></div>
+    <div class="win-desc" id="win-desc"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-primary" id="rematch-btn">Rematch</button>
+      <button class="btn btn-ghost" id="menu-btn">Menu</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="wordmark">Ashvaren</div>
+  <div class="game-title">Hex</div>
+  <div class="game-subtitle">Connect · Strategy · Topology</div>
+
+  <div class="score-bar" id="score-bar">
+    <div class="score-card" id="card-0">
+      <div class="score-bar-top" style="background:var(--copper)"></div>
+      <div class="score-card-inner">
+        <div class="score-dot" style="background:var(--copper)"></div>
+        <div style="flex:1">
+          <div class="score-name" id="sname-0">Copper</div>
+          <div class="score-dir">Top → Bottom</div>
+        </div>
+        <div class="score-wins" style="color:var(--copper)" id="swins-0">0</div>
+      </div>
+    </div>
+    <div class="score-card" id="card-1">
+      <div class="score-bar-top" style="background:var(--ice)"></div>
+      <div class="score-card-inner">
+        <div class="score-dot" style="background:var(--ice)"></div>
+        <div style="flex:1">
+          <div class="score-name" id="sname-1">Ice</div>
+          <div class="score-dir">Left → Right</div>
+        </div>
+        <div class="score-wins" style="color:var(--ice)" id="swins-1">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-banner" id="status"></div>
+  <div id="board-wrap"><svg id="board"></svg></div>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="new-game-btn">New Game</button>
+    <button class="btn btn-ghost" id="show-menu-btn">Menu</button>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let N = 11;
+let grid = [];        // 0=empty, 1=copper, 2=ice
+let currentPlayer = 1;
+let gameOver = false;
+let wins = [0, 0];
+let players = ["Player 1", "Player 2"];
+let selectedSize = 11;
+
+// ── Hex geometry ───────────────────────────────────────────────────────────────
+const HEX_SIZE = () => Math.min(26, Math.floor((Math.min(window.innerWidth - 40, 520)) / (N * 1.55)));
+
+function hexCorners(cx, cy, size) {
+  const pts = [];
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 180 * (60 * i + 30);
+    pts.push([cx + size * Math.cos(a), cy + size * Math.sin(a)]);
+  }
+  return pts.map(p => p.join(",")).join(" ");
+}
+
+function hexCenter(row, col, size) {
+  const w = Math.sqrt(3) * size;
+  const h = 2 * size;
+  const x = col * w + row * w / 2 + size * 2;
+  const y = row * (h * 0.75) + size * 1.2;
+  return [x, y];
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+function initGame() {
+  grid = Array.from({length: N}, () => Array(N).fill(0));
+  currentPlayer = 1;
+  gameOver = false;
+  renderBoard();
+  updateStatus();
+  document.getElementById("win-overlay").classList.remove("show");
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderBoard() {
+  const svg = document.getElementById("board");
+  svg.innerHTML = "";
+  const size = HEX_SIZE();
+  const w = Math.sqrt(3) * size;
+  const h = 2 * size;
+  const totalW = (N - 1) * w + (N - 1) * w / 2 + size * 4;
+  const totalH = (N - 1) * (h * 0.75) + h + size * 0.4;
+  svg.setAttribute("width", totalW);
+  svg.setAttribute("height", totalH);
+  svg.setAttribute("viewBox", `0 0 ${totalW} ${totalH}`);
+
+  // Border strips
+  drawBorderStrips(svg, size, w, h);
+
+  // Cells
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const [cx, cy] = hexCenter(r, c, size);
+      const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+      poly.setAttribute("points", hexCorners(cx, cy, size * 0.92));
+      poly.setAttribute("class", `hex-cell ${['empty','copper','ice'][grid[r][c]]}`);
+      poly.dataset.r = r;
+      poly.dataset.c = c;
+      if (grid[r][c] === 0 && !gameOver) {
+        poly.addEventListener("click", onCellClick);
+        poly.addEventListener("mouseenter", onCellHover);
+        poly.addEventListener("mouseleave", onCellLeave);
+      }
+      svg.appendChild(poly);
+    }
+  }
+}
+
+function drawBorderStrips(svg, size, w, h) {
+  // Copper: top and bottom edges
+  for (let c = 0; c < N; c++) {
+    const [cx, cy] = hexCenter(0, c, size);
+    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    strip.setAttribute("points", hexCorners(cx, cy - h * 0.82, size * 0.5));
+    strip.setAttribute("class","border-strip-copper");
+    svg.appendChild(strip);
+  }
+  for (let c = 0; c < N; c++) {
+    const [cx, cy] = hexCenter(N-1, c, size);
+    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    strip.setAttribute("points", hexCorners(cx, cy + h * 0.82, size * 0.5));
+    strip.setAttribute("class","border-strip-copper");
+    svg.appendChild(strip);
+  }
+  // Ice: left and right edges
+  for (let r = 0; r < N; r++) {
+    const [cx, cy] = hexCenter(r, 0, size);
+    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    strip.setAttribute("points", hexCorners(cx - w * 0.92, cy, size * 0.5));
+    strip.setAttribute("class","border-strip-ice");
+    svg.appendChild(strip);
+  }
+  for (let r = 0; r < N; r++) {
+    const [cx, cy] = hexCenter(r, N-1, size);
+    const strip = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    strip.setAttribute("points", hexCorners(cx + w * 0.92, cy, size * 0.5));
+    strip.setAttribute("class","border-strip-ice");
+    svg.appendChild(strip);
+  }
+}
+
+// ── Interaction ────────────────────────────────────────────────────────────────
+let hoverCell = null;
+function onCellHover(e) {
+  hoverCell = e.target;
+  e.target.style.fill = currentPlayer === 1 ? "rgba(200,146,74,0.35)" : "rgba(106,174,212,0.35)";
+  e.target.style.stroke = currentPlayer === 1 ? "var(--copper)" : "var(--ice)";
+}
+function onCellLeave(e) {
+  if (grid[e.target.dataset.r][e.target.dataset.c] === 0) {
+    e.target.style.fill = "";
+    e.target.style.stroke = "";
+  }
+}
+
+function onCellClick(e) {
+  if (gameOver) return;
+  const r = +e.target.dataset.r, c = +e.target.dataset.c;
+  if (grid[r][c] !== 0) return;
+  grid[r][c] = currentPlayer;
+  e.target.setAttribute("class", `hex-cell ${currentPlayer===1?"copper":"ice"}`);
+  e.target.style.fill = "";
+  e.target.style.stroke = "";
+  e.target.removeEventListener("click", onCellClick);
+  e.target.removeEventListener("mouseenter", onCellHover);
+  e.target.removeEventListener("mouseleave", onCellLeave);
+
+  const winPath = checkWin(currentPlayer);
+  if (winPath) {
+    gameOver = true;
+    highlightWinPath(winPath);
+    wins[currentPlayer - 1]++;
+    document.getElementById(`swins-${currentPlayer-1}`).textContent = wins[currentPlayer-1];
+    setTimeout(() => showWin(currentPlayer), 600);
+  } else {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    updateStatus();
+    updateActiveCard();
+  }
+}
+
+// ── Win detection (BFS) ────────────────────────────────────────────────────────
+function neighbors(r, c) {
+  return [[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0]]
+    .map(([dr,dc]) => [r+dr, c+dc])
+    .filter(([nr,nc]) => nr>=0&&nr<N&&nc>=0&&nc<N);
+}
+
+function checkWin(player) {
+  // Copper: connects row 0 to row N-1
+  // Ice: connects col 0 to col N-1
+  const starts = [];
+  if (player === 1) {
+    for (let c = 0; c < N; c++) if (grid[0][c]===1) starts.push([0,c]);
+  } else {
+    for (let r = 0; r < N; r++) if (grid[r][0]===2) starts.push([r,0]);
+  }
+  const visited = new Set();
+  const prev = new Map();
+  const queue = [...starts];
+  starts.forEach(([r,c]) => { visited.add(`${r},${c}`); prev.set(`${r},${c}`, null); });
+
+  while (queue.length) {
+    const [r, c] = queue.shift();
+    if ((player===1 && r===N-1) || (player===2 && c===N-1)) {
+      return tracePath(prev, r, c);
+    }
+    for (const [nr,nc] of neighbors(r,c)) {
+      const key = `${nr},${nc}`;
+      if (!visited.has(key) && grid[nr][nc]===player) {
+        visited.add(key);
+        prev.set(key, [r,c]);
+        queue.push([nr,nc]);
+      }
+    }
+  }
+  return null;
+}
+
+function tracePath(prev, r, c) {
+  const path = [];
+  let cur = `${r},${c}`;
+  while (cur !== null) {
+    const [pr, pc] = cur.split(",").map(Number);
+    path.push([pr, pc]);
+    cur = prev.get(cur) ? `${prev.get(cur)[0]},${prev.get(cur)[1]}` : null;
+  }
+  return path;
+}
+
+function highlightWinPath(path) {
+  const cls = currentPlayer === 1 ? "win-copper" : "win-ice";
+  path.forEach(([r,c]) => {
+    const cells = document.querySelectorAll(`.hex-cell`);
+    cells.forEach(cell => {
+      if (+cell.dataset.r===r && +cell.dataset.c===c) {
+        cell.setAttribute("class", `hex-cell ${cls}`);
+      }
+    });
+  });
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────────
+function updateStatus() {
+  const el = document.getElementById("status");
+  const name = players[currentPlayer - 1];
+  const colour = currentPlayer === 1 ? "var(--copper)" : "var(--ice)";
+  el.innerHTML = `<span style="color:${colour}">${name}</span><span style="color:var(--muted)"> to play</span>`;
+  updateActiveCard();
+}
+
+function updateActiveCard() {
+  ["card-0","card-1"].forEach((id, i) => {
+    const card = document.getElementById(id);
+    card.className = "score-card" + (i === currentPlayer-1
+      ? (i===0?" active-copper":" active-ice") : "");
+  });
+}
+
+function showWin(player) {
+  const overlay = document.getElementById("win-overlay");
+  const nameEl = document.getElementById("win-name");
+  const descEl = document.getElementById("win-desc");
+  nameEl.textContent = players[player - 1];
+  nameEl.style.color = player===1 ? "var(--copper)" : "var(--ice)";
+  descEl.textContent = player===1
+    ? "Connected top to bottom"
+    : "Connected left to right";
+  overlay.classList.add("show");
+  document.getElementById("status").innerHTML =
+    `<span style="color:${player===1?"var(--copper)":"var(--ice)"}">${players[player-1]} wins</span>`;
+}
+
+// ── Setup ──────────────────────────────────────────────────────────────────────
+document.getElementById("size-seg").addEventListener("click", e => {
+  const btn = e.target.closest("[data-size]");
+  if (!btn) return;
+  selectedSize = +btn.dataset.size;
+  document.querySelectorAll("#size-seg .seg").forEach(b => b.classList.toggle("active", b===btn));
+});
+
+document.getElementById("start-btn").addEventListener("click", () => {
+  const n1 = document.getElementById("p1-input").value.trim() || "Copper";
+  const n2 = document.getElementById("p2-input").value.trim() || "Ice";
+  players = [n1, n2];
+  N = selectedSize;
+  wins = [0, 0];
+  document.getElementById("sname-0").textContent = n1;
+  document.getElementById("sname-1").textContent = n2;
+  document.getElementById("swins-0").textContent = "0";
+  document.getElementById("swins-1").textContent = "0";
+  document.getElementById("setup").style.display = "none";
+  initGame();
+  updateStatus();
+});
+
+document.getElementById("new-game-btn").addEventListener("click", () => { initGame(); updateStatus(); });
+document.getElementById("show-menu-btn").addEventListener("click", () => {
+  document.getElementById("setup").style.display = "flex";
+  document.getElementById("win-overlay").classList.remove("show");
+});
+document.getElementById("rematch-btn").addEventListener("click", () => { initGame(); updateStatus(); });
+document.getElementById("menu-btn").addEventListener("click", () => {
+  document.getElementById("win-overlay").classList.remove("show");
+  document.getElementById("setup").style.display = "flex";
+});
+
+window.addEventListener("resize", () => { if (grid.length) renderBoard(); });
+</script>
+</body>
+</html>
