@@ -1,3499 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="description" content="Ashvaren Vehicle Tracker — personal asset management for vehicles and garden machinery." />
-<meta name="theme-color" content="#080c14" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Vehicles" />
-<title>Ashvaren — Vehicle Tracker</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23080c14'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia,serif' fill='%23b89a5a'>A</text></svg>" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Ashvaren Games"/>
+  <title>Ashvaren — Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="ashvaren.js"></script>
+  <style>
+    :root{--bg:#080c14;--surface:#0e1420;--surface2:#111926;--border:#1a2535;--accent:#2e6fc4;--text:#d8e2f0;--text-dim:#6a7a90;--muted:#3a4a5a;--orange:#e05c3a;--copper:#c8924a;--green:#50c878}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Mono','Courier New',monospace;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
+    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
 
-  :root {
-    --navy:         #080c14;
-    --navy-mid:     #0e1420;
-    --navy-2:       #131b2b;
-    --border:       #1e2a3d;
-    --muted:        #2e3f5c;
-    --text-dim:     #5d7494;
-    --text-sec:     #7a96b4;
-    --text:         #a8bdd4;
-    --text-hi:      #dde8f2;
-    --accent:       #2e6fc4;
-    --accent-hi:    #4a8fd9;
-    --accent-lo:    rgba(46,111,196,0.10);
-    --accent-mid:   rgba(46,111,196,0.22);
-    --gold:         #b89a5a;
-    --gold-lo:      rgba(184,154,90,0.12);
-    --green:        #3a9e74;
-    --green-bg:     rgba(58,158,116,0.12);
-    --amber:        #b8864a;
-    --amber-bg:     rgba(184,134,74,0.12);
-    --red:          #c0404a;
-    --red-bg:       rgba(192,64,74,0.12);
-    --purple:       #7b5dc4;
-    --purple-bg:    rgba(123,93,196,0.12);
-    --teal:         #3ab89a;
-    --teal-bg:      rgba(58,184,154,0.10);
-    --bg:           #080c14;
-    --surface:      #0e1420;
-    --surface-2:    #131b2b;
-    --shadow:       0 2px 12px rgba(0,0,0,0.4);
-    --radius:       10px;
-    --mono:         'DM Mono', monospace;
-    --display:      'Cormorant Garamond', Georgia, serif;
-    --sans:         'Jost', system-ui, sans-serif;
-  }
+    nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,12,20,0.94);backdrop-filter:blur(8px);z-index:50}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:17px;letter-spacing:0.16em;color:var(--text-dim)}
+    .nav-tabs{display:flex;gap:3px}
+    .nav-tab{padding:6px 12px;border-radius:6px;border:none;background:transparent;color:var(--text-dim);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;transition:background 0.15s,color 0.15s}
+    .nav-tab.active{background:var(--surface);color:var(--text);border:1px solid var(--border)}
 
-  body {
-    font-family: var(--sans);
-    font-weight: 300;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.55;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
+    .screen{display:none;padding:24px 18px 60px;max-width:820px;margin:0 auto}
+    .screen.active{display:block}
 
-  /* ── Loading ── */
-  #loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--bg);
-  }
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 1.5px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #loading p {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.1em;
-  }
+    .page-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;letter-spacing:0.03em;margin-bottom:3px}
+    .page-sub{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+    .section-title{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;margin-top:28px}
+    .rule{height:1px;background:var(--border);margin-bottom:14px}
 
-  /* ── Error banner ── */
-  #error-banner {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    background: #A32D2D;
-    color: #fff;
-    padding: 12px 16px;
-    font-size: 13px;
-    z-index: 9999;
-    line-height: 1.6;
-    white-space: pre-wrap;
-  }
+    .game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .game-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s}
+    .game-card:hover{transform:translateY(-2px)}
+    .game-thumb{height:110px;overflow:hidden}
+    .game-thumb svg{width:100%;height:100%}
+    .game-body{padding:12px 14px 14px}
+    .game-tag{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px}
+    .game-name{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;margin-bottom:5px}
+    .game-desc{font-size:10px;color:var(--text-dim);line-height:1.55;margin-bottom:10px}
+    .game-btns{display:flex;gap:6px}
 
-  /* ── Auth screen ── */
-  #auth-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 2rem;
-  }
-  .auth-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 2.5rem;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: var(--shadow);
-    text-align: center;
-  }
-  .auth-logo {
-    font-family: var(--display);
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-hi);
-    margin-bottom: 4px;
-  }
-  .auth-tagline {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--text-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-  }
-  .auth-card h2 {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-hi);
-    margin-bottom: 8px;
-  }
-  .auth-card p {
-    font-size: 13px;
-    color: var(--text-sec);
-    margin-bottom: 1.5rem;
-    line-height: 1.65;
-  }
-  .config-section { text-align: left; margin-bottom: 1.25rem; }
-  .config-section label {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    display: block;
-    margin-bottom: 5px;
-  }
-  .config-section input {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: var(--sans);
-    color: var(--text-hi);
-    background: var(--navy);
-    outline: none;
-  }
-  .config-section input:focus { border-color: var(--accent); }
-  .config-section .hint {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 4px;
-    font-family: var(--mono);
-  }
-  .btn-primary {
-    display: block;
-    width: 100%;
-    padding: 11px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: background 0.15s;
-    font-family: var(--sans);
-    letter-spacing: 0.03em;
-  }
-  .btn-primary:hover { background: var(--accent-hi); }
-  .auth-note {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 1rem;
-    line-height: 1.7;
-  }
+    .btn{padding:7px 14px;border-radius:6px;border:none;font-size:10px;font-weight:700;letter-spacing:0.07em;transition:opacity 0.15s,transform 0.1s;cursor:pointer}
+    .btn:hover{opacity:0.82}
+    .btn:active{transform:scale(0.96)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
+    .btn-sm{padding:5px 10px;font-size:9px}
+    .btn-danger{background:#2a0a0a;border:1.5px solid #5a1a1a;color:#ff6060}
 
-  /* ── App shell ── */
-  #app { display: none; min-height: 100vh; }
+    .inner-tabs{display:flex;gap:5px;margin-bottom:18px;flex-wrap:wrap}
+    .inner-tab{padding:6px 12px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-size:10px;font-weight:500;letter-spacing:0.07em;transition:border-color 0.15s,background 0.15s,color 0.15s;cursor:pointer}
+    .inner-tab.active{border-color:var(--accent);background:rgba(46,111,196,0.12);color:var(--text)}
+    .inner-panel{display:none}
+    .inner-panel.active{display:block}
 
-  /* ── Header ── */
-  header {
-    background: var(--navy);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    padding-left: max(2rem, env(safe-area-inset-left));
-    padding-right: max(2rem, env(safe-area-inset-right));
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-  .header-left { display: flex; flex-direction: column; justify-content: center; gap: 2px; }
-  .logo {
-    font-family: var(--display);
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-hi);
-    line-height: 1;
-  }
-  .logo-tag {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--text-dim);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-  .header-right { display: flex; align-items: center; gap: 6px; }
-  .sync-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .sync-btn:hover { background: var(--accent-lo); border-color: var(--accent); color: var(--accent-hi); }
-  .sync-status { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+    .lb{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .lb-head{display:grid;grid-template-columns:30px 1fr 64px 52px 52px 52px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:8px;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted)}
+    .lb-row{display:grid;grid-template-columns:30px 1fr 64px 52px 52px 52px;padding:11px 12px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.12s}
+    .lb-row:last-child{border-bottom:none}
+    .lb-row:hover{background:var(--surface2)}
+    .lb-rank{font-size:11px;font-weight:700;color:var(--muted)}
+    .lb-rank.gold{color:#c8924a} .lb-rank.silver{color:#8899aa} .lb-rank.bronze{color:#7a5a3a}
+    .lb-player{display:flex;align-items:center;gap:8px}
+    .lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .lb-name{font-size:12px;font-weight:500}
+    .lb-streak{font-size:9px;color:var(--orange);margin-top:1px}
+    .lb-elo{font-size:14px;font-weight:700;text-align:right}
+    .lb-cell{font-size:11px;color:var(--text-dim);text-align:right}
+    .lb-cell.w{color:var(--green)}
 
-  /* ── Nav bar ── */
-  .nav-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-  }
-  .nav-tab {
-    padding: 13px 18px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.15s;
-  }
-  .nav-tab:hover { color: var(--text); }
-  .nav-tab.active { color: var(--accent-hi); border-bottom-color: var(--accent); }
+    .results-list{display:flex;flex-direction:column;gap:6px}
+    .result-row{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:9px}
+    .result-tag{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 6px;border-radius:3px;font-weight:700;flex-shrink:0}
+    .result-names{flex:1;font-size:11px}
+    .result-winner{font-size:10px;font-weight:700;text-align:right;flex-shrink:0}
+    .result-ago{font-size:9px;color:var(--muted);flex-shrink:0;min-width:48px;text-align:right}
 
-  /* ── Main ── */
-  main { padding: 1.75rem 2rem; max-width: 1200px; }
+    .h2h-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+    .h2h-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+    .h2h-names{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+    .h2h-name{font-size:12px;font-weight:700}
+    .h2h-vs{font-size:9px;color:var(--muted)}
+    .h2h-stats{display:flex}
+    .h2h-stat{flex:1;text-align:center}
+    .h2h-num{font-size:20px;font-weight:700}
+    .h2h-lbl{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
 
-  /* ── Panels ── */
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-  .panel-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-  .panel-body { padding: 8px 0; }
+    .player-list{display:flex;flex-direction:column;gap:7px}
+    .player-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 13px;display:flex;align-items:center;gap:11px}
+    .p-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+    .p-name{flex:1;font-size:13px;font-weight:500}
+    .p-elo{font-size:10px;color:var(--text-dim)}
+    .add-form{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
+    .text-in{background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:7px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none}
+    .text-in:focus{border-color:var(--accent)}
+    .col-in{width:34px;height:30px;border-radius:5px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;padding:2px}
 
-  /* ── Filter pills ── */
-  .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
-  .filter-pill {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    padding: 4px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-pill:hover { border-color: var(--muted); color: var(--text); }
-  .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .title-badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 11px;display:flex;align-items:center;gap:7px}
+    .badge-game{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+    .badge-name{font-size:12px;font-weight:700}
 
-  /* ── Asset cards grid ── */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-  }
-  .asset-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    transition: border-color 0.15s;
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .asset-card:hover { border-color: var(--muted); }
-  .asset-card-photo {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: var(--navy-2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  .asset-card-photo img { width: 100%; height: 100%; object-fit: cover; }
-  .asset-card-photo-placeholder {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-align: center;
-    padding: 1rem;
-  }
-  .asset-card-body { padding: 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
-  .asset-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .asset-name { font-size: 14px; font-weight: 500; color: var(--text-hi); line-height: 1.3; }
-  .asset-group { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 3px; }
-  .status-pill {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: 8px;
-  }
-  .s-road       { background: var(--green-bg);  color: var(--green); }
-  .s-sorn       { background: var(--amber-bg);  color: var(--amber); }
-  .s-project    { background: var(--purple-bg); color: var(--purple); }
-  .s-in-use     { background: var(--green-bg);  color: var(--green); }
-  .s-retired    { background: rgba(93,116,148,0.12); color: var(--text-dim); }
-  .s-stored     { background: rgba(93,116,148,0.12); color: var(--text-dim); }
-  .asset-meta { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-bottom: 4px; }
-  .compliance-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
-  .compliance-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .compliance-dot.ok     { background: var(--green); }
-  .compliance-dot.soon   { background: var(--amber); }
-  .compliance-dot.overdue{ background: var(--red); }
-  .compliance-dot.none   { background: var(--muted); }
-  .compliance-text { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
-  .add-card {
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    cursor: pointer;
-    color: var(--text-dim);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    transition: all 0.15s;
-  }
-  .add-card:hover { border-color: var(--accent); color: var(--accent-hi); background: var(--accent-lo); }
+    .instr-hero{width:100%;height:140px;border-radius:10px;overflow:hidden;margin-bottom:16px}
+    .instr-hero svg{width:100%;height:100%}
+    .steps{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+    .step{display:flex;gap:12px}
+    .step-num{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px}
+    .step-title{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--text)}
+    .step-desc{font-size:10px;color:var(--text-dim);line-height:1.6}
+    .tip{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 7px 7px 0;padding:10px 13px;font-size:10px;color:var(--text-dim);line-height:1.6;margin-bottom:16px}
 
-  /* ── Dashboard ── */
-  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
-  .compliance-alert-item {
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .compliance-alert-item:last-child { border-bottom: none; }
-  .alert-asset { font-size: 13px; font-weight: 500; color: var(--text-hi); }
-  .alert-detail { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-  .alert-overdue { color: var(--red); }
-  .alert-soon    { color: var(--amber); }
-  .empty-state {
-    padding: 28px 16px;
-    text-align: center;
-    color: var(--text-dim);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.05em;
-  }
+    .empty{text-align:center;padding:28px;color:var(--muted);font-size:11px;letter-spacing:0.05em}
 
-  /* ── Compliance table ── */
-  .compliance-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .compliance-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .compliance-table th {
-    padding: 10px 14px;
-    text-align: left;
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-    background: var(--navy);
-  }
-  .compliance-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
-  .compliance-table tr:last-child td { border-bottom: none; }
-  .compliance-table tr:hover td { background: var(--surface-2); }
-
-  /* ── Modals ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 50px 1rem 2rem;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    overflow-y: auto;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.75rem;
-    width: 100%;
-    max-width: 520px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    transform: translateY(-8px);
-    transition: transform 0.15s;
-    margin: auto;
-    flex-shrink: 0;
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-  .modal h2 {
-    font-family: var(--display);
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-hi);
-    margin-bottom: 4px;
-    letter-spacing: 0.05em;
-  }
-  .modal-subtitle { font-size: 13px; color: var(--text-sec); margin-bottom: 1rem; }
-  .field { margin-bottom: 12px; }
-  .field label {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    display: block;
-    margin-bottom: 5px;
-  }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .field input, .field select, .field textarea {
-    width: 100%;
-    padding: 9px 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: var(--sans);
-    color: var(--text-hi);
-    background: var(--navy);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
-  .field select option { background: var(--surface); }
-  .field textarea { min-height: 64px; resize: vertical; }
-  .opt { font-size: 10px; color: var(--text-dim); font-weight: 400; margin-left: 4px; text-transform: none; letter-spacing: 0; }
-  .section-divider {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin: 1.25rem 0 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
-  .btn-cancel {
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-sec);
-    cursor: pointer;
-    font-size: 13px;
-    font-family: var(--sans);
-    transition: all 0.15s;
-  }
-  .btn-cancel:hover { background: var(--surface-2); border-color: var(--muted); }
-  .btn-save {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: var(--sans);
-    transition: background 0.15s;
-  }
-  .btn-save:hover { background: var(--accent-hi); }
-  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* ── Phase placeholder panels ── */
-  .phase-placeholder {
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1.25rem;
-    text-align: center;
-  }
-  .phase-placeholder-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 6px;
-  }
-  .phase-placeholder p { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-hi);
-    font-size: 13px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: all 0.2s;
-    pointer-events: none;
-    z-index: 300;
-    max-width: 320px;
-    line-height: 1.55;
-    box-shadow: var(--shadow);
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── Hamburger / mobile menu ── */
-  .hamburger-btn { display: none; }
-  .mobile-menu { display: none; }
-
-  /* ── Mobile responsive ── */
-  @media (max-width: 768px) {
-    header { padding: 0 1rem; height: 54px; }
-    .logo { font-size: 15px; }
-    .logo-tag { display: none; }
-    .header-right .sync-btn { display: none; }
-    .hamburger-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-size: 18px;
+    @media(max-width:500px){
+      .lb-head,.lb-row{grid-template-columns:26px 1fr 56px 44px}
+      .lb-cell.hs,.lb-head .hs{display:none}
     }
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 54px;
-      right: 0; left: 0;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      z-index: 100;
-      padding: 8px 0;
-      box-shadow: var(--shadow);
-    }
-    .mobile-menu.open { display: block; }
-    .mobile-menu-item {
-      display: block;
-      width: 100%;
-      padding: 13px 20px;
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-sec);
-      background: transparent;
-      border: none;
-      text-align: left;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border);
-    }
-    .mobile-menu-item:last-child { border-bottom: none; }
-    .mobile-menu-item:hover { background: var(--surface-2); color: var(--text-hi); }
-    .nav-bar { padding: 0 0.5rem; overflow-x: auto; scrollbar-width: none; }
-    .nav-bar::-webkit-scrollbar { display: none; }
-    .nav-tab { padding: 12px 14px; font-size: 10px; white-space: nowrap; }
-    main { padding: 1rem; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
-    .dashboard-grid { grid-template-columns: 1fr; }
-    .cards-grid { grid-template-columns: 1fr; }
-    .modal-overlay { padding: 0; align-items: flex-end; }
-    .modal { border-radius: 14px 14px 0 0; max-height: 92dvh; overflow-y: auto; margin: 0; max-width: 100%; }
-    .field-row { grid-template-columns: 1fr; }
-  }
-</style>
+  </style>
 </head>
 <body>
 
-<div id="error-banner"></div>
-<div id="loading"><div class="spinner"></div><p id="loading-msg">Loading&hellip;</p></div>
-
-<!-- AUTH SCREEN -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">Ashvaren</div>
-    <div class="auth-tagline">Clarity. Structure. Growth.</div>
-    <h2>Vehicle Tracker</h2>
-    <p>Enter your credentials to get started. These are stored only in your browser's local storage.</p>
-    <div class="config-section">
-      <label>Google OAuth client ID</label>
-      <input type="text" id="cfg-client-id" placeholder="xxxx.apps.googleusercontent.com" />
-      <div class="hint">From Google Cloud Console &rsaquo; APIs &amp; Services &rsaquo; Credentials</div>
-    </div>
-    <div class="config-section">
-      <label>Proxy URL <span style="font-weight:300;letter-spacing:0;">(leave blank for now)</span></label>
-      <input type="text" id="cfg-proxy-url" placeholder="https://ashvaren-vehicles-proxy.xxx.workers.dev" />
-      <div class="hint">Cloudflare Worker &mdash; set up in WP7</div>
-    </div>
-    <button class="btn-primary" onclick="saveConfigAndAuth()">Connect with Google &rarr;</button>
-    <p class="auth-note">You will be redirected to Google to grant access to Drive and Calendar.</p>
+<nav>
+  <div class="nav-logo">Ashvaren</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="nav('games',this)">Games</button>
+    <button class="nav-tab" onclick="nav('champ',this)">Championship</button>
+    <button class="nav-tab" onclick="nav('players',this)">Players</button>
   </div>
-</div>
+</nav>
 
-<!-- APP SHELL -->
-<div id="app">
-  <header>
-    <div class="header-left">
-      <span class="logo">Ashvaren</span>
-      <span class="logo-tag">Vehicle tracker</span>
-    </div>
-    <div class="header-right">
-      <span class="sync-status" id="sync-status"></span>
-      <button class="sync-btn" onclick="saveToD()">Save to Drive</button>
-      <button class="sync-btn" onclick="openSettings()">Settings</button>
-      <button class="sync-btn" onclick="signOut()">Sign out</button>
-      <button class="hamburger-btn" onclick="toggleMobileMenu()" id="hamburger-btn" aria-label="Menu">&#9776;</button>
-    </div>
-  </header>
-
-  <div class="mobile-menu" id="mobile-menu">
-    <button class="mobile-menu-item" onclick="saveToD();closeMobileMenu()">Save to Drive</button>
-    <button class="mobile-menu-item" onclick="openSettings();closeMobileMenu()">Settings</button>
-    <button class="mobile-menu-item" onclick="signOut()">Sign out</button>
+<!-- GAMES -->
+<div id="s-games" class="screen active">
+  <div style="margin-bottom:20px">
+    <div class="page-title">Games</div>
+    <div class="page-sub">Ashvaren Family Collection</div>
   </div>
+  <div class="section-title">Current Champions</div>
+  <div id="champ-badges" class="title-badges" style="margin-bottom:24px"></div>
+  <div class="section-title">Play</div>
+  <div class="game-grid" id="game-grid">
 
-  <div class="nav-bar">
-    <button class="nav-tab active" onclick="showView('dashboard', this)">Dashboard</button>
-    <button class="nav-tab" onclick="showView('assets', this)">Assets</button>
-    <button class="nav-tab" onclick="showView('compliance', this)">Compliance</button>
-    <button class="nav-tab" onclick="showView('settings-view', this)">Settings</button>
-  </div>
-
-  <main>
-
-    <!-- DASHBOARD VIEW -->
-    <div id="view-dashboard">
-      <!-- Summary strip -->
-      <div id="dashboard-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem;"></div>
-      <!-- Main panels -->
-      <div class="dashboard-grid">
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">Compliance alerts</span>
-            <button class="sync-btn" style="font-size:9px;padding:3px 10px;" onclick="openComplianceModal(null,null)">+ Add record</button>
-          </div>
-          <div class="panel-body" id="dashboard-alerts">
-            <div class="empty-state">No assets loaded yet</div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">Recent mileage &amp; hours</span>
-            <button class="sync-btn" style="font-size:9px;padding:3px 10px;" onclick="openMileageModal(null)">+ Add reading</button>
-          </div>
-          <div class="panel-body" id="dashboard-mileage">
-            <div class="empty-state">No readings recorded yet</div>
-          </div>
-        </div>
-      </div>
-      <!-- Quick actions -->
-      <div class="panel" style="margin-bottom:1.25rem;">
-        <div class="panel-header"><span class="panel-title">Quick actions</span></div>
-        <div class="panel-body" style="padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="sync-btn" onclick="showView('assets', document.querySelectorAll('.nav-tab')[1])">Assets</button>
-          <button class="sync-btn" onclick="showView('compliance', document.querySelectorAll('.nav-tab')[2])">All compliance</button>
-          <button class="sync-btn" onclick="openAssetModal()">+ Add asset</button>
-          <button class="sync-btn" onclick="openMileageModal(null)">+ Add mileage reading</button>
-          <button class="sync-btn" onclick="openComplianceModal(null,null)">+ Add compliance record</button>
+    <!-- Dots & Boxes -->
+    <div class="game-card" onmouseenter="this.style.borderColor='#e05c3a';this.style.boxShadow='0 4px 20px rgba(224,92,58,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <rect x="52" y="18" width="56" height="46" fill="rgba(224,92,58,0.15)" rx="2"/>
+        <rect x="162" y="48" width="56" height="46" fill="rgba(46,111,196,0.15)" rx="2"/>
+        <line x1="50" y1="16" x2="110" y2="16" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="66" x2="110" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="16" x2="50" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="110" y1="16" x2="110" y2="66" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="46" x2="220" y2="46" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="96" x2="220" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="160" y1="46" x2="160" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <line x1="220" y1="46" x2="220" y2="96" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/>
+        <text x="80" y="48" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="12" font-weight="700">P1</text>
+        <text x="190" y="77" text-anchor="middle" fill="#2e6fc4" font-family="'DM Mono',monospace" font-size="12" font-weight="700">P2</text>
+        <g fill="#c8d0e0"><circle cx="50" cy="16" r="3.5"/><circle cx="110" cy="16" r="3.5"/><circle cx="160" cy="16" r="3.5"/><circle cx="220" cy="16" r="3.5"/><circle cx="50" cy="66" r="3.5"/><circle cx="110" cy="66" r="3.5"/><circle cx="160" cy="66" r="3.5"/><circle cx="220" cy="66" r="3.5"/><circle cx="50" cy="96" r="3.5"/><circle cx="110" cy="96" r="3.5"/><circle cx="160" cy="96" r="3.5"/><circle cx="220" cy="96" r="3.5"/></g>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">2 Players · Strategy · vs AI</div>
+        <div class="game-name" style="color:#e05c3a">Dots &amp; Boxes</div>
+        <div class="game-desc">Draw lines to claim boxes. Most boxes wins. Play a friend or the AI.</div>
+        <div class="game-btns">
+          <button class="btn" style="background:#e05c3a;color:#fff" onclick="showInstr('dots')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('dots-and-boxes.html')">Play →</button>
         </div>
       </div>
     </div>
 
-    <!-- ASSETS VIEW -->
-    <div id="view-assets" style="display:none;">
-      <div class="filter-pills" id="asset-filter-pills">
-        <button class="filter-pill active" onclick="setAssetFilter('all', this)">All</button>
-        <button class="filter-pill" onclick="setAssetFilter('car', this)">Cars</button>
-        <button class="filter-pill" onclick="setAssetFilter('motorcycle', this)">Motorcycles</button>
-        <button class="filter-pill" onclick="setAssetFilter('garden', this)">Garden</button>
-      </div>
-      <div class="cards-grid" id="asset-cards-grid">
-        <div class="add-card" onclick="openAssetModal()">+ Add asset</div>
-      </div>
-    </div>
-
-    <!-- ASSET DETAIL VIEW (not a tab — rendered full page) -->
-    <div id="view-asset-detail" style="display:none;">
-      <div style="margin-bottom:1rem;">
-        <button class="sync-btn" onclick="closeAssetDetail()">&larr; Back to assets</button>
-      </div>
-      <div id="asset-detail-content"></div>
-    </div>
-
-    <!-- COMPLIANCE VIEW -->
-    <div id="view-compliance" style="display:none;">
-      <div class="compliance-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Type</th>
-              <th>Expiry</th>
-              <th>Days remaining</th>
-              <th>Provider</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="compliance-tbody">
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-dim);font-family:var(--mono);font-size:11px;">No compliance records yet</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SETTINGS VIEW -->
-    <div id="view-settings-view" style="display:none;">
-      <div class="panel" style="max-width:520px;">
-        <div class="panel-header"><span class="panel-title">Configuration</span></div>
-        <div style="padding:1.25rem;">
-          <div class="field">
-            <label>Google OAuth client ID</label>
-            <input type="text" id="sv-client-id" />
-          </div>
-          <div class="field">
-            <label>Proxy URL <span class="opt">(Cloudflare Worker &mdash; WP7)</span></label>
-            <input type="text" id="sv-proxy-url" placeholder="https://ashvaren-vehicles-proxy.xxx.workers.dev" />
-          </div>
-          <div class="field">
-            <label>Worker secret <span class="opt">from your credentials file</span></label>
-            <input type="password" id="sv-worker-secret" placeholder="Paste your WORKER_SECRET value" />
-          </div>
-          <div class="field">
-            <label>Default reminder lead days</label>
-            <input type="number" id="sv-reminder-days" value="30" min="1" max="90" />
-          </div>
-          <div style="margin-top:1rem;">
-            <button class="btn-save" onclick="saveSettingsView()">Save settings</button>
-          </div>
+    <!-- Hex -->
+    <div class="game-card" onmouseenter="this.style.borderColor='#c8924a';this.style.boxShadow='0 4px 20px rgba(200,146,74,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <polygon points="50,16 63,8 76,16 76,32 63,40 50,32" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="84,16 97,8 110,16 110,32 97,40 84,32" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="118,16 131,8 144,16 144,32 131,40 118,32" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="152,16 165,8 178,16 178,32 165,40 152,32" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="67,48 80,40 93,48 93,64 80,72 67,64" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="101,48 114,40 127,48 127,64 114,72 101,64" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="135,48 148,40 161,48 161,64 148,72 135,64" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
+        <polygon points="169,48 182,40 195,48 195,64 182,72 169,64" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polygon points="84,80 97,72 110,80 110,96 97,104 84,96" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/>
+        <polygon points="118,80 131,72 144,80 144,96 131,104 118,96" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/>
+        <polygon points="152,80 165,72 178,80 178,96 165,104 152,96" fill="#111926" stroke="#243040" stroke-width="1"/>
+        <polyline points="63,24 114,56 131,88" stroke="#c8924a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">2 Players · Topology · vs AI</div>
+        <div class="game-name" style="color:#c8924a">Hex</div>
+        <div class="game-desc">Connect your two board edges. No draws possible. Four AI levels.</div>
+        <div class="game-btns">
+          <button class="btn" style="background:#c8924a;color:#fff" onclick="showInstr('hex')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('hex.html')">Play →</button>
         </div>
       </div>
     </div>
 
-  </main>
-</div>
-
-<!-- ASSET ADD / EDIT MODAL -->
-<div class="modal-overlay" id="asset-modal">
-  <div class="modal">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
-      <h2 id="asset-modal-title">Add asset</h2>
-      <button onclick="closeAssetModal()" style="font-size:18px;line-height:1;border:none;background:transparent;color:var(--text-dim);cursor:pointer;padding:0 0 0 12px;">&times;</button>
-    </div>
-    <p class="modal-subtitle">Enter the details for this asset.</p>
-
-    <div class="field-row">
-      <div class="field">
-        <label>Asset type</label>
-        <select id="am-type">
-          <option value="car">Car</option>
-          <option value="motorcycle">Motorcycle</option>
-          <option value="mower">Mower</option>
-          <option value="strimmer">Strimmer</option>
-          <option value="blower">Blower</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select id="am-status">
-          <option value="road">Road</option>
-          <option value="sorn">SORN</option>
-          <option value="project">Project</option>
-          <option value="in-use">In use</option>
-          <option value="stored">Stored</option>
-          <option value="retired">Retired</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Display name</label>
-      <input type="text" id="am-name" placeholder="e.g. BMW E36 318ti Compact" />
-    </div>
-
-    <div class="field">
-      <label>Group <span class="opt">optional — e.g. NC30 Collection</span></label>
-      <input type="text" id="am-group" placeholder="e.g. NC30 Collection" />
-    </div>
-
-    <div class="field-row">
-      <div class="field">
-        <label>Make</label>
-        <input type="text" id="am-make" placeholder="e.g. BMW" />
-      </div>
-      <div class="field">
-        <label>Model</label>
-        <input type="text" id="am-model" placeholder="e.g. 318ti Compact (E36)" />
+    <!-- Minesweeper -->
+    <div class="game-card" onmouseenter="this.style.borderColor='#2e6fc4';this.style.boxShadow='0 4px 20px rgba(46,111,196,0.12)'" onmouseleave="this.style.borderColor='#1a2535';this.style.boxShadow='none'">
+      <div class="game-thumb"><svg viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="260" height="110" fill="#0e1420"/>
+        <rect x="14" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="46" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="78" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="110" y="12" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="142" y="12" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="174" y="12" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="14" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="46" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="78" y="44" width="28" height="28" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/>
+        <rect x="110" y="44" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="142" y="44" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="14" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="46" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <rect x="78" y="76" width="28" height="28" rx="3" fill="#2a0808" stroke="#4a1010"/>
+        <rect x="110" y="76" width="28" height="28" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/>
+        <text x="28" y="31" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="60" y="31" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="92" y="31" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="13" font-weight="700">3</text>
+        <text x="124" y="31" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="28" y="63" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="60" y="63" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="13" font-weight="700">2</text>
+        <text x="92" y="63" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="13" font-weight="700">1</text>
+        <text x="156" y="31" text-anchor="middle" fill="#e05c3a" font-size="14">⚑</text>
+        <text x="188" y="31" text-anchor="middle" fill="#e05c3a" font-size="14">⚑</text>
+        <text x="92" y="96" text-anchor="middle" font-size="16">💣</text>
+      </svg></div>
+      <div class="game-body">
+        <div class="game-tag">Solo · Logic · Beat Your Best</div>
+        <div class="game-name" style="color:#2e6fc4">Minefield</div>
+        <div class="game-desc">Clear the grid without detonating a mine. Pure logic and nerve.</div>
+        <div class="game-btns">
+          <button class="btn btn-primary" onclick="showInstr('mines')">How to Play</button>
+          <button class="btn btn-ghost" onclick="go('minesweeper.html')">Play →</button>
+        </div>
       </div>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label>Year</label>
-        <input type="number" id="am-year" placeholder="1997" min="1900" max="2030" />
-      </div>
-      <div class="field">
-        <label>Colour <span class="opt">optional</span></label>
-        <input type="text" id="am-colour" placeholder="e.g. Boston Green" />
-      </div>
-    </div>
+  </div>
 
-    <div class="field">
-      <label>VRM / frame number / serial number</label>
-      <input type="text" id="am-identifier" placeholder="Registration, frame, or serial number" />
+  <div id="instr-wrap" style="display:none;margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin:0" id="instr-ttl"></div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('instr-wrap').style.display='none'">✕</button>
     </div>
-
-    <div class="field-row">
-      <div class="field">
-        <label>VIN <span class="opt">optional</span></label>
-        <input type="text" id="am-vin" />
-      </div>
-      <div class="field">
-        <label>Engine number <span class="opt">optional</span></label>
-        <input type="text" id="am-engine" />
-      </div>
-    </div>
-
-    <div class="section-divider">Acquisition &amp; value</div>
-
-    <div class="field-row">
-      <div class="field">
-        <label>Acquisition date</label>
-        <input type="date" id="am-acq-date" />
-      </div>
-      <div class="field">
-        <label>Acquisition cost &pound;</label>
-        <input type="number" id="am-acq-cost" placeholder="0" min="0" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Current value &pound; <span class="opt">user-maintained estimate</span></label>
-      <input type="number" id="am-value" placeholder="0" min="0" />
-    </div>
-
-    <div class="field" id="am-uses-hours-field" style="display:none;">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" id="am-uses-hours" style="width:auto;margin:0;" />
-        <span>Track hours rather than mileage (garden machinery)</span>
-      </label>
-    </div>
-
-    <div class="field">
-      <label>Notes <span class="opt">optional</span></label>
-      <textarea id="am-notes" placeholder="Background, condition, history&hellip;"></textarea>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeAssetModal()">Cancel</button>
-      <button class="btn-save" onclick="saveAsset()">Save asset</button>
-    </div>
+    <div id="instr-body"></div>
   </div>
 </div>
 
-<!-- SETTINGS MODAL (header button) -->
-<div class="modal-overlay" id="settings-modal">
-  <div class="modal">
-    <h2>Settings</h2>
-    <div class="field">
-      <label>Google OAuth client ID</label>
-      <input type="text" id="s-client-id" />
-    </div>
-    <div class="field">
-      <label>Proxy URL</label>
-      <input type="text" id="s-proxy-url" />
-    </div>
-    <div class="field">
-      <label>Worker secret</label>
-      <input type="password" id="s-worker-secret" />
-    </div>
-    <div class="field">
-      <label>Default reminder lead days</label>
-      <input type="number" id="s-reminder-days" value="30" min="1" max="90" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
-      <button class="btn-save" onclick="saveSettings()">Save</button>
-    </div>
+<!-- CHAMPIONSHIP -->
+<div id="s-champ" class="screen">
+  <div class="page-title">Championship</div>
+  <div class="page-sub">Elo ratings · Win records · Head to head</div>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="itab('champ','lb',this)">Leaderboard</button>
+    <button class="inner-tab" onclick="itab('champ','h2h',this)">Head to Head</button>
+    <button class="inner-tab" onclick="itab('champ','recent',this)">Recent</button>
+    <button class="inner-tab" onclick="itab('champ','bygame',this)">By Game</button>
+  </div>
+  <div id="champ-lb" class="inner-panel active"></div>
+  <div id="champ-h2h" class="inner-panel"></div>
+  <div id="champ-recent" class="inner-panel"></div>
+  <div id="champ-bygame" class="inner-panel"></div>
+  <div style="margin-top:28px">
+    <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete ALL results and reset Elo ratings?')){ACV.clearAll();renderChamp()}">Reset all records</button>
   </div>
 </div>
 
-<!-- DOCUMENT DETAIL MODAL -->
-<div class="modal-overlay" id="doc-detail-modal">
-  <div class="modal" style="max-width:600px;">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
-      <h2 id="doc-detail-title">Document</h2>
-      <button onclick="document.getElementById('doc-detail-modal').classList.remove('open')" style="font-size:18px;line-height:1;border:none;background:transparent;color:var(--text-dim);cursor:pointer;padding:0 0 0 12px;">&times;</button>
-    </div>
-    <div id="doc-detail-content"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="doc-delete-btn" onclick="deleteDocument()" style="color:var(--red);border-color:var(--red-bg);">Delete</button>
-      <button class="btn-save" onclick="document.getElementById('doc-detail-modal').classList.remove('open')">Close</button>
-    </div>
+<!-- PLAYERS -->
+<div id="s-players" class="screen">
+  <div class="page-title">Players</div>
+  <div class="page-sub">Family roster</div>
+  <div id="plist" class="player-list"></div>
+  <div class="add-form">
+    <input class="text-in" id="pname" placeholder="New player name" maxlength="14" style="flex:1;min-width:110px"/>
+    <input type="color" class="col-in" id="pcol" value="#c8924a"/>
+    <button class="btn btn-primary" onclick="addP()">Add</button>
   </div>
 </div>
-
-<!-- DOCUMENT CAPTURE CONFIRMATION MODAL -->
-<div class="modal-overlay" id="capture-modal">
-  <div class="modal" style="max-width:600px;">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
-      <h2>Confirm extraction</h2>
-      <button onclick="closeCaptureModal()" style="font-size:18px;line-height:1;border:none;background:transparent;color:var(--text-dim);cursor:pointer;padding:0 0 0 12px;">&times;</button>
-    </div>
-    <p class="modal-subtitle">Review the extracted data before saving. Edit any field that is incorrect.</p>
-    <div id="capture-modal-content"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeCaptureModal()">Cancel</button>
-      <button class="btn-save" id="capture-save-btn" onclick="saveCapture()">Save all</button>
-    </div>
-  </div>
-</div>
-
-<!-- COMPLIANCE RECORD MODAL -->
-<div class="modal-overlay" id="compliance-modal">
-  <div class="modal">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
-      <h2 id="compliance-modal-title">Add compliance record</h2>
-      <button onclick="closeComplianceModal()" style="font-size:18px;line-height:1;border:none;background:transparent;color:var(--text-dim);cursor:pointer;padding:0 0 0 12px;">&times;</button>
-    </div>
-    <p class="modal-subtitle">MOT, road tax, insurance, V5 location or service plan.</p>
-    <div class="field-row">
-      <div class="field">
-        <label>Asset</label>
-        <select id="cm-asset"></select>
-      </div>
-      <div class="field">
-        <label>Record type</label>
-        <select id="cm-type">
-          <option value="mot">MOT</option>
-          <option value="road-tax">Road tax</option>
-          <option value="insurance">Insurance</option>
-          <option value="v5-location">V5 location</option>
-          <option value="service-plan">Service plan</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Expiry date</label>
-        <input type="date" id="cm-expiry" />
-      </div>
-      <div class="field">
-        <label>Start date <span class="opt">optional</span></label>
-        <input type="date" id="cm-start" />
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Provider <span class="opt">optional</span></label>
-        <input type="text" id="cm-provider" placeholder="e.g. AA, DVLA, Bennetts" />
-      </div>
-      <div class="field">
-        <label>Policy / ref number <span class="opt">optional</span></label>
-        <input type="text" id="cm-policy" placeholder="e.g. GDCCA07743809" />
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Cost &pound; <span class="opt">optional</span></label>
-        <input type="number" id="cm-cost" placeholder="0" min="0" step="0.01" />
-      </div>
-      <div class="field">
-        <label>Reminder lead days</label>
-        <input type="number" id="cm-lead" value="30" min="1" max="90" />
-      </div>
-    </div>
-    <div class="field">
-      <label>Notes <span class="opt">optional</span></label>
-      <input type="text" id="cm-notes" placeholder="e.g. Comprehensive, MOT exempt" />
-    </div>
-    <div id="cm-calendar-status" style="display:none;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:8px 12px;background:var(--navy);border-radius:7px;border:1px solid var(--border);"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeComplianceModal()">Cancel</button>
-      <button class="btn-save" id="cm-save-btn" onclick="saveComplianceRecord()">Save record</button>
-    </div>
-  </div>
-</div>
-
-<!-- MILEAGE READING MODAL -->
-<div class="modal-overlay" id="mileage-modal">
-  <div class="modal">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
-      <h2 id="mileage-modal-title">Add reading</h2>
-      <button onclick="closeMileageModal()" style="font-size:18px;line-height:1;border:none;background:transparent;color:var(--text-dim);cursor:pointer;padding:0 0 0 12px;">&times;</button>
-    </div>
-    <p class="modal-subtitle" id="mileage-modal-subtitle">Enter the current odometer or hours reading.</p>
-    <div class="field">
-      <label>Asset</label>
-      <select id="mm-asset" onchange="updateMileageModalAsset()"></select>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label id="mm-value-label">Reading</label>
-        <input type="number" id="mm-value" placeholder="0" min="0" step="1" />
-      </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="mm-date" />
-      </div>
-    </div>
-    <div class="field">
-      <label>Source</label>
-      <select id="mm-source">
-        <option value="manual">Manual entry</option>
-        <option value="mot-certificate">MOT certificate</option>
-        <option value="service-invoice">Service invoice</option>
-        <option value="derived">Derived</option>
-      </select>
-    </div>
-    <div class="field">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" id="mm-estimate" style="width:auto;margin:0;" />
-        <span>Mark as estimate</span>
-      </label>
-    </div>
-    <div class="field">
-      <label>Notes <span class="opt">optional</span></label>
-      <input type="text" id="mm-notes" placeholder="e.g. pre-service check" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeMileageModal()">Cancel</button>
-      <button class="btn-save" onclick="saveMileageReading()">Save reading</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-window.onerror = function(msg, src, line, col, err) {
-  const banner = document.getElementById('error-banner');
-  if (banner) {
-    banner.style.display = 'block';
-    banner.textContent = 'JS Error: ' + msg + '\nFile: ' + src + ' Line: ' + line + ':' + col + (err ? '\n' + err.stack : '');
-  }
-  document.getElementById('loading-msg').textContent = 'Error on load — see red banner';
-  return false;
-};
-window.addEventListener('unhandledrejection', function(e) {
-  const banner = document.getElementById('error-banner');
-  if (banner) {
-    banner.style.display = 'block';
-    banner.textContent = (banner.textContent || '') + '\nUnhandled promise: ' + (e.reason ? e.reason.toString() : 'unknown');
-  }
-});
+const GL = ACV.GAME_LABELS, GC = ACV.GAME_COLOURS;
 
-// ── Constants ────────────────────────────────────────────────────────────────
-const SCOPES    = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar';
-const STATE_FILE = 'vehicle-tracker-state.json';
+function nav(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='champ')   renderChamp();
+  if(id==='players') renderPlayers();
+  if(id==='games')   renderBadges();
+}
+function go(url){ window.location.href = url; }
+function itab(group,id,el){
+  const p = document.getElementById(group+'-'+id);
+  p.closest('.screen').querySelectorAll('.inner-panel').forEach(x=>x.classList.remove('active'));
+  p.closest('.screen').querySelectorAll('.inner-tab').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active');
+  el.classList.add('active');
+}
 
-// ── App state ────────────────────────────────────────────────────────────────
-let cfg = { clientId: '', proxyUrl: '', reminderDays: 30, workerSecret: '' };
-let token = null;
-let driveFileId = null;
-let editAssetId = null;
-let assetFilter = 'all';
+// Badges
+function renderBadges(){
+  const rs = ACV.getResults();
+  const pm = Object.fromEntries(ACV.getPlayers().map(p=>[p.id,p]));
+  const el = document.getElementById('champ-badges');
+  const badges = ['dots','hex','mines'].map(g=>{
+    const last = rs.find(r=>r.game===g&&r.winnerId);
+    if(!last) return null;
+    const p = pm[last.winnerId];
+    return `<div class="badge"><span style="font-size:14px">🏆</span><div><div class="badge-game">${GL[g]}</div><div class="badge-name" style="color:${p?.colour||'var(--text)'}">${p?.name||'?'}</div></div></div>`;
+  }).filter(Boolean);
+  el.innerHTML = badges.length ? badges.join('') : '<div style="font-size:10px;color:var(--muted)">No games recorded yet.</div>';
+}
 
-let state = {
-  assets: [],
-  complianceRecords: [],
-  mileageReadings: [],
-  settings: { reminderLeadDays: 30, calendarId: null },
-};
+// Championship
+function renderChamp(){
+  renderLB(); renderH2H(); renderRecent(); renderByGame();
+}
+function rc(i){ return i===0?'gold':i===1?'silver':i===2?'bronze':''; }
+function ri(i){ return i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1; }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
-window.onload = async () => {
-  cfg.clientId     = localStorage.getItem('vt_client_id')      || '';
-  cfg.proxyUrl     = localStorage.getItem('vt_proxy_url')     || '';
-  cfg.reminderDays = parseInt(localStorage.getItem('vt_reminder_days') || '30');
-  cfg.workerSecret = localStorage.getItem('vt_worker_secret') || '';
+function renderLB(){
+  const lb = ACV.leaderboard();
+  const el = document.getElementById('champ-lb');
+  if(!lb.length){el.innerHTML='<div class="empty">No players yet.</div>';return;}
+  el.innerHTML=`<div class="lb">
+    <div class="lb-head"><div>#</div><div>Player</div><div style="text-align:right">Elo</div><div style="text-align:right">W</div><div style="text-align:right" class="hs">L</div><div style="text-align:right" class="hs">D</div></div>
+    ${lb.map((p,i)=>`<div class="lb-row">
+      <div class="lb-rank ${rc(i)}">${ri(i)}</div>
+      <div class="lb-player"><div class="lb-dot" style="background:${p.colour}"></div><div>
+        <div class="lb-name">${p.name}</div>
+        ${p.stats.streak>1?`<div class="lb-streak">🔥 ${p.stats.streak}</div>`:''}
+      </div></div>
+      <div class="lb-elo" style="color:${p.colour}">${p.elo}</div>
+      <div class="lb-cell w">${p.stats.total.w}</div>
+      <div class="lb-cell hs">${p.stats.total.l}</div>
+      <div class="lb-cell hs">${p.stats.total.d}</div>
+    </div>`).join('')}
+  </div>
+  <div style="font-size:9px;color:var(--muted);margin-top:7px;letter-spacing:0.07em">Elo starts at 1000. Updated after every two-player game.</div>`;
+}
 
-  const hash = window.location.hash;
-  if (hash.includes('access_token')) {
-    token = new URLSearchParams(hash.replace('#', '?')).get('access_token');
-    localStorage.setItem('vt_token', token);
-    window.location.hash = '';
-    await boot();
-    return;
-  }
-
-  token = localStorage.getItem('vt_token');
-  if (token && cfg.clientId) {
-    try { await boot(); }
-    catch (e) {
-      document.getElementById('error-banner').style.display = 'block';
-      document.getElementById('error-banner').textContent   = 'Boot error: ' + e.message + '\n' + e.stack;
-      document.getElementById('loading-msg').textContent    = 'Boot failed — see red banner';
+function renderH2H(){
+  const players=ACV.getPlayers(), el=document.getElementById('champ-h2h');
+  const pairs=[];
+  for(let i=0;i<players.length;i++)
+    for(let j=i+1;j<players.length;j++){
+      const h=ACV.headToHead(players[i].id,players[j].id);
+      if(h.total>0) pairs.push({a:players[i],b:players[j],h});
     }
-  } else {
-    document.getElementById('loading').style.display    = 'none';
-    if (cfg.clientId) document.getElementById('cfg-client-id').value = cfg.clientId;
-    if (cfg.proxyUrl) document.getElementById('cfg-proxy-url').value  = cfg.proxyUrl;
-    document.getElementById('auth-screen').style.display = 'flex';
-  }
-};
-
-async function boot() {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('app').style.display     = 'block';
-  await loadFromDrive();
-  await fixExistingPhotoPermissions();
-  await ensureVehiclesCalendar();
-  await syncSeedComplianceToCalendar();
-  render();
-}
-
-// Fix any photos uploaded before the permissions step was added
-async function fixExistingPhotoPermissions() {
-  const allPhotoIds = state.assets.flatMap(a => a.photoIds || []);
-  for (const fileId of allPhotoIds) {
-    try {
-      await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'reader', type: 'anyone' }),
-      });
-    } catch (e) { /* best effort */ }
-  }
-}
-
-// ── Auth ─────────────────────────────────────────────────────────────────────
-function saveConfigAndAuth() {
-  const id = document.getElementById('cfg-client-id').value.trim();
-  const px = document.getElementById('cfg-proxy-url').value.trim().replace(/\/$/, '');
-  if (!id) { alert('Google OAuth client ID is required.'); return; }
-  cfg.clientId = id;
-  cfg.proxyUrl = px;
-  localStorage.setItem('vt_client_id', id);
-  localStorage.setItem('vt_proxy_url', px);
-  goGoogle();
-}
-
-function goGoogle() {
-  const r = window.location.origin + window.location.pathname;
-  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cfg.clientId)}&redirect_uri=${encodeURIComponent(r)}&response_type=token&scope=${encodeURIComponent(SCOPES)}&prompt=consent`;
-}
-
-function signOut() {
-  localStorage.removeItem('vt_token');
-  token = null;
-  document.getElementById('app').style.display        = 'none';
-  document.getElementById('auth-screen').style.display = 'flex';
-}
-
-// ── Drive helpers ─────────────────────────────────────────────────────────────
-async function gapi(url, opts = {}) {
-  const res = await fetch(url, {
-    ...opts,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...(opts.headers || {}),
-    },
-  });
-  if (res.status === 401) { localStorage.removeItem('vt_token'); goGoogle(); return null; }
-  return res;
-}
-
-async function mkFolder(parentId, name) {
-  const q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
-  const r = await gapi(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
-  if (!r) return null;
-  const d = await r.json();
-  if (d.files && d.files.length) return d.files[0].id;
-  const c = await gapi('https://www.googleapis.com/drive/v3/files', {
-    method: 'POST',
-    body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] }),
-  });
-  if (!c) return null;
-  const f = await c.json();
-  return f.id;
-}
-
-async function ensurePath(parts) {
-  let p = 'root';
-  for (const n of parts) { p = await mkFolder(p, n); if (!p) return null; }
-  return p;
-}
-
-function kmToMiles(km) { return Math.round(km * 0.621371); }
-
-function buildSeedState() {
-  const now = new Date().toISOString();
-  const assets = [
-    // ── Road vehicles ──────────────────────────────────────────────────────
-    {
-      id: 'a001', createdAt: now, updatedAt: now,
-      assetType: 'car', status: 'road',
-      name: 'BMW E36 318ti Compact',
-      group: null,
-      make: 'BMW', model: '318ti Compact (E36)', year: 1997, colour: 'Boston Green',
-      identifier: 'R457 UKE', vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, notes: '',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a002', createdAt: now, updatedAt: now,
-      assetType: 'car', status: 'road',
-      name: 'Reliant Scimitar GTE 1972',
-      group: null,
-      make: 'Reliant', model: 'Scimitar GTE (SE5)', year: 1972, colour: 'Highland Purple',
-      identifier: 'DKT 110K', vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false,
-      notes: 'Interior work required. Front suspension rebuild needed. New exhaust and engine inspection outstanding.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a003', createdAt: now, updatedAt: now,
-      assetType: 'car', status: 'road',
-      name: 'Volvo XC90 T8 Hybrid',
-      group: null,
-      make: 'Volvo', model: 'XC90 T8 Recharge', year: 2020, colour: null,
-      identifier: 'LM20 BNA', vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, notes: 'Family car. Serviced by Volvo dealer.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a004', createdAt: now, updatedAt: now,
-      assetType: 'motorcycle', status: 'road',
-      name: 'Honda VFR400 NC30 — Road',
-      group: 'NC30 Collection',
-      make: 'Honda', model: 'VFR400 NC30', year: null, colour: null,
-      identifier: 'H248 FGH', vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, odometerUnit: 'km',
-      notes: 'Road-registered NC30. Odometer reads in km.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    // ── NC30 project bikes ─────────────────────────────────────────────────
-    {
-      id: 'a005', createdAt: now, updatedAt: now,
-      assetType: 'motorcycle', status: 'project',
-      name: 'Honda VFR400 NC30 — Bike 2',
-      group: 'NC30 Collection',
-      make: 'Honda', model: 'VFR400 NC30', year: null, colour: null,
-      identifier: 'G768 SVV', vin: 'NC301052203', engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, odometerUnit: 'km',
-      notes: '',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a006', createdAt: now, updatedAt: now,
-      assetType: 'motorcycle', status: 'project',
-      name: 'Honda VFR400 NC30 — Bike 3',
-      group: 'NC30 Collection',
-      make: 'Honda', model: 'VFR400 NC30', year: null, colour: null,
-      identifier: 'H754 JLB', vin: 'NC301057211', engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, odometerUnit: 'km',
-      notes: '',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a007', createdAt: now, updatedAt: now,
-      assetType: 'motorcycle', status: 'project',
-      name: 'Honda VFR400 NC30 — Bike 4',
-      group: 'NC30 Collection',
-      make: 'Honda', model: 'VFR400 NC30', year: null, colour: null,
-      identifier: 'L434 UVG', vin: 'NC301109893', engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: false, odometerUnit: 'km',
-      notes: '',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    // ── Garden machinery ───────────────────────────────────────────────────
-    {
-      id: 'a008', createdAt: now, updatedAt: now,
-      assetType: 'mower', status: 'in-use',
-      name: 'Honda HRB 476c',
-      group: 'Garden Machinery',
-      make: 'Honda', model: 'HRB 476c', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: 'Self-propelled rear-roller mower.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a009', createdAt: now, updatedAt: now,
-      assetType: 'mower', status: 'in-use',
-      name: 'Hayter Harrier 48 GS',
-      group: 'Garden Machinery',
-      make: 'Hayter', model: 'Harrier 48 GS', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: 'Self-propelled cylinder mower.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a010', createdAt: now, updatedAt: now,
-      assetType: 'mower', status: 'in-use',
-      name: 'Allett Kensington KENS20B',
-      group: 'Garden Machinery',
-      make: 'Allett', model: 'Kensington KENS20B', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: 'Cylinder cassette mower.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a011', createdAt: now, updatedAt: now,
-      assetType: 'strimmer', status: 'in-use',
-      name: 'Stihl FS55 Strimmer',
-      group: 'Garden Machinery',
-      make: 'Stihl', model: 'FS55', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: '',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a012', createdAt: now, updatedAt: now,
-      assetType: 'strimmer', status: 'in-use',
-      name: 'Titan TTL530GBC Brush Cutter',
-      group: 'Garden Machinery',
-      make: 'Titan', model: 'TTL530GBC', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: 'Petrol brush cutter.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-    {
-      id: 'a013', createdAt: now, updatedAt: now,
-      assetType: 'blower', status: 'in-use',
-      name: 'Stihl SH86C Blower',
-      group: 'Garden Machinery',
-      make: 'Stihl', model: 'SH86C', year: null, colour: null,
-      identifier: null, vin: null, engineNumber: null,
-      acquisitionDate: null, acquisitionCost: null, currentValue: null,
-      usesHours: true, notes: 'Vacuum shredder blower.',
-      heroPhotoId: null, photoIds: [], driveFolder: null,
-    },
-  ];
-
-  const mileageReadings = [
-    { id: 'm001', assetId: 'a001', date: '2025-04-14', value: 75412, source: 'manual', isEstimate: false, notes: '' },
-    { id: 'm002', assetId: 'a002', date: '2025-04-14', value: 84635, source: 'manual', isEstimate: false, notes: '' },
-    { id: 'm003', assetId: 'a003', date: '2025-04-14', value: 40088, source: 'manual', isEstimate: false, notes: '' },
-    { id: 'm004', assetId: 'a004', date: '2025-04-14', value: 2748,  source: 'manual', isEstimate: false, notes: 'Odometer in km' },
-  ];
-
-  const complianceRecords = [
-    // BMW E36 318ti -- a001
-    { id: 'c001', assetId: 'a001', type: 'mot',        provider: 'DVSA',          policyNumber: null,             startDate: null,         expiryDate: '2026-09-07', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c002', assetId: 'a001', type: 'road-tax',   provider: 'DVLA',          policyNumber: null,             startDate: null,         expiryDate: '2026-09-01', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c003', assetId: 'a001', type: 'insurance',  provider: 'AA / Ageas',    policyNumber: 'GDCCA07743809', startDate: '2025-09-04', expiryDate: '2026-09-04', reminderLeadDays: 30, cost: null, notes: 'Comprehensive',                               calendarEventId: null },
-    // Reliant Scimitar GTE -- a002
-    { id: 'c004', assetId: 'a002', type: 'mot',        provider: 'DVSA',          policyNumber: null,             startDate: null,         expiryDate: '2027-04-01', reminderLeadDays: 30, cost: null, notes: 'MOT exempt — voluntary annual check',        calendarEventId: null },
-    { id: 'c005', assetId: 'a002', type: 'road-tax',   provider: 'DVLA',          policyNumber: null,             startDate: null,         expiryDate: '2027-04-01', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c006', assetId: 'a002', type: 'insurance',  provider: 'Adrian Flux',   policyNumber: 'GP98643B',       startDate: null,         expiryDate: '2027-03-12', reminderLeadDays: 30, cost: null, notes: 'Comprehensive',                               calendarEventId: null },
-    // Volvo XC90 -- a003
-    { id: 'c007', assetId: 'a003', type: 'mot',        provider: 'DVSA',          policyNumber: null,             startDate: null,         expiryDate: '2026-05-11', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c008', assetId: 'a003', type: 'road-tax',   provider: 'DVLA',          policyNumber: null,             startDate: null,         expiryDate: '2026-07-01', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c009', assetId: 'a003', type: 'insurance',  provider: 'Allianz',       policyNumber: 'FLO462327715456', startDate: '2025-12-01', expiryDate: '2026-11-30', reminderLeadDays: 30, cost: 591.70, notes: 'Comprehensive — Allianz Online Gold',     calendarEventId: null },
-    // Honda VFR400 NC30 Road -- a004
-    { id: 'c010', assetId: 'a004', type: 'mot',        provider: 'DVSA',          policyNumber: null,             startDate: null,         expiryDate: '2026-09-19', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c011', assetId: 'a004', type: 'road-tax',   provider: 'DVLA',          policyNumber: null,             startDate: null,         expiryDate: '2026-10-01', reminderLeadDays: 30, cost: null, notes: '',                                           calendarEventId: null },
-    { id: 'c012', assetId: 'a004', type: 'insurance',  provider: 'Bennetts',      policyNumber: 'GP98643B',       startDate: null,         expiryDate: '2026-08-23', reminderLeadDays: 30, cost: null, notes: 'Comprehensive',                               calendarEventId: null },
-  ];
-
-  return {
-    assets,
-    complianceRecords,
-    mileageReadings,
-    settings: { reminderLeadDays: 30, calendarId: null },
-  };
-}
-
-async function loadFromDrive() {
-  setSS('Loading\u2026');
-  try {
-    const fid = await ensurePath(['Ashvaren', 'Vehicles']);
-    if (!fid) { setSS('Drive error'); return; }
-    const q = `name='${STATE_FILE}' and '${fid}' in parents and trashed=false`;
-    const r = await gapi(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
-    if (!r) return;
-    const d = await r.json();
-    if (d.files && d.files.length) {
-      driveFileId = d.files[0].id;
-      const fr = await gapi(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`);
-      if (fr) {
-        const j = await fr.json();
-        // Load from Drive if it has assets; otherwise seed
-        if (j.assets && j.assets.length > 0) {
-          state = j;
-          // Migration: inject seed compliance records if none exist yet
-          if (!state.complianceRecords || state.complianceRecords.length === 0) {
-            const seed = buildSeedState();
-            state.complianceRecords = seed.complianceRecords;
-            await saveToD();
-            toast('Compliance records loaded.');
-          }
-          // Ensure settings object exists
-          if (!state.settings) state.settings = { reminderLeadDays: 30, calendarId: null };
-        } else {
-          state = buildSeedState();
-          await saveToD();
-          toast('Seed data loaded — 13 assets created.');
-        }
-      }
-    } else {
-      // No file at all — first run
-      state = buildSeedState();
-      await saveToD();
-      toast('Seed data loaded — 13 assets created.');
-    }
-    setSS('');
-  } catch (e) { setSS('Drive error'); console.error(e); }
-}
-
-async function saveToD() {
-  setSS('Saving\u2026');
-  try {
-    const fid  = await ensurePath(['Ashvaren', 'Vehicles']);
-    if (!fid) { setSS('Save failed'); return; }
-    const body = JSON.stringify(state, null, 2);
-    if (driveFileId) {
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body,
-      });
-    } else {
-      const m = await gapi('https://www.googleapis.com/drive/v3/files', {
-        method: 'POST',
-        body: JSON.stringify({ name: STATE_FILE, mimeType: 'application/json', parents: [fid] }),
-      });
-      if (m) {
-        const f = await m.json();
-        driveFileId = f.id;
-        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body,
-        });
-      }
-    }
-    setSS('Saved \u2713');
-    setTimeout(() => setSS(''), 3000);
-  } catch (e) { setSS('Save failed'); console.error(e); }
-}
-
-function setSS(m) { document.getElementById('sync-status').textContent = m; }
-
-// ── Compliance helpers ────────────────────────────────────────────────────────
-function daysUntilExpiry(expiryDateStr) {
-  if (!expiryDateStr) return null;
-  const today  = new Date(); today.setHours(0, 0, 0, 0);
-  const expiry = new Date(expiryDateStr);
-  return Math.floor((expiry - today) / (1000 * 60 * 60 * 24));
-}
-
-function complianceStatus(days, leadDays) {
-  if (days === null) return 'none';
-  if (days < 0)     return 'overdue';
-  if (days <= leadDays) return 'soon';
-  return 'ok';
-}
-
-function complianceLabel(type) {
-  return { mot: 'MOT', 'road-tax': 'Road tax', insurance: 'Insurance', 'v5-location': 'V5 location', 'service-plan': 'Service plan' }[type] || type;
-}
-
-function worstCompliance(assetId) {
-  const lead    = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-  const records = state.complianceRecords.filter(r => r.assetId === assetId);
-  if (!records.length) return 'none';
-  const statuses = records.map(r => complianceStatus(daysUntilExpiry(r.expiryDate), lead));
-  if (statuses.includes('overdue')) return 'overdue';
-  if (statuses.includes('soon'))    return 'soon';
-  return 'ok';
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-function render() {
-  renderDashboard();
-  renderAssetGrid();
-  renderComplianceTable();
-  populateSettingsView();
-}
-
-function renderDashboard() {
-  const lead = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-
-  // Summary strip
-  const summaryEl = document.getElementById('dashboard-summary');
-  if (summaryEl) {
-    const totalAssets   = state.assets.length;
-    const roadAssets    = state.assets.filter(a => a.status === 'road' || a.status === 'in-use').length;
-    const totalOverdue  = state.complianceRecords.filter(r => { const d = daysUntilExpiry(r.expiryDate); return d !== null && d < 0; }).length;
-    const totalDueSoon  = state.complianceRecords.filter(r => { const d = daysUntilExpiry(r.expiryDate); return d !== null && d >= 0 && d <= lead; }).length;
-    const totalReadings = state.mileageReadings.length;
-    const metrics = [
-      { label: 'Total assets',     value: totalAssets,   colour: 'var(--text-hi)' },
-      { label: 'On the road',      value: roadAssets,    colour: 'var(--green)' },
-      { label: 'Compliance due',   value: totalDueSoon,  colour: totalDueSoon  > 0 ? 'var(--amber)' : 'var(--green)' },
-      { label: 'Overdue',          value: totalOverdue,  colour: totalOverdue  > 0 ? 'var(--red)'   : 'var(--green)' },
-      { label: 'Mileage readings', value: totalReadings, colour: 'var(--text-hi)' },
-    ];
-    summaryEl.innerHTML = metrics.map(m => `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);">
-        <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">${m.label}</div>
-        <div style="font-family:var(--display);font-size:26px;font-weight:500;color:${m.colour};line-height:1;">${m.value}</div>
-      </div>`).join('');
-  }
-
-  // Compliance alerts
-  const alertsEl = document.getElementById('dashboard-alerts');
-  const alerts = state.complianceRecords
-    .map(r => ({ r, days: daysUntilExpiry(r.expiryDate), asset: state.assets.find(a => a.id === r.assetId) }))
-    .filter(x => x.asset && x.days !== null && x.days <= lead)
-    .sort((a, b) => a.days - b.days);
-
-  if (!alerts.length) {
-    alertsEl.innerHTML = `<div style="padding:20px 16px;display:flex;align-items:center;gap:10px;">
-      <div class="compliance-dot ok"></div>
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--text-hi);">All compliance records are up to date</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px;">${state.complianceRecords.length} record${state.complianceRecords.length !== 1 ? 's' : ''} tracked across ${state.assets.length} assets</div>
+  if(!pairs.length){el.innerHTML='<div class="empty">Play some games to build head-to-head records.</div>';return;}
+  el.innerHTML=`<div class="h2h-grid">${pairs.map(({a,b,h})=>`
+    <div class="h2h-card">
+      <div class="h2h-names">
+        <span class="h2h-name" style="color:${a.colour}">${a.name}</span>
+        <span class="h2h-vs">vs</span>
+        <span class="h2h-name" style="color:${b.colour}">${b.name}</span>
+        <span style="margin-left:auto;font-size:9px;color:var(--muted)">${h.total}g</span>
       </div>
-    </div>`;
-  } else {
-    alertsEl.innerHTML = alerts.map(({ r, days, asset }) => {
-      const cls  = days < 0 ? 'alert-overdue' : 'alert-soon';
-      const txt  = days < 0
-        ? `Expired ${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} ago`
-        : `Due in ${days} day${days !== 1 ? 's' : ''}`;
-      return `<div class="compliance-alert-item" style="cursor:pointer;" onclick="openAssetDetail('${asset.id}')">
-        <div class="compliance-dot ${days < 0 ? 'overdue' : 'soon'}"></div>
-        <div style="flex:1;">
-          <div class="alert-asset">${asset.name} &mdash; ${complianceLabel(r.type)}</div>
-          <div class="alert-detail ${cls}">${txt}${r.expiryDate ? ' (' + r.expiryDate + ')' : ''}${r.provider ? ' &mdash; ' + r.provider : ''}</div>
-        </div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);padding-left:8px;">&rsaquo;</div>
-      </div>`;
-    }).join('');
-  }
-
-  // Recent mileage
-  const mileageEl = document.getElementById('dashboard-mileage');
-  const recent = [...state.mileageReadings]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
-
-  if (!recent.length) {
-    mileageEl.innerHTML = '<div class="empty-state">No readings recorded yet</div>';
-  } else {
-    mileageEl.innerHTML = recent.map(m => {
-      const asset  = state.assets.find(a => a.id === m.assetId);
-      const label  = asset ? asset.name : 'Unknown';
-      const isKm   = asset && !asset.usesHours && asset.odometerUnit === 'km';
-      const unit   = asset && asset.usesHours ? 'hrs' : (isKm ? 'km' : 'mi');
-      const conv   = isKm ? ` (${kmToMiles(m.value).toLocaleString('en-GB')} mi)` : '';
-      const assetId2 = asset ? asset.id : null;
-      return `<div class="compliance-alert-item" style="${assetId2 ? 'cursor:pointer;' : ''}" ${assetId2 ? `onclick="openAssetDetail('${assetId2}')"` : ''}>
-        <div style="flex:1;">
-          <div class="alert-asset">${label}</div>
-          <div class="alert-detail">${m.value.toLocaleString('en-GB')} ${unit}${conv}${m.isEstimate ? ' (est.)' : ''} &mdash; ${m.date}</div>
-        </div>
-        ${assetId2 ? '<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);padding-left:8px;">&rsaquo;</div>' : ''}
-      </div>`;
-    }).join('');
-  }
+      <div class="h2h-stats">
+        <div class="h2h-stat"><div class="h2h-num" style="color:${a.colour}">${h.wA}</div><div class="h2h-lbl">wins</div></div>
+        <div class="h2h-stat"><div class="h2h-num" style="color:var(--muted)">${h.d}</div><div class="h2h-lbl">draws</div></div>
+        <div class="h2h-stat"><div class="h2h-num" style="color:${b.colour}">${h.wB}</div><div class="h2h-lbl">wins</div></div>
+      </div>
+    </div>`).join('')}</div>`;
 }
 
-function renderAssetGrid() {
-  const grid    = document.getElementById('asset-cards-grid');
-  const lead    = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-  const filters = { car: ['car'], motorcycle: ['motorcycle'], garden: ['mower', 'strimmer', 'blower'] };
-  const filtered = assetFilter === 'all'
-    ? state.assets
-    : state.assets.filter(a => (filters[assetFilter] || [assetFilter]).includes(a.assetType));
-
-  const statusClass = s => ({ road: 's-road', sorn: 's-sorn', project: 's-project', 'in-use': 's-in-use', stored: 's-stored', retired: 's-retired' }[s] || '');
-  const statusLabel = s => ({ road: 'Road', sorn: 'SORN', project: 'Project', 'in-use': 'In use', stored: 'Stored', retired: 'Retired' }[s] || s);
-
-  const cards = filtered.map(a => {
-    const ws     = worstCompliance(a.id);
-    const latest = [...state.mileageReadings]
-      .filter(m => m.assetId === a.id)
-      .sort((x, y) => new Date(y.date) - new Date(x.date))[0];
-    const isKm  = !a.usesHours && a.odometerUnit === 'km';
-    const unit  = a.usesHours ? 'hrs' : (isKm ? 'km' : 'mi');
-
-    const photoHtml = a.heroPhotoId
-      ? `<img src="https://drive.google.com/thumbnail?id=${a.heroPhotoId}&sz=w600" alt="${a.name}" loading="lazy" />`
-      : `<div class="asset-card-photo-placeholder">No photo yet</div>`;
-
-    const complianceDotHtml = `<div class="compliance-indicator">
-      <div class="compliance-dot ${ws}"></div>
-      <span class="compliance-text">${ws === 'none' ? 'No compliance records' : ws === 'overdue' ? 'Compliance overdue' : ws === 'soon' ? 'Due soon' : 'All OK'}</span>
+function renderRecent(){
+  const rs=ACV.recentResults(20), el=document.getElementById('champ-recent');
+  const pm=Object.fromEntries(ACV.getPlayers().map(p=>[p.id,p]));
+  if(!rs.length){el.innerHTML='<div class="empty">No games recorded yet.</div>';return;}
+  const ago=ts=>{const s=Math.floor((Date.now()-ts)/1000);return s<60?'just now':s<3600?Math.floor(s/60)+'m':s<86400?Math.floor(s/3600)+'h':Math.floor(s/86400)+'d';};
+  el.innerHTML=`<div class="results-list">${rs.map(r=>{
+    const w=r.winnerId?pm[r.winnerId]:null;
+    const names=r.players.map(id=>pm[id]?.name||id).join(' vs ');
+    return `<div class="result-row">
+      <span class="result-tag" style="background:${GC[r.game]}20;color:${GC[r.game]}">${GL[r.game]||r.game}</span>
+      <span class="result-names">${names}</span>
+      <span class="result-winner" style="color:${w?.colour||'var(--muted)'}">${w?w.name+' won':'Draw'}</span>
+      <span class="result-ago">${ago(r.ts)}</span>
     </div>`;
+  }).join('')}</div>`;
+}
 
-    const mileageHtml = latest
-      ? `<div class="asset-meta">${latest.value.toLocaleString('en-GB')} ${unit}${isKm ? ' (' + kmToMiles(latest.value).toLocaleString('en-GB') + ' mi)' : ''}${latest.isEstimate ? ' (est.)' : ''} &mdash; ${latest.date}</div>`
-      : `<div class="asset-meta" style="color:var(--text-dim);">No readings yet</div>`;
-
-    return `<div class="asset-card" onclick="openAssetDetail('${a.id}')">
-      <div class="asset-card-photo">${photoHtml}</div>
-      <div class="asset-card-body">
-        <div class="asset-card-top">
-          <div>
-            <div class="asset-name">${a.name}</div>
-            ${a.group ? `<div class="asset-group">${a.group}</div>` : ''}
-          </div>
-          <span class="status-pill ${statusClass(a.status)}">${statusLabel(a.status)}</span>
-        </div>
-        ${mileageHtml}
-        ${complianceDotHtml}
-      </div>
-    </div>`;
+function renderByGame(){
+  const players=ACV.getPlayers(), el=document.getElementById('champ-bygame');
+  el.innerHTML=['dots','hex','mines'].map(g=>{
+    const rows=players.map(p=>{
+      const s=ACV.statsFor(p.id), gs=s.byGame[g]||{w:0,l:0,d:0};
+      return{p,gs,t:gs.w+gs.l+gs.d};
+    }).filter(r=>r.t>0).sort((a,b)=>b.gs.w-a.gs.w);
+    if(!rows.length) return `<div style="margin-bottom:20px"><div class="section-title" style="color:${GC[g]}">${GL[g]}</div><div class="rule"></div><div class="empty" style="padding:12px">No games yet.</div></div>`;
+    return `<div style="margin-bottom:20px">
+      <div class="section-title" style="color:${GC[g]}">${GL[g]}</div><div class="rule"></div>
+      <div class="lb"><div class="lb-head"><div>#</div><div>Player</div><div style="text-align:right">W</div><div style="text-align:right">L</div><div style="text-align:right" class="hs">D</div><div style="text-align:right" class="hs">Games</div></div>
+      ${rows.map((r,i)=>`<div class="lb-row">
+        <div class="lb-rank ${rc(i)}">${ri(i)}</div>
+        <div class="lb-player"><div class="lb-dot" style="background:${r.p.colour}"></div><div class="lb-name">${r.p.name}</div></div>
+        <div class="lb-cell w">${r.gs.w}</div><div class="lb-cell">${r.gs.l}</div>
+        <div class="lb-cell hs">${r.gs.d}</div><div class="lb-cell hs">${r.t}</div>
+      </div>`).join('')}</div></div>`;
   }).join('');
-
-  grid.innerHTML = cards + `<div class="add-card" onclick="openAssetModal()">+ Add asset</div>`;
 }
 
-function renderComplianceTable() {
-  const tbody = document.getElementById('compliance-tbody');
-  if (!state.complianceRecords.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-dim);font-family:var(--mono);font-size:11px;">No compliance records yet</td></tr>';
-    return;
-  }
-
-  const lead = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-  const rows = [...state.complianceRecords]
-    .sort((a, b) => (a.expiryDate || '9999') > (b.expiryDate || '9999') ? 1 : -1)
-    .map(r => {
-      const asset = state.assets.find(a => a.id === r.assetId);
-      const days  = daysUntilExpiry(r.expiryDate);
-      const ws    = complianceStatus(days, lead);
-      const dotCls = { ok: 'ok', soon: 'soon', overdue: 'overdue', none: 'none' }[ws];
-      const daysText = days === null ? '--' : days < 0 ? `Overdue ${Math.abs(days)}d` : `${days}d`;
-      const daysStyle = days !== null && days < 0 ? 'color:var(--red)' : days !== null && days <= lead ? 'color:var(--amber)' : '';
-
-      return `<tr>
-        <td style="font-weight:500;color:var(--text-hi);">${asset ? asset.name : '--'}</td>
-        <td>${complianceLabel(r.type)}</td>
-        <td style="font-family:var(--mono);font-size:12px;">${r.expiryDate || '--'}</td>
-        <td style="font-family:var(--mono);font-size:12px;${daysStyle}">${daysText}</td>
-        <td style="color:var(--text-sec);">${r.provider || '--'}</td>
-        <td><span class="compliance-dot ${dotCls}" style="display:inline-block;"></span></td>
-        <td></td>
-      </tr>`;
-    });
-
-  tbody.innerHTML = rows.join('');
+// Players
+function renderPlayers(){
+  const pl=ACV.getPlayers(), el=document.getElementById('plist');
+  el.innerHTML=pl.map(p=>`<div class="player-row">
+    <div class="p-dot" style="background:${p.colour}"></div>
+    <div class="p-name">${p.name}</div>
+    <div class="p-elo">Elo ${ACV.playerElo(p.id)}</div>
+    <button class="btn btn-ghost btn-sm" onclick="rmP('${p.id}')">Remove</button>
+  </div>`).join('');
+}
+function rmP(id){if(confirm('Remove player?')){ACV.removePlayer(id);renderPlayers();}}
+function addP(){
+  const n=document.getElementById('pname').value.trim();
+  if(!n) return;
+  ACV.addPlayer(n,document.getElementById('pcol').value);
+  document.getElementById('pname').value='';
+  renderPlayers();
 }
 
-function populateSettingsView() {
-  document.getElementById('sv-client-id').value     = cfg.clientId;
-  document.getElementById('sv-proxy-url').value     = cfg.proxyUrl;
-  document.getElementById('sv-worker-secret').value = cfg.workerSecret;
-  document.getElementById('sv-reminder-days').value = cfg.reminderDays;
-}
+// Instructions
+const INSTRS = {
+  dots:{
+    colour:'#e05c3a',file:'dots-and-boxes.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><rect x="82" y="22" width="66" height="56" fill="rgba(224,92,58,0.15)" rx="2"/><rect x="232" y="62" width="66" height="56" fill="rgba(46,111,196,0.15)" rx="2"/><line x1="80" y1="20" x2="150" y2="20" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="80" x2="150" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="20" x2="80" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="20" x2="150" y2="80" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="60" x2="300" y2="60" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="120" x2="300" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="60" x2="230" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><line x1="300" y1="60" x2="300" y2="120" stroke="#2e6fc4" stroke-width="4" stroke-linecap="round"/><text x="115" y="57" text-anchor="middle" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="15" font-weight="700">P1</text><text x="265" y="97" text-anchor="middle" fill="#2e6fc4" font-family="'DM Mono',monospace" font-size="15" font-weight="700">P2</text><rect x="152" y="62" width="66" height="56" fill="rgba(224,92,58,0.06)" rx="2"/><line x1="150" y1="60" x2="220" y2="60" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="60" x2="150" y2="120" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="220" y1="60" x2="220" y2="120" stroke="#e05c3a" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="120" x2="220" y2="120" stroke="rgba(46,111,196,0.4)" stroke-width="4" stroke-linecap="round" stroke-dasharray="7 5"/><text x="185" y="97" text-anchor="middle" fill="rgba(46,111,196,0.4)" font-family="'DM Mono',monospace" font-size="10">tap here!</text><g fill="#c8d0e0"><circle cx="80" cy="20" r="4"/><circle cx="150" cy="20" r="4"/><circle cx="220" cy="20" r="4"/><circle cx="300" cy="20" r="4"/><circle cx="80" cy="80" r="4"/><circle cx="150" cy="80" r="4"/><circle cx="220" cy="80" r="4"/><circle cx="300" cy="80" r="4"/><circle cx="80" cy="120" r="4"/><circle cx="150" cy="120" r="4"/><circle cx="220" cy="120" r="4"/><circle cx="300" cy="120" r="4"/></g></svg>`,
+    steps:[
+      {t:'Take turns drawing one line',d:'Tap any gap between two dots to draw a horizontal or vertical line. One line per turn.'},
+      {t:'Complete a box to score',d:'If your line closes the fourth side of a square, you claim it. Your initial appears inside and you get a bonus turn.'},
+      {t:'Chain your bonus turns',d:'Claiming a box earns another turn. Expert play means sacrificing small chains to avoid handing away larger ones.'},
+      {t:'Most boxes wins',d:'When all boxes are claimed, the player with more wins. Results feed the championship table automatically.'},
+    ],
+    tip:'Avoid drawing the third side of any box — that gifts your opponent an easy score. Sacrifice two to save five.',
+    ai:'Four AI levels available: Easy (random), Medium (avoids gifting boxes), Hard (minimax depth 4), Extreme (minimax depth 7).',
+  },
+  hex:{
+    colour:'#c8924a',file:'hex.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><polygon points="60,20 76,10 92,20 92,40 76,50 60,40" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="100,20 116,10 132,20 132,40 116,50 100,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="140,20 156,10 172,20 172,40 156,50 140,40" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="180,20 196,10 212,20 212,40 196,50 180,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="220,20 236,10 252,20 252,40 236,50 220,40" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="80,56 96,46 112,56 112,76 96,86 80,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="120,56 136,46 152,56 152,76 136,86 120,76" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="160,56 176,46 192,56 192,76 176,86 160,76" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/><polygon points="200,56 216,46 232,56 232,76 216,86 200,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="240,56 256,46 272,56 272,76 256,86 240,76" fill="#111926" stroke="#243040" stroke-width="1"/><polygon points="100,92 116,82 132,92 132,112 116,122 100,112" fill="#6aaed4" stroke="#4a8eaa" stroke-width="1.5"/><polygon points="140,92 156,82 172,92 172,112 156,122 140,112" fill="#c8924a" stroke="#a07030" stroke-width="1.5"/><polygon points="180,92 196,82 212,92 212,112 196,122 180,112" fill="#111926" stroke="#243040" stroke-width="1"/><polyline points="76,30 136,66 156,102" stroke="#c8924a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/><rect x="52" y="2" width="208" height="6" rx="2" fill="rgba(200,146,74,0.3)"/><rect x="92" y="132" width="170" height="6" rx="2" fill="rgba(200,146,74,0.3)"/><text x="330" y="50" fill="rgba(200,146,74,0.8)" font-family="'DM Mono',monospace" font-size="11">Copper: top → bottom</text><text x="330" y="72" fill="rgba(106,174,212,0.7)" font-family="'DM Mono',monospace" font-size="11">Ice: left → right</text><text x="330" y="100" fill="var(--text-dim,#6a7a90)" font-family="'DM Mono',monospace" font-size="10">No draws possible</text></svg>`,
+    steps:[
+      {t:'Pick your colour and direction',d:'Copper connects top to bottom. Ice connects left to right. The coloured border strips on the board show your direction.'},
+      {t:'Place one stone per turn',d:'Tap any empty hexagon to place your stone. Players alternate. Stones cannot be moved or removed once placed.'},
+      {t:'Form an unbroken chain',d:'The first player to connect both their edges with an unbroken chain of their own stones wins.'},
+      {t:'No draws are possible',d:'By mathematical proof, one player must always win. Every stone you place is also a potential block against your opponent.'},
+    ],
+    tip:'The centre of the board gives the shortest path across. Bridges — two stones sharing a safe connecting gap — are the core building blocks of strong play.',
+    ai:'Four AI levels: Easy (random), Medium (greedy defence), Hard (Monte Carlo 300 simulations), Extreme (Monte Carlo 800 simulations).',
+  },
+  mines:{
+    colour:'#2e6fc4',file:'minesweeper.html',
+    hero:`<svg viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="140" fill="#0e1420"/><rect x="14" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="52" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="90" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="128" y="14" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="166" y="14" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="204" y="14" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="14" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="52" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="90" y="52" width="34" height="34" rx="3" fill="#0a1018" stroke="#1a2535" stroke-width="0.5"/><rect x="128" y="52" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="14" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="52" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><rect x="90" y="90" width="34" height="34" rx="3" fill="#2a0808" stroke="#4a1010"/><rect x="128" y="90" width="34" height="34" rx="3" fill="#111926" stroke="#1a2535" stroke-width="1"/><text x="31" y="37" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="69" y="37" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="107" y="37" text-anchor="middle" fill="#ff6b6b" font-family="'DM Mono',monospace" font-size="15" font-weight="700">3</text><text x="145" y="37" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="31" y="75" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="69" y="75" text-anchor="middle" fill="#50c878" font-family="'DM Mono',monospace" font-size="15" font-weight="700">2</text><text x="107" y="75" text-anchor="middle" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="15" font-weight="700">1</text><text x="183" y="37" text-anchor="middle" fill="#e05c3a" font-size="16">⚑</text><text x="221" y="37" text-anchor="middle" fill="#e05c3a" font-size="16">⚑</text><text x="107" y="114" text-anchor="middle" font-size="18">💣</text><text x="310" y="45" fill="#4a9eff" font-family="'DM Mono',monospace" font-size="11">1 = one adjacent mine</text><text x="310" y="67" fill="#50c878" font-family="'DM Mono',monospace" font-size="11">2 = two adjacent mines</text><text x="310" y="89" fill="#e05c3a" font-family="'DM Mono',monospace" font-size="11">⚑ = flagged mine</text><text x="310" y="111" fill="#ff4444" font-family="'DM Mono',monospace" font-size="11">💣 = game over</text></svg>`,
+    steps:[
+      {t:'Click to reveal a cell',d:'Left-click any hidden cell to reveal it. Your first click is always safe — mines are placed after, with a safe zone around your click.'},
+      {t:'Read the numbers',d:'Each number tells you how many of its eight neighbours contain mines. A blank cell has no mine neighbours and auto-reveals the surrounding safe area.'},
+      {t:'Flag suspected mines',d:'Right-click (or long-press on mobile) to place a flag ⚑. This prevents accidental clicks. The HUD tracks unflagged mines remaining.'},
+      {t:'Clear the field to win',d:'Reveal every safe cell without detonating anything. Completion times are saved as personal bests per difficulty level.'},
+    ],
+    tip:'If a "1" has only one unrevealed neighbour, flag it immediately. If a number already has as many flags as its value, all other neighbours are safe to click.',
+    ai:null,
+  },
+};
 
-// ── View switching ─────────────────────────────────────────────────────────────
-function showView(name, btn) {
-  ['dashboard', 'assets', 'asset-detail', 'compliance', 'settings-view'].forEach(v => {
-    const el = document.getElementById('view-' + v);
-    if (el) el.style.display = 'none';
-  });
-  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  const el = document.getElementById('view-' + name);
-  if (el) el.style.display = 'block';
-  if (btn) btn.classList.add('active');
-}
-
-function setAssetFilter(f, btn) {
-  assetFilter = f;
-  document.querySelectorAll('#asset-filter-pills .filter-pill').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderAssetGrid();
-}
-
-// ── Asset detail view ─────────────────────────────────────────────────────────
-function openAssetDetail(assetId) {
-  const asset   = state.assets.find(a => a.id === assetId);
-  if (!asset) return;
-  const lead    = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-  const records = state.complianceRecords.filter(r => r.assetId === assetId);
-  const readings = [...state.mileageReadings]
-    .filter(m => m.assetId === assetId)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
-  const isKm = !asset.usesHours && asset.odometerUnit === 'km';
-  const unit = asset.usesHours ? 'hrs' : (isKm ? 'km' : 'mi');
-
-  const complianceRows = records.length ? records.map(r => {
-    const days = daysUntilExpiry(r.expiryDate);
-    const ws   = complianceStatus(days, lead);
-    const daysStyle = ws === 'overdue' ? 'color:var(--red)' : ws === 'soon' ? 'color:var(--amber)' : '';
-    const daysText  = days === null ? '--' : days < 0 ? `Expired ${Math.abs(days)}d ago` : `${days}d`;
-    return `<tr>
-      <td style="font-weight:500;color:var(--text-hi);">${complianceLabel(r.type)}</td>
-      <td style="font-family:var(--mono);font-size:12px;">${r.expiryDate || '--'}</td>
-      <td style="font-family:var(--mono);font-size:12px;${daysStyle}">${daysText}</td>
-      <td style="color:var(--text-sec);font-size:12px;">${r.provider || '--'}${r.policyNumber ? ' · ' + r.policyNumber : ''}</td>
-      <td style="text-align:right;white-space:nowrap;">
-        <button onclick="openComplianceModal('${r.id}','${assetId}')" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-dim);cursor:pointer;margin-right:4px;">Edit</button>
-        <button onclick="deleteComplianceRecord('${r.id}','${assetId}')" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text-dim);cursor:pointer;" onmouseover="this.style.background='var(--red-bg)';this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-dim)';this.style.borderColor='transparent'">Remove</button>
-      </td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="5" style="color:var(--text-dim);font-family:var(--mono);font-size:11px;padding:1rem 0;">No compliance records</td></tr>';
-
-  const readingRows = readings.slice(0, 12).map(m =>
-    `<tr>
-      <td style="font-family:var(--mono);font-size:12px;">${m.date}</td>
-      <td style="font-family:var(--mono);font-size:12px;">${m.value.toLocaleString('en-GB')} ${unit}${isKm ? ' <span style="color:var(--text-dim)">(' + kmToMiles(m.value).toLocaleString('en-GB') + ' mi)</span>' : ''}${m.isEstimate ? ' <span style="color:var(--text-dim)">(est.)</span>' : ''}</td>
-      <td style="color:var(--text-sec);font-size:12px;">${{ manual:'Manual', 'mot-certificate':'MOT cert', 'service-invoice':'Service invoice', derived:'Derived' }[m.source] || m.source || 'Manual'}</td>
-      <td style="text-align:right;"><button onclick="deleteMileageReading('${m.id}','${assetId}')" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='var(--red-bg)';this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-dim)';this.style.borderColor='transparent'">Remove</button></td>
-    </tr>`
-  ).join('') || '<tr><td colspan="4" style="color:var(--text-dim);font-family:var(--mono);font-size:11px;padding:1rem 0;">No readings yet</td></tr>';
-
-  document.getElementById('asset-detail-content').innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
-      <div>
-        <h1 style="font-family:var(--display);font-size:28px;font-weight:600;color:var(--text-hi);letter-spacing:0.05em;">${asset.name}</h1>
-        ${asset.group ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:4px;letter-spacing:0.1em;">${asset.group}</div>` : ''}
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="sync-btn" onclick="openAssetModal('${asset.id}')">Edit asset</button>
-      </div>
-    </div>
-
-    <!-- Hero photo & gallery -->
-    <div style="margin-bottom:1.25rem;">
-      <div style="position:relative;background:var(--navy-2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;aspect-ratio:16/6;display:flex;align-items:center;justify-content:center;">
-        ${asset.heroPhotoId
-          ? `<img src="https://drive.google.com/thumbnail?id=${asset.heroPhotoId}&sz=w1200" style="width:100%;height:100%;object-fit:cover;" alt="${asset.name}" />`
-          : `<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;"><div style="margin-bottom:8px;">No hero photo yet</div><div style="font-size:10px;opacity:0.6;">Upload a photo below</div></div>`
-        }
-      </div>
-      ${asset.photoIds && asset.photoIds.length > 0 ? `
-      <div style="display:flex;gap:8px;overflow-x:auto;padding:8px 0;scrollbar-width:none;">
-        ${asset.photoIds.map(pid => `
-          <div style="position:relative;flex-shrink:0;width:100px;height:70px;border-radius:6px;overflow:hidden;border:2px solid ${pid === asset.heroPhotoId ? 'var(--accent)' : 'var(--border)'};cursor:pointer;" onclick="setHeroPhoto('${asset.id}','${pid}')">
-            <img src="https://drive.google.com/thumbnail?id=${pid}&sz=w200" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
-            ${pid === asset.heroPhotoId
-              ? '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--accent);font-family:var(--mono);font-size:8px;letter-spacing:0.06em;text-align:center;padding:2px;color:#fff;">HERO</div>'
-              : '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-family:var(--mono);font-size:8px;letter-spacing:0.06em;text-align:center;padding:2px;color:var(--text-dim);opacity:0;transition:opacity 0.15s;" class="set-hero-label">SET HERO</div>'
-            }
-          </div>`).join('')}
-      </div>` : ''}
-      <div style="display:flex;gap:8px;align-items:center;padding-top:4px;flex-wrap:wrap;">
-        <label style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent-hi)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-          📷 Take photo
-          <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event,'${asset.id}')" />
-        </label>
-        <label style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent-hi)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-          🖼 Choose file
-          <input type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event,'${asset.id}')" />
-        </label>
-        <span id="photo-uploading" style="display:none;font-family:var(--mono);font-size:10px;color:var(--text-dim);">Uploading&hellip;</span>
-      </div>
-    </div>
-
-    <!-- Key facts -->
-    <div class="panel" style="margin-bottom:1.25rem;">
-      <div class="panel-header"><span class="panel-title">Key facts</span></div>
-      <div style="padding:1rem 1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">
-        ${[
-          ['Make', asset.make],
-          ['Model', asset.model],
-          ['Year', asset.year],
-          ['Colour', asset.colour],
-          ['VRM / identifier', asset.identifier],
-          ['VIN', asset.vin],
-          ['Engine number', asset.engineNumber],
-          ['Status', asset.status],
-          ['Acquisition date', asset.acquisitionDate],
-          ['Acquisition cost', asset.acquisitionCost ? '&pound;' + Number(asset.acquisitionCost).toLocaleString('en-GB') : null],
-          ['Current value', asset.currentValue ? '&pound;' + Number(asset.currentValue).toLocaleString('en-GB') : null],
-        ].filter(([, v]) => v).map(([l, v]) => `
-          <div>
-            <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px;">${l}</div>
-            <div style="font-size:13px;color:var(--text-hi);">${v}</div>
-          </div>`).join('')}
-      </div>
-      ${asset.notes ? `<div style="padding:0 1.25rem 1rem;font-size:13px;color:var(--text-sec);line-height:1.65;border-top:1px solid var(--border);padding-top:1rem;">${asset.notes}</div>` : ''}
-    </div>
-
-    <!-- Compliance -->
-    <div class="panel" style="margin-bottom:1.25rem;">
-      <div class="panel-header">
-        <span class="panel-title">Compliance</span>
-        <button class="sync-btn" style="font-size:9px;padding:3px 10px;" onclick="openComplianceModal(null,'${asset.id}')">+ Add record</button>
-      </div>
-      <div style="overflow:hidden;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead><tr style="background:var(--navy);">
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Type</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Expiry</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Days</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Provider / policy</th>
-            <th style="padding:10px 14px;border-bottom:1px solid var(--border);"></th>
-          </tr></thead>
-          <tbody>${complianceRows}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mileage -->
-    <div class="panel" style="margin-bottom:1.25rem;">
-      <div class="panel-header">
-        <span class="panel-title">Mileage &amp; hours</span>
-        <button class="sync-btn" style="font-size:9px;padding:3px 10px;" onclick="openMileageModal('${asset.id}')">+ Add reading</button>
-      </div>
-      ${readings.length >= 2 ? `<div style="padding:12px 16px 4px;"><canvas id="mileage-sparkline" height="60" style="width:100%;display:block;"></canvas></div>` : ''}
-      <div style="overflow:hidden;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead><tr style="background:var(--navy);">
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Date</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Reading</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">Source</th>
-            <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);"></th>
-          </tr></thead>
-          <tbody>${readingRows}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Phase placeholder panels -->
-    <!-- Document capture -->
-    <div class="panel" style="margin-bottom:1.25rem;" id="capture-panel-${asset.id}">
-      <div class="panel-header">
-        <span class="panel-title">Documents</span>
-        <div style="display:flex;gap:6px;">
-          <label class="sync-btn" style="cursor:pointer;font-size:9px;padding:3px 10px;">
-            📷 Capture
-            <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="startCapture(event,'${asset.id}')" />
-          </label>
-          <label class="sync-btn" style="cursor:pointer;font-size:9px;padding:3px 10px;">
-            🖼 Upload
-            <input type="file" accept="image/*" style="display:none;" onchange="startCapture(event,'${asset.id}')" />
-          </label>
-        </div>
-      </div>
-      <div id="capture-status-${asset.id}" style="display:none;padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim);"></div>
-      <div id="doc-list-${asset.id}">
-        ${(maintenanceState.documents || []).filter(d => d.assetId === '${asset.id}').length === 0
-          ? '<div class="empty-state">No documents captured yet</div>'
-          : (maintenanceState.documents || []).filter(d => d.assetId === '${asset.id}').map(d => `
-            <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
-              <div style="flex:1;">
-                <div style="font-size:13px;color:var(--text-hi);">${{ mot:'MOT Certificate', 'parts-invoice':'Parts Invoice', 'service-invoice':'Service Invoice', inspection:'Inspection Report', manual:'Manual', photo:'Photo' }[d.type] || d.type}</div>
-                <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px;">${d.createdAt ? d.createdAt.split('T')[0] : ''}</div>
-              </div>
-            </div>`).join('')
-        }
-      </div>
-    </div>
-
-    <!-- Ask Claude -->
-    <div class="panel" style="margin-bottom:1.25rem;">
-      <div class="panel-header" style="cursor:pointer;" onclick="toggleAskClaude('${asset.id}')">
-        <span class="panel-title">Ask Claude about this asset</span>
-        <span id="ask-toggle-${asset.id}" style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">Expand</span>
-      </div>
-      <div id="ask-panel-${asset.id}" style="display:none;">
-        <div id="ask-history-${asset.id}" style="max-height:300px;overflow-y:auto;padding:8px 0;"></div>
-        <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;">
-          <textarea id="ask-input-${asset.id}" placeholder="Ask about this asset…" rows="2" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--sans);color:var(--text-hi);background:var(--navy);outline:none;resize:none;line-height:1.5;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAsk('${asset.id}');}"></textarea>
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <label style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text-dim);" title="Attach photo">
-              📷
-              <input type="file" accept="image/*" style="display:none;" onchange="attachAskPhoto(event,'${asset.id}')" />
-            </label>
-            <button onclick="sendAsk('${asset.id}')" style="width:34px;height:34px;border:none;border-radius:7px;background:var(--accent);color:#fff;cursor:pointer;font-size:14px;">↗</button>
-          </div>
-        </div>
-        <div id="ask-photo-preview-${asset.id}" style="display:none;padding:0 16px 10px;"></div>
-      </div>
-    </div>
-    <div class="phase-placeholder">
-      <div class="phase-placeholder-label">Phase 3 &mdash; Parts catalogue</div>
-      <p>Log parts on hand, track stock levels, and link parts consumption to maintenance records.</p>
-    </div>
-    <div class="phase-placeholder">
-      <div class="phase-placeholder-label">Phase 4 &mdash; Service schedules</div>
-      <p>Interval-based service reminders by mileage, hours, or calendar date.</p>
-    </div>
+function showInstr(game){
+  const d=INSTRS[game], c=d.colour;
+  document.getElementById('instr-ttl').textContent=`${ACV.GAME_LABELS[game]} — How to Play`;
+  document.getElementById('instr-body').innerHTML=`
+    <div class="instr-hero">${d.hero}</div>
+    <div class="steps">${d.steps.map((s,i)=>`<div class="step">
+      <div class="step-num" style="background:${c}22;color:${c}">${i+1}</div>
+      <div><div class="step-title">${s.t}</div><div class="step-desc">${s.d}</div></div>
+    </div>`).join('')}</div>
+    <div class="tip"><strong>Tip:</strong> ${d.tip}</div>
+    ${d.ai?`<div class="tip" style="border-color:var(--muted)"><strong>AI:</strong> ${d.ai}</div>`:''}
+    <button class="btn" style="background:${c};color:#fff;width:100%;padding:12px;font-size:12px;border-radius:8px" onclick="go('${d.file}')">Play ${ACV.GAME_LABELS[game]} →</button>
   `;
-
-  // Load maintenance state (needed for documents list and ask-Claude)
-  ensureMaintenanceLoaded().then(() => {
-    const docListEl = document.getElementById(`doc-list-${assetId}`);
-    if (docListEl) {
-      const docs = (maintenanceState.documents || []).filter(d => d.assetId === assetId);
-      if (docs.length === 0) {
-        docListEl.innerHTML = '<div class="empty-state">No documents captured yet</div>';
-      } else {
-        const typeLabels = { mot:'MOT Certificate','parts-invoice':'Parts Invoice','service-invoice':'Service Invoice',inspection:'Inspection Report',v5c:'V5C Registration Document',insurance:'Insurance Certificate',manual:'Manual',photo:'Photo' };
-        docListEl.innerHTML = docs.slice().reverse().map(d => `
-          <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openDocumentDetail('${d.id}')">
-            <div style="flex:1;">
-              <div style="font-size:13px;color:var(--text-hi);">${typeLabels[d.type] || d.type}</div>
-              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px;">${d.createdAt ? d.createdAt.split('T')[0] : ''}</div>
-            </div>
-            <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);">&rsaquo;</div>
-          </div>`).join('');
-      }
-    }
-  });
-
-  // Hide main nav views and show detail
-  ['dashboard', 'assets', 'compliance', 'settings-view'].forEach(v => {
-    const el = document.getElementById('view-' + v);
-    if (el) el.style.display = 'none';
-  });
-  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-asset-detail').style.display = 'block';
-
-  // Draw sparkline if enough readings
-  if (readings.length >= 2) {
-    requestAnimationFrame(() => drawSparkline('mileage-sparkline', readings.slice(0, 12).reverse()));
-  }
+  const w=document.getElementById('instr-wrap');
+  w.style.display='block';
+  w.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function closeAssetDetail() {
-  document.getElementById('view-asset-detail').style.display = 'none';
-  showView('assets', document.querySelectorAll('.nav-tab')[1]);
-  renderAssetGrid();
-}
-
-// ── Photo upload ──────────────────────────────────────────────────────────────
-async function handlePhotoUpload(event, assetId) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const asset = state.assets.find(a => a.id === assetId);
-  if (!asset) return;
-
-  // Show uploading indicator
-  const ind = document.getElementById('photo-uploading');
-  if (ind) ind.style.display = 'inline';
-
-  try {
-    // Ensure asset Drive folder exists
-    if (!asset.driveFolder) {
-      const safeName = asset.name.replace(/[^a-zA-Z0-9 _-]/g, '').trim();
-      asset.driveFolder = await ensurePath(['Ashvaren', 'Vehicles', 'Assets', safeName, 'photos']);
-    } else {
-      // Ensure photos subfolder exists within existing folder
-      // driveFolder may point to asset root or photos — we store photos folderId separately
-    }
-
-    // Create photos folder if not yet stored as photosFolderId
-    if (!asset.photosFolderId) {
-      const safeName = asset.name.replace(/[^a-zA-Z0-9 _-]/g, '').trim();
-      asset.photosFolderId = await ensurePath(['Ashvaren', 'Vehicles', 'Assets', safeName, 'photos']);
-    }
-
-    const fileId = await uploadFileToDrive(file, asset.photosFolderId, file.name);
-
-    if (!asset.photoIds) asset.photoIds = [];
-    asset.photoIds.push(fileId);
-
-    // First photo becomes hero automatically
-    if (!asset.heroPhotoId) {
-      asset.heroPhotoId = fileId;
-    }
-
-    asset.updatedAt = new Date().toISOString();
-    await saveToD();
-    toast('Photo uploaded.');
-
-    // Re-render the detail view for this asset
-    openAssetDetail(assetId);
-
-  } catch (e) {
-    toast('Upload failed: ' + e.message);
-    console.error(e);
-  } finally {
-    const ind2 = document.getElementById('photo-uploading');
-    if (ind2) ind2.style.display = 'none';
-    // Reset file input so the same file can be re-selected if needed
-    event.target.value = '';
-  }
-}
-
-async function setHeroPhoto(assetId, photoId) {
-  const asset = state.assets.find(a => a.id === assetId);
-  if (!asset) return;
-  asset.heroPhotoId = photoId;
-  asset.updatedAt   = new Date().toISOString();
-  await saveToD();
-  toast('Hero photo updated.');
-  openAssetDetail(assetId);
-}
-
-async function uploadFileToDrive(file, folderId, fileName) {
-  // Step 1: create metadata
-  const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: fileName, parents: [folderId] }),
-  });
-  if (!meta.ok) throw new Error('Drive metadata create failed: ' + meta.status);
-  const { id: fileId } = await meta.json();
-
-  // Step 2: upload content
-  const arrayBuffer = await file.arrayBuffer();
-  const upload = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
-    method: 'PATCH',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': file.type || 'image/jpeg' },
-    body: arrayBuffer,
-  });
-  if (!upload.ok) throw new Error('Drive upload failed: ' + upload.status);
-
-  // Step 3: make the file readable by anyone with the link so the thumbnail URL works
-  await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ role: 'reader', type: 'anyone' }),
-  });
-
-  return fileId;
-}
-
-// ── Asset modal ───────────────────────────────────────────────────────────────
-function openAssetModal(assetId) {
-  editAssetId = assetId || null;
-  const a = assetId ? state.assets.find(x => x.id === assetId) : null;
-
-  document.getElementById('asset-modal-title').textContent = a ? 'Edit asset' : 'Add asset';
-  document.getElementById('am-type').value       = a ? a.assetType        : 'car';
-  document.getElementById('am-status').value     = a ? a.status           : 'road';
-  document.getElementById('am-name').value       = a ? a.name             : '';
-  document.getElementById('am-group').value      = a ? (a.group || '')    : '';
-  document.getElementById('am-make').value       = a ? (a.make || '')     : '';
-  document.getElementById('am-model').value      = a ? (a.model || '')    : '';
-  document.getElementById('am-year').value       = a ? (a.year || '')     : '';
-  document.getElementById('am-colour').value     = a ? (a.colour || '')   : '';
-  document.getElementById('am-identifier').value = a ? (a.identifier || ''): '';
-  document.getElementById('am-vin').value        = a ? (a.vin || '')      : '';
-  document.getElementById('am-engine').value     = a ? (a.engineNumber || ''): '';
-  document.getElementById('am-acq-date').value   = a ? (a.acquisitionDate || ''): '';
-  document.getElementById('am-acq-cost').value   = a ? (a.acquisitionCost || ''): '';
-  document.getElementById('am-value').value      = a ? (a.currentValue || ''): '';
-  document.getElementById('am-notes').value      = a ? (a.notes || '')    : '';
-  document.getElementById('am-uses-hours').checked = a ? !!a.usesHours    : false;
-
-  updateUsesHoursVisibility();
-  document.getElementById('asset-modal').classList.add('open');
-  setTimeout(() => document.getElementById('am-name').focus(), 100);
-}
-
-function updateUsesHoursVisibility() {
-  const type = document.getElementById('am-type').value;
-  const gardenTypes = ['mower', 'strimmer', 'blower'];
-  document.getElementById('am-uses-hours-field').style.display = gardenTypes.includes(type) ? 'block' : 'none';
-  if (gardenTypes.includes(type)) document.getElementById('am-uses-hours').checked = true;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const typeSelect = document.getElementById('am-type');
-  if (typeSelect) typeSelect.addEventListener('change', updateUsesHoursVisibility);
-});
-
-function closeAssetModal() {
-  document.getElementById('asset-modal').classList.remove('open');
-  editAssetId = null;
-}
-
-function saveAsset() {
-  const name = document.getElementById('am-name').value.trim();
-  if (!name) { toast('Please enter a display name.'); return; }
-
-  const assetData = {
-    assetType:       document.getElementById('am-type').value,
-    status:          document.getElementById('am-status').value,
-    name,
-    group:           document.getElementById('am-group').value.trim() || null,
-    make:            document.getElementById('am-make').value.trim(),
-    model:           document.getElementById('am-model').value.trim(),
-    year:            parseInt(document.getElementById('am-year').value) || null,
-    colour:          document.getElementById('am-colour').value.trim() || null,
-    identifier:      document.getElementById('am-identifier').value.trim(),
-    vin:             document.getElementById('am-vin').value.trim() || null,
-    engineNumber:    document.getElementById('am-engine').value.trim() || null,
-    acquisitionDate: document.getElementById('am-acq-date').value || null,
-    acquisitionCost: parseFloat(document.getElementById('am-acq-cost').value) || null,
-    currentValue:    parseFloat(document.getElementById('am-value').value) || null,
-    usesHours:       document.getElementById('am-uses-hours').checked,
-    notes:           document.getElementById('am-notes').value.trim(),
-    updatedAt:       new Date().toISOString(),
-  };
-
-  if (editAssetId) {
-    const idx = state.assets.findIndex(a => a.id === editAssetId);
-    if (idx > -1) {
-      // Preserve photo and folder data — never overwrite from the edit modal
-      state.assets[idx] = { ...state.assets[idx], ...assetData };
-    }
-  } else {
-    state.assets.push({
-      id:             'a' + Date.now(),
-      createdAt:      new Date().toISOString(),
-      heroPhotoId:    null,
-      photoIds:       [],
-      photosFolderId: null,
-      driveFolder:    null,
-      ...assetData,
-    });
-  }
-
-  closeAssetModal();
-  saveToD();
-  render();
-  toast(editAssetId ? 'Asset updated.' : 'Asset added.');
-}
-
-// ── Maintenance state ────────────────────────────────────────────────────────
-// vehicle-tracker-maintenance.json — loaded lazily when needed
-let maintenanceState = { documents: [], maintenanceRecords: [], conversations: {} };
-let maintenanceDriveFileId = null;
-const MAINTENANCE_FILE = 'vehicle-tracker-maintenance.json';
-
-async function ensureMaintenanceLoaded() {
-  if (maintenanceDriveFileId) return; // already loaded
-  try {
-    const fid = await ensurePath(['Ashvaren', 'Vehicles']);
-    if (!fid) return;
-    const q = `name='${MAINTENANCE_FILE}' and '${fid}' in parents and trashed=false`;
-    const r = await gapi(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
-    if (!r) return;
-    const d = await r.json();
-    if (d.files && d.files.length) {
-      maintenanceDriveFileId = d.files[0].id;
-      const fr = await gapi(`https://www.googleapis.com/drive/v3/files/${maintenanceDriveFileId}?alt=media`);
-      if (fr) {
-        const j = await fr.json();
-        maintenanceState = { documents: [], maintenanceRecords: [], conversations: {}, ...j };
-      }
-    } else {
-      await saveMaintenanceState();
-    }
-  } catch (e) { console.error('Maintenance state load failed:', e); }
-}
-
-async function saveMaintenanceState() {
-  try {
-    const fid = await ensurePath(['Ashvaren', 'Vehicles']);
-    if (!fid) return;
-    const body = JSON.stringify(maintenanceState, null, 2);
-    if (maintenanceDriveFileId) {
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${maintenanceDriveFileId}?uploadType=media`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body,
-      });
-    } else {
-      const m = await gapi('https://www.googleapis.com/drive/v3/files', {
-        method: 'POST',
-        body: JSON.stringify({ name: MAINTENANCE_FILE, mimeType: 'application/json', parents: [fid] }),
-      });
-      if (m) {
-        const f = await m.json();
-        maintenanceDriveFileId = f.id;
-        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${maintenanceDriveFileId}?uploadType=media`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body,
-        });
-      }
-    }
-  } catch (e) { console.error('Maintenance state save failed:', e); }
-}
-
-// ── Image resize helper ───────────────────────────────────────────────────────
-async function imagesToPdf(pages) {
-  // Converts array of { data (base64 jpeg), mediaType } to a PDF Blob
-  const { jsPDF } = window.jspdf;
-  let pdf = null;
-  for (let i = 0; i < pages.length; i++) {
-    const imgData = 'data:image/jpeg;base64,' + pages[i].data;
-    // Get image dimensions via Image element
-    const dims = await new Promise(res => {
-      const img = new Image();
-      img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight });
-      img.src = imgData;
-    });
-    // Use landscape if wider than tall
-    const orient = dims.w > dims.h ? 'l' : 'p';
-    if (i === 0) {
-      pdf = new jsPDF({ orientation: orient, unit: 'px', format: [dims.w, dims.h] });
-    } else {
-      pdf.addPage([dims.w, dims.h], orient);
-    }
-    pdf.addImage(imgData, 'JPEG', 0, 0, dims.w, dims.h);
-  }
-  return pdf ? pdf.output('blob') : null;
-}
-
-function resizeImage(file, maxPx = 1600) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
-      const w = Math.round(img.width  * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob(blob => {
-        const reader = new FileReader();
-        reader.onload = () => resolve({
-          data:      reader.result.split(',')[1],
-          mediaType: 'image/jpeg',
-          blob,
-        });
-        reader.readAsDataURL(blob);
-      }, 'image/jpeg', 0.88);
-    };
-    img.src = url;
-  });
-}
-
-// ── Document capture ──────────────────────────────────────────────────────────
-let captureAssetId   = null;
-let capturePages     = [];  // array of { data, mediaType, blob }
-let captureExtracted = null;
-
-async function startCapture(event, assetId) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-
-  if (!cfg.proxyUrl) { toast('Proxy URL not set. Go to Settings.'); return; }
-
-  // First page of a new capture
-  if (captureAssetId !== assetId) {
-    captureAssetId   = assetId;
-    capturePages     = [];
-    captureExtracted = null;
-  }
-
-  const statusEl = document.getElementById(`capture-status-${assetId}`);
-  if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = 'Resizing image…'; }
-
-  try {
-    const resized = await resizeImage(file);
-    capturePages.push(resized);
-
-    if (statusEl) statusEl.style.display = 'none';
-
-    // Show staging area -- let user add more pages or extract now
-    showCaptureStagingArea(assetId);
-
-  } catch (e) {
-    if (statusEl) { statusEl.textContent = `Image processing failed: ${e.message}`; }
-    toast(`Image processing failed: ${e.message}`);
-  }
-}
-
-function showCaptureStagingArea(assetId) {
-  const statusEl = document.getElementById(`capture-status-${assetId}`);
-  if (!statusEl) return;
-
-  const thumbs = capturePages.map((p, i) =>
-    `<div style="position:relative;width:60px;height:44px;border-radius:5px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;">
-      <img src="data:image/jpeg;base64,${p.data.substring(0, 200)}" style="width:100%;height:100%;object-fit:cover;" />
-      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);font-family:var(--mono);font-size:8px;color:#fff;text-align:center;padding:1px;">p.${i+1}</div>
-    </div>`
-  ).join('');
-
-  statusEl.style.display = 'block';
-  statusEl.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <div style="display:flex;gap:6px;align-items:center;">${thumbs}</div>
-      <div style="font-size:12px;color:var(--text-dim);">${capturePages.length} page${capturePages.length !== 1 ? 's' : ''}</div>
-      ${capturePages.length < 4 ? `
-        <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;">
-          + Add page
-          <input type="file" accept="image/*" style="display:none;" onchange="addCapturePage(event,'${assetId}')" />
-        </label>
-        <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;">
-          📷 Add page
-          <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="addCapturePage(event,'${assetId}')" />
-        </label>` : '<span style="font-family:var(--mono);font-size:10px;color:var(--amber);">Max 4 pages</span>'}
-      <button onclick="runExtraction('${assetId}')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:4px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;">Extract now &rarr;</button>
-      <button onclick="cancelCapture('${assetId}')" style="font-family:var(--mono);font-size:10px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;">Cancel</button>
-    </div>`;
-}
-
-async function addCapturePage(event, assetId) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-  const statusEl = document.getElementById(`capture-status-${assetId}`);
-  if (statusEl) statusEl.innerHTML = '<span style="font-family:var(--mono);font-size:11px;color:var(--text-dim);">Resizing…</span>';
-  try {
-    const resized = await resizeImage(file);
-    capturePages.push(resized);
-    showCaptureStagingArea(assetId);
-  } catch (e) {
-    toast(`Could not add page: ${e.message}`);
-    showCaptureStagingArea(assetId);
-  }
-}
-
-function cancelCapture(assetId) {
-  capturePages     = [];
-  captureAssetId   = null;
-  captureExtracted = null;
-  const statusEl = document.getElementById(`capture-status-${assetId}`);
-  if (statusEl) { statusEl.style.display = 'none'; statusEl.innerHTML = ''; }
-}
-
-async function runExtraction(assetId) {
-  if (capturePages.length === 0) return;
-  if (!cfg.proxyUrl) { toast('Proxy URL not set. Go to Settings.'); return; }
-
-  const statusEl = document.getElementById(`capture-status-${assetId}`);
-  if (statusEl) statusEl.innerHTML = '<span style="font-family:var(--mono);font-size:11px;color:var(--text-dim);">Sending to Claude…</span>';
-
-  try {
-    const asset     = state.assets.find(a => a.id === assetId);
-    const assetList = state.assets.map(a => ({ id: a.id, name: a.name, identifier: a.identifier }));
-
-    const r = await fetch(`${cfg.proxyUrl}/extract`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-worker-secret': cfg.workerSecret || '' },
-      body: JSON.stringify({
-        assetId,
-        assetName: asset ? asset.name : '',
-        images:    capturePages.map(p => ({ data: p.data, mediaType: p.mediaType })),
-        assetList,
-      }),
-    });
-
-    if (!r.ok) {
-      const err = await r.json();
-      throw new Error(err.error || `HTTP ${r.status}`);
-    }
-
-    const result = await r.json();
-    captureExtracted = result.extraction;
-
-    if (statusEl) { statusEl.style.display = 'none'; statusEl.innerHTML = ''; }
-
-    showCaptureConfirmation(assetId, captureExtracted);
-
-  } catch (e) {
-    if (statusEl) statusEl.innerHTML = `<span style="color:var(--red);font-family:var(--mono);font-size:11px;">Extraction failed: ${e.message}</span>`;
-    toast(`Extraction failed: ${e.message}`);
-  }
-}
-
-function showCaptureConfirmation(assetId, extraction) {
-  const { documentType, documentTypeLabel, confidence, summary, fields } = extraction || {};
-  const confPct = Math.round((confidence || 0) * 100);
-  const confCol = confPct >= 80 ? 'var(--green)' : confPct >= 50 ? 'var(--amber)' : 'var(--red)';
-  const label   = documentTypeLabel || documentType || 'Unknown document';
-
-  // Build a clean summary of key extracted values
-  const f = fields || {};
-  const keyFacts = [
-    f.vrm           ? `VRM: ${f.vrm}` : null,
-    f.testResult    ? `Result: ${f.testResult}` : null,
-    f.expiryDate    ? `Expires: ${f.expiryDate}` : null,
-    f.odometerReading ? `Odometer: ${f.odometerReading.toLocaleString('en-GB')} ${f.odometerUnit || 'mi'}` : null,
-    (f.advisories || []).length > 0 ? `${f.advisories.length} advisory` : null,
-    f.total         ? `Total: £${f.total}` : null,
-    f.supplier      ? `Supplier: ${f.supplier}` : null,
-    f.insurer       ? `Insurer: ${f.insurer}` : null,
-    f.policyNumber  ? `Policy: ${f.policyNumber}` : null,
-    f.vin           ? `VIN: ${f.vin}` : null,
-    f.keeperName    ? `Keeper: ${f.keeperName}` : null,
-  ].filter(Boolean);
-
-  const allFieldRows = buildAllFieldRows(f);
-
-  document.getElementById('capture-modal-content').innerHTML = `
-    <!-- Summary (always visible) -->
-    <div style="background:var(--navy);border-radius:8px;padding:14px 16px;margin-bottom:1rem;">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
-        <div>
-          <div style="font-size:15px;font-weight:500;color:var(--text-hi);">${label}</div>
-          ${summary ? `<div style="font-size:12px;color:var(--text-sec);margin-top:4px;line-height:1.5;">${summary}</div>` : ''}
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px;">Confidence</div>
-          <div style="font-family:var(--mono);font-size:16px;font-weight:500;color:${confCol};">${confPct}%</div>
-        </div>
-      </div>
-      ${keyFacts.length > 0 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">${keyFacts.map(f2 => `<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text-sec);">${f2}</span>`).join('')}</div>` : ''}
-    </div>
-
-    <!-- Records preview -->
-    <div style="background:var(--navy);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--text-dim);">
-      <div style="margin-bottom:4px;color:var(--text-sec);">Records that will be created or updated:</div>
-      <div id="cm-records-preview">${buildRecordsPreview(documentType, f, assetId)}</div>
-    </div>
-
-    <!-- Edit section (collapsed by default) -->
-    <div>
-      <button onclick="toggleCaptureEdit()" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);cursor:pointer;width:100%;text-align:left;" id="capture-edit-toggle">
-        &#9660; Edit extracted fields
-      </button>
-      <div id="capture-edit-fields" style="display:none;margin-top:10px;">${allFieldRows}</div>
-    </div>`;
-
-  document.getElementById('capture-save-btn').textContent = 'Save ✓';
-  document.getElementById('capture-modal').classList.add('open');
-}
-
-function toggleCaptureEdit() {
-  const fields = document.getElementById('capture-edit-fields');
-  const btn    = document.getElementById('capture-edit-toggle');
-  const open   = fields.style.display !== 'none';
-  fields.style.display = open ? 'none' : 'block';
-  btn.textContent = open ? '▼ Edit extracted fields' : '▲ Hide fields';
-}
-
-function buildFieldRows(docType, fields) {
-  const rows = [];
-  const addRow = (label, key, type='text') => {
-    const val = fields[key] ?? '';
-    const amber = val === null || val === '' || val === undefined;
-    rows.push(`
-      <div style="margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:${amber?'var(--amber)':'var(--text-dim)'};margin-bottom:3px;">${label}${amber?' ⚠':''}</div>
-        <input type="${type}" id="cf-${key}" value="${val !== null && val !== undefined ? String(val).replace(/"/g,'&quot;') : ''}"
-          style="width:100%;padding:7px 10px;border:1px solid ${amber?'var(--amber)':'var(--border)'};border-radius:7px;font-size:13px;font-family:var(--sans);color:var(--text-hi);background:var(--navy);outline:none;" />
-      </div>`);
-  };
-
-  const docTypeMapped = docType === 'v5c' ? 'v5c' : docType === 'insurance_certificate' ? 'insurance' : docType;
-  if (docType === 'mot_certificate') {
-    addRow('VRM', 'vrm');
-    addRow('Test date', 'testDate');
-    addRow('Expiry date', 'expiryDate');
-    addRow('Odometer reading', 'odometerReading', 'number');
-    addRow('Test result', 'testResult');
-    const advisories = (fields.advisories || []).join('; ');
-    rows.push(`
-      <div style="margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px;">Advisories (semicolon-separated)</div>
-        <textarea id="cf-advisories" rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--sans);color:var(--text-hi);background:var(--navy);outline:none;resize:vertical;">${advisories}</textarea>
-      </div>`);
-  } else if (docType === 'parts_invoice' || docType === 'service_invoice') {
-    addRow('Supplier', 'supplier');
-    addRow('Invoice date', 'invoiceDate');
-    addRow('Invoice number', 'invoiceNumber');
-    addRow('Total (£)', 'total', 'number');
-    if (docType === 'service_invoice') {
-      addRow('Mileage at service', 'mileageAtService', 'number');
-      addRow('Work carried out', 'workCarriedOut');
-    }
-  } else if (docType === 'inspection_report') {
-    addRow('Supplier', 'supplier');
-    addRow('Inspection date', 'inspectionDate');
-    addRow('Mileage', 'mileage', 'number');
-    addRow('Result', 'result');
-    addRow('Findings', 'findings');
-  } else if (docType === 'v5c') {
-    addRow('VRM', 'vrm');
-    addRow('Make', 'make');
-    addRow('Model', 'model');
-    addRow('Colour', 'colour');
-    addRow('VIN', 'vin');
-    addRow('Engine number', 'engineNumber');
-    addRow('Registration date', 'registrationDate');
-    addRow('Keeper name', 'keeperName');
-  } else if (docType === 'insurance_certificate') {
-    addRow('Insurer', 'insurer');
-    addRow('Policy number', 'policyNumber');
-    addRow('Cover type', 'coverType');
-    addRow('Start date', 'startDate');
-    addRow('Expiry date', 'expiryDate');
-    addRow('Policyholder', 'policyholder');
-  }
-
-  return rows.join('');
-}
-
-function buildRecordsPreview(docType, fields, assetId) {
-  const asset = state.assets.find(a => a.id === assetId);
-  const lines = [];
-  if (docType === 'mot_certificate') {
-    if (fields.expiryDate) lines.push(`Update MOT compliance record → expiry ${fields.expiryDate}`);
-    if (fields.odometerReading) lines.push(`Create mileage reading → ${fields.odometerReading}`);
-    if ((fields.advisories || []).length > 0) lines.push(`Create maintenance record → ${fields.advisories.length} advisory item(s)`);
-  } else if (docType === 'parts_invoice' || docType === 'service_invoice') {
-    lines.push(`Create maintenance record for ${asset ? asset.name : 'asset'}`);
-    if (fields.mileageAtService) lines.push(`Create mileage reading → ${fields.mileageAtService}`);
-  } else if (docType === 'inspection_report') {
-    lines.push(`Create maintenance record for ${asset ? asset.name : 'asset'}`);
-  }
-  lines.push('Upload image to Drive documents/ folder');
-  lines.push('Save JSON sidecar alongside image');
-  return lines.map(l => `<div style="padding:2px 0;">&bull; ${l}</div>`).join('');
-}
-
-function closeCaptureModal() {
-  document.getElementById('capture-modal').classList.remove('open');
-  captureExtracted = null;
-}
-
-let currentDocDetailId = null;
-
-function openDocumentDetail(docId) {
-  currentDocDetailId = docId;
-  const doc = (maintenanceState.documents || []).find(d => d.id === docId);
-  if (!doc) return;
-
-  const typeLabels = {
-    mot:'MOT Certificate', 'parts-invoice':'Parts Invoice',
-    'service-invoice':'Service Invoice', inspection:'Inspection Report',
-    v5c:'V5C Registration Document', insurance:'Insurance Certificate',
-    manual:'Manual', photo:'Photo',
-  };
-
-  document.getElementById('doc-detail-title').textContent = typeLabels[doc.type] || doc.type;
-
-  const fields = doc.extractedData?.fields || {};
-  const fieldRows = Object.entries(fields)
-    .filter(([k, v]) => v !== null && v !== undefined && v !== '' && !k.startsWith('//') && !Array.isArray(v))
-    .map(([k, v]) => `
-      <tr>
-        <td style="font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:6px 0;padding-right:12px;white-space:nowrap;vertical-align:top;">${k}</td>
-        <td style="font-size:13px;color:var(--text-hi);padding:6px 0;">${v}</td>
-      </tr>`).join('');
-
-  const arrayRows = Object.entries(fields)
-    .filter(([, v]) => Array.isArray(v) && v.length > 0)
-    .map(([k, v]) => `
-      <div style="margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;">${k}</div>
-        ${(Array.isArray(v) ? v : []).map(item => `<div style="font-size:13px;color:var(--text);padding:3px 0;border-bottom:1px solid var(--border);">${item}</div>`).join('')}
-      </div>`).join('');
-
-  const driveLink = doc.driveFileId
-    ? `<a href="https://drive.google.com/file/d/${doc.driveFileId}/view" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--accent-hi);">Open in Drive &nearr;</a>`
-    : '';
-
-  document.getElementById('doc-detail-content').innerHTML = `
-    <div style="margin-bottom:1rem;">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-bottom:4px;">Captured ${doc.createdAt ? doc.createdAt.split('T')[0] : ''} &nbsp; ${driveLink}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">Confidence: ${Math.round((doc.extractedData?.confidence || 0) * 100)}%</div>
-    </div>
-    ${fieldRows ? `<table style="width:100%;border-collapse:collapse;">${fieldRows}</table>` : ''}
-    ${arrayRows ? `<div style="margin-top:1rem;">${arrayRows}</div>` : ''}
-    ${doc.linkedRecordIds && doc.linkedRecordIds.length > 0
-      ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text-dim);">${doc.linkedRecordIds.length} record${doc.linkedRecordIds.length !== 1 ? 's' : ''} created from this document</div>`
-      : ''}`;
-
-  document.getElementById('doc-detail-modal').classList.add('open');
-}
-
-async function deleteDocument() {
-  if (!currentDocDetailId) return;
-  if (!confirm('Delete this document? The Drive file will remain but the record will be removed.')) return;
-  maintenanceState.documents = (maintenanceState.documents || []).filter(d => d.id !== currentDocDetailId);
-  await saveMaintenanceState();
-  document.getElementById('doc-detail-modal').classList.remove('open');
-  // Refresh the current asset detail if open
-  const detailVisible = document.getElementById('view-asset-detail').style.display !== 'none';
-  if (detailVisible && captureAssetId) openAssetDetail(captureAssetId);
-  else render();
-  toast('Document record deleted.');
-}
-
-async function saveCapture() {
-  const btn = document.getElementById('capture-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  const assetId = captureAssetId;
-  const asset   = state.assets.find(a => a.id === assetId);
-  if (!asset) { btn.disabled = false; btn.textContent = 'Save all'; return; }
-
-  const getField = (key) => {
-    const el = document.getElementById(`cf-${key}`);
-    if (!el) {
-      // Fall back to extracted data if field not in edit form
-      return captureExtracted?.fields?.[key] ?? null;
-    }
-    return el.value.trim() || null;
-  };
-  const docType = captureExtracted?.documentType || 'unknown';
-
-  const today = new Date().toISOString().split('T')[0];
-
-  try {
-    await ensureMaintenanceLoaded();
-
-    // 1. Upload image to Drive documents/ folder
-    const safeName = asset.name.replace(/[^a-zA-Z0-9 _-]/g, '').trim();
-    const docsFolderId = await ensurePath(['Ashvaren', 'Vehicles', 'Assets', safeName, 'documents']);
-
-    const docTypeLabel = {
-      mot_certificate: 'MOT Certificate', parts_invoice: 'Parts Invoice',
-      service_invoice: 'Service Invoice', inspection_report: 'Inspection Report',
-    }[docType] || 'Document';
-
-    const supplier = getField('supplier') || getField('vrm') || '';
-    const dateStr  = getField('testDate') || getField('invoiceDate') || getField('inspectionDate') || today;
-    const filename  = `${dateStr} ${docTypeLabel}${supplier ? ' (' + supplier + ')' : ''}`;
-
-    // Convert all pages to a single PDF and upload
-    const pdfBlob = await imagesToPdf(capturePages);
-    const pdfFilename = filename.replace('.jpg', '.pdf');
-    const pdfFile = new File([pdfBlob], pdfFilename, { type: 'application/pdf' });
-    const imgFileId = await uploadFileToDrive(pdfFile, docsFolderId, pdfFilename);
-
-    // Upload JSON sidecar
-    const sidecarData = JSON.stringify({ documentType: docType, extractedAt: new Date().toISOString(), extraction: captureExtracted }, null, 2);
-    const sidecarFile = new File([sidecarData], filename.replace('.jpg', '.json'), { type: 'application/json' });
-    const sidecarFileId = await uploadFileToDrive(sidecarFile, docsFolderId, sidecarFile.name);
-
-    // 2. Create Document record
-    const docRecord = {
-      id:           'd' + Date.now(),
-      assetId,
-      type:         docType === 'mot_certificate' ? 'mot' : docType === 'parts_invoice' ? 'parts-invoice' : docType === 'service_invoice' ? 'service-invoice' : 'inspection',
-      driveFileId:  imgFileId,
-      sidecarFileId,
-      extractedData: captureExtracted,
-      linkedRecordIds: [],
-      createdAt:    new Date().toISOString(),
-    };
-
-    if (!maintenanceState.documents) maintenanceState.documents = [];
-    maintenanceState.documents.push(docRecord);
-
-    // 3. Create records based on document type
-    if (docType === 'mot_certificate') {
-      const expiryDate = getField('expiryDate');
-      const odometer   = parseFloat(getField('odometerReading'));
-      const advisories = (getField('advisories') || '').split(';').map(s => s.trim()).filter(Boolean);
-
-      // Update MOT compliance record
-      if (expiryDate) {
-        const existing = state.complianceRecords.find(r => r.assetId === assetId && r.type === 'mot');
-        if (existing) {
-          existing.expiryDate = expiryDate;
-          const eventId = await upsertCalendarEvent(existing);
-          if (eventId) existing.calendarEventId = eventId;
-          docRecord.linkedRecordIds.push(existing.id);
-        } else {
-          const newRecord = {
-            id: 'c' + Date.now(), assetId, type: 'mot', expiryDate,
-            provider: 'DVSA', policyNumber: null, startDate: null,
-            reminderLeadDays: 30, cost: null, notes: '', calendarEventId: null,
-          };
-          const eventId = await upsertCalendarEvent(newRecord);
-          if (eventId) newRecord.calendarEventId = eventId;
-          state.complianceRecords.push(newRecord);
-          docRecord.linkedRecordIds.push(newRecord.id);
-        }
-      }
-
-      // Create mileage reading
-      if (!isNaN(odometer) && odometer > 0) {
-        const reading = {
-          id: 'm' + Date.now(), assetId, date: getField('testDate') || today,
-          value: odometer, source: 'mot-certificate', isEstimate: false, notes: 'From MOT certificate',
-        };
-        state.mileageReadings.push(reading);
-      }
-
-      // Create maintenance record for advisories
-      if (advisories.length > 0) {
-        const mRecord = {
-          id: 'mr' + Date.now(), assetId, date: getField('testDate') || today,
-          workCarriedOut: `MOT advisories: ${advisories.join('; ')}`,
-          outstandingAdvisories: advisories, supplier: 'DVSA',
-          cost: null, mileageAtWork: parseFloat(getField('odometerReading')) || null,
-          partsUsedText: '', sourceDocumentId: docRecord.id, createdAt: new Date().toISOString(),
-        };
-        if (!maintenanceState.maintenanceRecords) maintenanceState.maintenanceRecords = [];
-        maintenanceState.maintenanceRecords.push(mRecord);
-        docRecord.linkedRecordIds.push(mRecord.id);
-      }
-
-    } else if (docType === 'parts_invoice' || docType === 'service_invoice') {
-      const mRecord = {
-        id: 'mr' + Date.now(), assetId,
-        date: getField('invoiceDate') || today,
-        workCarriedOut: getField('workCarriedOut') || `${docTypeLabel} from ${getField('supplier') || 'supplier'}`,
-        supplier: getField('supplier'),
-        cost: parseFloat(getField('total')) || null,
-        mileageAtWork: parseFloat(getField('mileageAtService')) || null,
-        partsUsedText: '', sourceDocumentId: docRecord.id,
-        outstandingAdvisories: [], createdAt: new Date().toISOString(),
-      };
-      if (!maintenanceState.maintenanceRecords) maintenanceState.maintenanceRecords = [];
-      maintenanceState.maintenanceRecords.push(mRecord);
-      docRecord.linkedRecordIds.push(mRecord.id);
-
-      if (parseFloat(getField('mileageAtService')) > 0) {
-        state.mileageReadings.push({
-          id: 'm' + Date.now() + 1, assetId, date: getField('invoiceDate') || today,
-          value: parseFloat(getField('mileageAtService')), source: 'service-invoice',
-          isEstimate: false, notes: `From ${docTypeLabel}`,
-        });
-      }
-
-    } else if (docType === 'inspection_report') {
-      const mRecord = {
-        id: 'mr' + Date.now(), assetId,
-        date: getField('inspectionDate') || today,
-        workCarriedOut: getField('findings') || 'Inspection',
-        supplier: getField('supplier'),
-        cost: null, mileageAtWork: parseFloat(getField('mileage')) || null,
-        partsUsedText: '', sourceDocumentId: docRecord.id,
-        outstandingAdvisories: [], createdAt: new Date().toISOString(),
-      };
-      if (!maintenanceState.maintenanceRecords) maintenanceState.maintenanceRecords = [];
-      maintenanceState.maintenanceRecords.push(mRecord);
-      docRecord.linkedRecordIds.push(mRecord.id);
-    } else if (docType === 'v5c') {
-      // Update asset fields from V5C
-      const asset2 = state.assets.find(a => a.id === assetId);
-      if (asset2) {
-        if (getField('vin')         && !asset2.vin)          asset2.vin          = getField('vin');
-        if (getField('engineNumber')&& !asset2.engineNumber) asset2.engineNumber = getField('engineNumber');
-        if (getField('colour')      && !asset2.colour)       asset2.colour       = getField('colour');
-        asset2.updatedAt = new Date().toISOString();
-      }
-    } else if (docType === 'insurance_certificate') {
-      // Update or create insurance compliance record
-      const expiryDate = getField('expiryDate');
-      if (expiryDate) {
-        const existing = state.complianceRecords.find(r => r.assetId === assetId && r.type === 'insurance');
-        if (existing) {
-          existing.expiryDate    = expiryDate;
-          existing.provider      = getField('insurer') || existing.provider;
-          existing.policyNumber  = getField('policyNumber') || existing.policyNumber;
-          existing.startDate     = getField('startDate') || existing.startDate;
-          const eventId = await upsertCalendarEvent(existing);
-          if (eventId) existing.calendarEventId = eventId;
-          docRecord.linkedRecordIds.push(existing.id);
-        } else {
-          const newRecord = {
-            id: 'c' + Date.now(), assetId, type: 'insurance',
-            expiryDate, startDate: getField('startDate') || null,
-            provider: getField('insurer') || null, policyNumber: getField('policyNumber') || null,
-            reminderLeadDays: 30, cost: null, notes: getField('coverType') || '',
-            calendarEventId: null,
-          };
-          const eventId = await upsertCalendarEvent(newRecord);
-          if (eventId) newRecord.calendarEventId = eventId;
-          state.complianceRecords.push(newRecord);
-          docRecord.linkedRecordIds.push(newRecord.id);
-        }
-      }
-    }
-
-    // 4. Save state
-    await saveToD();
-    await saveMaintenanceState();
-
-    capturePages   = [];
-    captureAssetId = null;
-    closeCaptureModal();
-    render();
-    openAssetDetail(assetId);
-    toast('Document saved successfully.');
-
-  } catch (e) {
-    toast(`Save failed: ${e.message}`);
-    console.error(e);
-  }
-
-  btn.disabled = false; btn.textContent = 'Save all';
-}
-
-// ── Ask-Claude ────────────────────────────────────────────────────────────────
-let askPhotos = {};  // assetId -> { data, mediaType } | null
-
-function toggleAskClaude(assetId) {
-  const panel   = document.getElementById(`ask-panel-${assetId}`);
-  const toggle  = document.getElementById(`ask-toggle-${assetId}`);
-  const isOpen  = panel.style.display !== 'none';
-  panel.style.display  = isOpen ? 'none' : 'block';
-  toggle.textContent   = isOpen ? 'Expand' : 'Collapse';
-  if (!isOpen) {
-    ensureMaintenanceLoaded().then(() => renderAskHistory(assetId));
-  }
-}
-
-function renderAskHistory(assetId) {
-  const histEl = document.getElementById(`ask-history-${assetId}`);
-  if (!histEl) return;
-  const conv = (maintenanceState.conversations || {})[assetId];
-  if (!conv || !conv.messages || conv.messages.length === 0) {
-    histEl.innerHTML = '<div class="empty-state" style="padding:1.5rem;">No conversation yet. Ask a question below.</div>';
-    return;
-  }
-  histEl.innerHTML = conv.messages.map(m => `
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
-      <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:${m.role==='user'?'var(--accent-hi)':'var(--text-dim)'};margin-bottom:4px;">${m.role === 'user' ? 'You' : 'Claude'} &mdash; ${m.timestamp ? m.timestamp.split('T')[0] : ''}</div>
-      <div style="font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;">${typeof m.content === 'string' ? m.content : '[image + text]'}</div>
-    </div>`).join('');
-  histEl.scrollTop = histEl.scrollHeight;
-}
-
-function attachAskPhoto(event, assetId) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-  resizeImage(file).then(resized => {
-    askPhotos[assetId] = { data: resized.data, mediaType: resized.mediaType };
-    const preview = document.getElementById(`ask-photo-preview-${assetId}`);
-    if (preview) {
-      preview.style.display = 'block';
-      preview.innerHTML = `<div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--text-dim);">
-        <img src="data:image/jpeg;base64,${resized.data.substring(0,100)}..." style="display:none;" />
-        <span>📷 Photo attached</span>
-        <button onclick="clearAskPhoto('${assetId}')" style="font-family:var(--mono);font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-dim);cursor:pointer;">Remove</button>
-      </div>`;
-    }
-    toast('Photo attached.');
-  });
-}
-
-function clearAskPhoto(assetId) {
-  delete askPhotos[assetId];
-  const preview = document.getElementById(`ask-photo-preview-${assetId}`);
-  if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
-}
-
-async function sendAsk(assetId) {
-  const inputEl = document.getElementById(`ask-input-${assetId}`);
-  const message = inputEl ? inputEl.value.trim() : '';
-  if (!message) return;
-  if (!cfg.proxyUrl) { toast('Proxy URL not set. Go to Settings.'); return; }
-
-  inputEl.value    = '';
-  inputEl.disabled = true;
-
-  await ensureMaintenanceLoaded();
-  if (!maintenanceState.conversations) maintenanceState.conversations = {};
-  if (!maintenanceState.conversations[assetId]) {
-    maintenanceState.conversations[assetId] = { messages: [], lastUpdated: new Date().toISOString() };
-  }
-
-  const conv = maintenanceState.conversations[assetId];
-  const asset = state.assets.find(a => a.id === assetId);
-  const lead  = (state.settings && state.settings.reminderLeadDays) || cfg.reminderDays;
-
-  // Build asset context
-  const assetContext = {
-    asset: asset ? {
-      name: asset.name, make: asset.make, model: asset.model, year: asset.year,
-      identifier: asset.identifier, vin: asset.vin, status: asset.status,
-      notes: asset.notes, usesHours: asset.usesHours,
-    } : {},
-    latestMileage: state.mileageReadings.filter(m => m.assetId === assetId)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null,
-    complianceRecords: state.complianceRecords.filter(r => r.assetId === assetId),
-    recentMaintenance: (maintenanceState.maintenanceRecords || [])
-      .filter(m => m.assetId === assetId)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 10),
-    documents: (maintenanceState.documents || [])
-      .filter(d => d.assetId === assetId)
-      .map(d => ({ type: d.type, createdAt: d.createdAt })),
-  };
-
-  // Add user message to history
-  conv.messages.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
-  renderAskHistory(assetId);
-
-  // Show thinking indicator
-  const histEl = document.getElementById(`ask-history-${assetId}`);
-  if (histEl) {
-    histEl.innerHTML += `<div id="ask-thinking" style="padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim);font-style:italic;">Claude is thinking…</div>`;
-    histEl.scrollTop = histEl.scrollHeight;
-  }
-
-  try {
-    // Build conversation history for Anthropic (exclude system messages)
-    const history = conv.messages.slice(0, -1).map(m => ({
-      role:    m.role,
-      content: m.content,
-    }));
-
-    const photo = askPhotos[assetId] || null;
-
-    const r = await fetch(`${cfg.proxyUrl}/ask`, {
-      method: 'POST',
-      headers: {
-        'Content-Type':    'application/json',
-        'x-worker-secret': cfg.workerSecret || '',
-      },
-      body: JSON.stringify({
-        assetContext,
-        conversationHistory: history,
-        userMessage: message,
-        image: photo,
-      }),
-    });
-
-    const thinking = document.getElementById('ask-thinking');
-    if (thinking) thinking.remove();
-
-    if (!r.ok) {
-      const err = await r.json();
-      throw new Error(err.error || `HTTP ${r.status}`);
-    }
-
-    const result = await r.json();
-    const reply  = result.reply || 'No response received.';
-
-    conv.messages.push({ role: 'assistant', content: reply, timestamp: new Date().toISOString() });
-    conv.lastUpdated = new Date().toISOString();
-
-    if (photo) clearAskPhoto(assetId);
-
-    await saveMaintenanceState();
-    renderAskHistory(assetId);
-
-  } catch (e) {
-    const thinking = document.getElementById('ask-thinking');
-    if (thinking) thinking.remove();
-    conv.messages.push({ role: 'assistant', content: `Error: ${e.message}`, timestamp: new Date().toISOString() });
-    renderAskHistory(assetId);
-    toast(`Ask Claude failed: ${e.message}`);
-  }
-
-  if (inputEl) inputEl.disabled = false;
-}
-
-// ── Calendar helpers ─────────────────────────────────────────────────────────
-async function ensureVehiclesCalendar() {
-  if (state.settings && state.settings.calendarId) return;
-  try {
-    // Check if calendar already exists
-    const r = await gapi('https://www.googleapis.com/calendar/v3/users/me/calendarList');
-    if (!r) return;
-    const d = await r.json();
-    const existing = (d.items || []).find(c => c.summary === 'Ashvaren Vehicles');
-    if (existing) {
-      state.settings.calendarId = existing.id;
-      await saveToD();
-      return;
-    }
-    // Create it
-    const cr = await gapi('https://www.googleapis.com/calendar/v3/calendars', {
-      method: 'POST',
-      body: JSON.stringify({ summary: 'Ashvaren Vehicles', timeZone: 'Europe/London' }),
-    });
-    if (!cr) return;
-    const cal = await cr.json();
-    state.settings.calendarId = cal.id;
-    await saveToD();
-    toast('Ashvaren Vehicles calendar created.');
-  } catch (e) { console.error('Calendar create failed:', e); }
-}
-
-// Calendar colour IDs: MOT=11(red), road-tax=9(blueberry), insurance=5(banana/gold), default=7(peacock)
-const CAL_COLOURS = { mot: '11', 'road-tax': '9', insurance: '5', 'v5-location': '7', 'service-plan': '7' };
-
-async function upsertCalendarEvent(record) {
-  const calId = state.settings && state.settings.calendarId;
-  if (!calId || !record.expiryDate) return null;
-
-  const asset  = state.assets.find(a => a.id === record.assetId);
-  const title  = `${complianceLabel(record.type)} — ${asset ? asset.name : 'Vehicle'}`;
-  const desc   = [
-    asset ? asset.identifier : '',
-    record.provider || '',
-    record.policyNumber || '',
-    record.notes || '',
-    'Managed at https://ashvaren.github.io/ashvaren-vehicles/',
-  ].filter(Boolean).join(' · ');
-
-  const event = {
-    summary:     title,
-    description: desc,
-    start:       { date: record.expiryDate },
-    end:         { date: record.expiryDate },
-    colorId:     CAL_COLOURS[record.type] || '7',
-    reminders: {
-      useDefault: false,
-      overrides:  [{ method: 'email', minutes: (record.reminderLeadDays || 30) * 24 * 60 }],
-    },
-  };
-
-  try {
-    if (record.calendarEventId) {
-      // Update existing event
-      const r = await gapi(
-        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${record.calendarEventId}`,
-        { method: 'PUT', body: JSON.stringify(event) }
-      );
-      if (r && r.ok) { const d = await r.json(); return d.id; }
-    }
-    // Create new event
-    const r = await gapi(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
-      { method: 'POST', body: JSON.stringify(event) }
-    );
-    if (r && r.ok) { const d = await r.json(); return d.id; }
-  } catch (e) { console.error('Calendar event upsert failed:', e); }
-  return null;
-}
-
-async function deleteCalendarEvent(eventId) {
-  const calId = state.settings && state.settings.calendarId;
-  if (!calId || !eventId) return;
-  try {
-    await gapi(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${eventId}`,
-      { method: 'DELETE' }
-    );
-  } catch (e) { console.error('Calendar event delete failed:', e); }
-}
-
-// ── Compliance modal ──────────────────────────────────────────────────────────
-let editComplianceId = null;
-let complianceAssetId = null;
-
-function openComplianceModal(recordId, assetId) {
-  editComplianceId  = recordId || null;
-  complianceAssetId = assetId  || null;
-
-  const r = recordId ? state.complianceRecords.find(x => x.id === recordId) : null;
-
-  document.getElementById('compliance-modal-title').textContent = r ? 'Edit compliance record' : 'Add compliance record';
-  document.getElementById('cm-calendar-status').style.display = 'none';
-
-  // Populate asset selector
-  const sel = document.getElementById('cm-asset');
-  sel.innerHTML = state.assets.map(a =>
-    `<option value="${a.id}" ${a.id === (r ? r.assetId : assetId) ? 'selected' : ''}>${a.name}</option>`
-  ).join('');
-
-  document.getElementById('cm-type').value    = r ? r.type           : 'mot';
-  document.getElementById('cm-expiry').value  = r ? (r.expiryDate  || '') : '';
-  document.getElementById('cm-start').value   = r ? (r.startDate   || '') : '';
-  document.getElementById('cm-provider').value= r ? (r.provider    || '') : '';
-  document.getElementById('cm-policy').value  = r ? (r.policyNumber|| '') : '';
-  document.getElementById('cm-cost').value    = r ? (r.cost        || '') : '';
-  document.getElementById('cm-lead').value    = r ? (r.reminderLeadDays || 30) : 30;
-  document.getElementById('cm-notes').value   = r ? (r.notes       || '') : '';
-
-  document.getElementById('compliance-modal').classList.add('open');
-}
-
-function closeComplianceModal() {
-  document.getElementById('compliance-modal').classList.remove('open');
-  editComplianceId = null;
-  complianceAssetId = null;
-}
-
-async function saveComplianceRecord() {
-  const assetId = document.getElementById('cm-asset').value;
-  const expiry  = document.getElementById('cm-expiry').value;
-  if (!assetId) { toast('Please select an asset.'); return; }
-  if (!expiry)  { toast('Please enter an expiry date.'); return; }
-
-  const btn = document.getElementById('cm-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  const calStatus = document.getElementById('cm-calendar-status');
-  calStatus.style.display = 'block';
-  calStatus.textContent   = 'Syncing to Google Calendar…';
-
-  const record = {
-    id:               editComplianceId || ('c' + Date.now()),
-    assetId,
-    type:             document.getElementById('cm-type').value,
-    expiryDate:       expiry,
-    startDate:        document.getElementById('cm-start').value   || null,
-    provider:         document.getElementById('cm-provider').value.trim() || null,
-    policyNumber:     document.getElementById('cm-policy').value.trim()   || null,
-    cost:             parseFloat(document.getElementById('cm-cost').value) || null,
-    reminderLeadDays: parseInt(document.getElementById('cm-lead').value)   || 30,
-    notes:            document.getElementById('cm-notes').value.trim(),
-    calendarEventId:  editComplianceId
-      ? (state.complianceRecords.find(x => x.id === editComplianceId) || {}).calendarEventId || null
-      : null,
-  };
-
-  // Sync to calendar
-  const eventId = await upsertCalendarEvent(record);
-  if (eventId) {
-    record.calendarEventId = eventId;
-    calStatus.textContent  = 'Calendar event saved ✓';
-  } else {
-    calStatus.textContent  = 'Calendar sync unavailable — record saved locally';
-  }
-
-  if (editComplianceId) {
-    const idx = state.complianceRecords.findIndex(x => x.id === editComplianceId);
-    if (idx > -1) state.complianceRecords[idx] = record;
-  } else {
-    state.complianceRecords.push(record);
-  }
-
-  await saveToD();
-  render();
-
-  const detailVisible = document.getElementById('view-asset-detail').style.display !== 'none';
-  if (detailVisible) openAssetDetail(assetId);
-
-  setTimeout(() => {
-    closeComplianceModal();
-    toast(editComplianceId ? 'Compliance record updated.' : 'Compliance record added.');
-  }, 800);
-
-  btn.disabled = false; btn.textContent = 'Save record';
-}
-
-async function deleteComplianceRecord(recordId, assetId) {
-  if (!confirm('Remove this compliance record? The calendar event will also be deleted.')) return;
-  const record = state.complianceRecords.find(r => r.id === recordId);
-  if (record && record.calendarEventId) {
-    await deleteCalendarEvent(record.calendarEventId);
-  }
-  state.complianceRecords = state.complianceRecords.filter(r => r.id !== recordId);
-  await saveToD();
-  render();
-  openAssetDetail(assetId);
-  toast('Compliance record removed.');
-}
-
-// ── Sync all seeded compliance records to calendar (run once) ────────────────
-async function syncSeedComplianceToCalendar() {
-  const unsynced = state.complianceRecords.filter(r => !r.calendarEventId && r.expiryDate);
-  if (!unsynced.length) return;
-  setSS('Syncing calendar…');
-  for (const record of unsynced) {
-    const eventId = await upsertCalendarEvent(record);
-    if (eventId) record.calendarEventId = eventId;
-  }
-  await saveToD();
-  setSS('');
-}
-
-// ── Mileage modal ────────────────────────────────────────────────────────────
-let mileageModalAssetId = null;
-
-function openMileageModal(assetId) {
-  mileageModalAssetId = assetId;
-
-  // Populate asset selector
-  const sel = document.getElementById('mm-asset');
-  sel.innerHTML = state.assets.map(a =>
-    `<option value="${a.id}" ${a.id === assetId ? 'selected' : ''}>${a.name}</option>`
-  ).join('');
-
-  // Set defaults
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('mm-date').value    = today;
-  document.getElementById('mm-value').value   = '';
-  document.getElementById('mm-notes').value   = '';
-  document.getElementById('mm-source').value  = 'manual';
-
-  updateMileageModalAsset();
-  document.getElementById('mileage-modal').classList.add('open');
-  setTimeout(() => document.getElementById('mm-value').focus(), 100);
-}
-
-function updateMileageModalAsset() {
-  const assetId = document.getElementById('mm-asset').value;
-  const asset   = state.assets.find(a => a.id === assetId);
-  if (!asset) return;
-
-  const unit = asset.usesHours ? 'Hours' : (asset.odometerUnit === 'km' ? 'Reading (km)' : 'Reading (miles)');
-  document.getElementById('mm-value-label').textContent = unit;
-  document.getElementById('mileage-modal-subtitle').textContent =
-    asset.usesHours ? 'Enter estimated hours for ' + asset.name + '.' : 'Enter the current odometer reading for ' + asset.name + '.';
-
-  // Default estimate to ticked for garden machinery
-  const gardenTypes = ['mower', 'strimmer', 'blower'];
-  document.getElementById('mm-estimate').checked = gardenTypes.includes(asset.assetType);
-}
-
-function closeMileageModal() {
-  document.getElementById('mileage-modal').classList.remove('open');
-  mileageModalAssetId = null;
-}
-
-function saveMileageReading() {
-  const assetId = document.getElementById('mm-asset').value;
-  const value   = parseFloat(document.getElementById('mm-value').value);
-  const date    = document.getElementById('mm-date').value;
-
-  if (!assetId)       { toast('Please select an asset.');        return; }
-  if (isNaN(value) || value < 0) { toast('Please enter a valid reading.'); return; }
-  if (!date)          { toast('Please enter a date.');           return; }
-
-  const reading = {
-    id:         'm' + Date.now(),
-    assetId,
-    date,
-    value,
-    source:     document.getElementById('mm-source').value,
-    isEstimate: document.getElementById('mm-estimate').checked,
-    notes:      document.getElementById('mm-notes').value.trim(),
-  };
-
-  state.mileageReadings.push(reading);
-  closeMileageModal();
-  saveToD();
-  render();
-
-  // If we were on an asset detail page, re-open it to show the new reading
-  const detailVisible = document.getElementById('view-asset-detail').style.display !== 'none';
-  if (detailVisible) openAssetDetail(assetId);
-
-  toast('Reading saved.');
-}
-
-function deleteMileageReading(readingId, assetId) {
-  if (!confirm('Remove this reading? This cannot be undone.')) return;
-  state.mileageReadings = state.mileageReadings.filter(m => m.id !== readingId);
-  saveToD();
-  render();
-  openAssetDetail(assetId);
-  toast('Reading removed.');
-}
-
-// ── Sparkline ─────────────────────────────────────────────────────────────────
-function drawSparkline(canvasId, readings) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-
-  const dpr    = window.devicePixelRatio || 1;
-  const W      = canvas.offsetWidth;
-  const H      = 60;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, W, H);
-
-  if (readings.length < 2) return;
-
-  const values = readings.map(r => r.value);
-  const minV   = Math.min(...values);
-  const maxV   = Math.max(...values);
-  const range  = maxV - minV || 1;
-
-  const pad  = { top: 6, bottom: 6, left: 4, right: 4 };
-  const plotW = W - pad.left - pad.right;
-  const plotH = H - pad.top - pad.bottom;
-
-  const xOf = i => pad.left + (i / (readings.length - 1)) * plotW;
-  const yOf = v => pad.top + plotH - ((v - minV) / range) * plotH;
-
-  // Gradient fill
-  const grad = ctx.createLinearGradient(0, pad.top, 0, H);
-  grad.addColorStop(0, 'rgba(46,111,196,0.25)');
-  grad.addColorStop(1, 'rgba(46,111,196,0)');
-
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(values[0]));
-  for (let i = 1; i < readings.length; i++) {
-    ctx.lineTo(xOf(i), yOf(values[i]));
-  }
-  ctx.lineTo(xOf(readings.length - 1), H);
-  ctx.lineTo(xOf(0), H);
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Line
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(values[0]));
-  for (let i = 1; i < readings.length; i++) {
-    ctx.lineTo(xOf(i), yOf(values[i]));
-  }
-  ctx.strokeStyle = '#2e6fc4';
-  ctx.lineWidth   = 1.5;
-  ctx.lineJoin    = 'round';
-  ctx.stroke();
-
-  // Dots
-  readings.forEach((r, i) => {
-    const x = xOf(i), y = yOf(r.value);
-    ctx.beginPath();
-    ctx.arc(x, y, r.isEstimate ? 2.5 : 3, 0, Math.PI * 2);
-    ctx.fillStyle   = r.isEstimate ? '#5d7494' : '#4a8fd9';
-    ctx.strokeStyle = '#080c14';
-    ctx.lineWidth   = 1.5;
-    ctx.fill();
-    ctx.stroke();
-  });
-
-  // Latest value label
-  const last = readings[readings.length - 1];
-  const lx   = xOf(readings.length - 1);
-  const ly   = yOf(last.value);
-  ctx.font      = '9px "DM Mono", monospace';
-  ctx.fillStyle = '#dde8f2';
-  ctx.textAlign = 'right';
-  ctx.fillText(last.value.toLocaleString('en-GB'), lx - 6, ly + 3);
-}
-
-// ── Settings ──────────────────────────────────────────────────────────────────
-function openSettings() {
-  document.getElementById('s-client-id').value     = cfg.clientId;
-  document.getElementById('s-proxy-url').value     = cfg.proxyUrl;
-  document.getElementById('s-worker-secret').value = cfg.workerSecret;
-  document.getElementById('s-reminder-days').value = cfg.reminderDays;
-  document.getElementById('settings-modal').classList.add('open');
-}
-
-function closeSettings() {
-  document.getElementById('settings-modal').classList.remove('open');
-}
-
-function saveSettings() {
-  const id   = document.getElementById('s-client-id').value.trim();
-  const px   = document.getElementById('s-proxy-url').value.trim().replace(/\/$/, '');
-  const days = parseInt(document.getElementById('s-reminder-days').value) || 30;
-  if (!id) { toast('OAuth client ID is required.'); return; }
-  const changed = id !== cfg.clientId;
-  cfg.clientId     = id;
-  cfg.proxyUrl     = px;
-  cfg.reminderDays = days;
-  localStorage.setItem('vt_client_id',      id);
-  localStorage.setItem('vt_proxy_url',      px);
-  localStorage.setItem('vt_reminder_days',  String(days));
-  if (state.settings) state.settings.reminderLeadDays = days;
-  closeSettings();
-  if (changed) { toast('Re-authenticating\u2026'); setTimeout(goGoogle, 1200); }
-  else { toast('Settings saved.'); render(); }
-}
-
-function saveSettingsView() {
-  const id     = document.getElementById('sv-client-id').value.trim();
-  const px     = document.getElementById('sv-proxy-url').value.trim().replace(/\/$/, '');
-  const secret = document.getElementById('sv-worker-secret').value.trim();
-  const days   = parseInt(document.getElementById('sv-reminder-days').value) || 30;
-  if (!id) { toast('OAuth client ID is required.'); return; }
-  cfg.clientId     = id;
-  cfg.proxyUrl     = px;
-  cfg.workerSecret = secret;
-  cfg.reminderDays = days;
-  localStorage.setItem('vt_client_id',     id);
-  localStorage.setItem('vt_proxy_url',     px);
-  localStorage.setItem('vt_worker_secret', secret);
-  localStorage.setItem('vt_reminder_days', String(days));
-  if (state.settings) state.settings.reminderLeadDays = days;
-  toast('Settings saved.');
-  render();
-}
-
-// ── Utilities ─────────────────────────────────────────────────────────────────
-function toast(m) {
-  const el = document.getElementById('toast');
-  el.textContent = m;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-function toggleMobileMenu() {
-  document.getElementById('mobile-menu').classList.toggle('open');
-}
-
-function closeMobileMenu() {
-  document.getElementById('mobile-menu').classList.remove('open');
-}
-
-document.addEventListener('click', function (e) {
-  const menu = document.getElementById('mobile-menu');
-  const btn  = document.getElementById('hamburger-btn');
-  if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
-    menu.classList.remove('open');
-  }
-});
-
-['asset-modal', 'settings-modal', 'mileage-modal', 'compliance-modal', 'capture-modal', 'doc-detail-modal'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('click', e => { if (e.target.id === id) el.classList.remove('open'); });
-});
+renderBadges();
 </script>
 </body>
 </html>
