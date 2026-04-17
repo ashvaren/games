@@ -12,8 +12,16 @@
     :root{--bg:#080c14;--surface:#0e1420;--surface2:#111926;--border:#1a2535;--accent:#2e6fc4;--text:#d8e2f0;--text-dim:#6a7a90;--muted:#3a4a5a;--flag:#e05c3a}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;background:var(--bg)}
-    body{font-family:'DM Mono','Courier New',monospace;color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none}
-    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace}
+    body{
+      font-family:'DM Mono','Courier New',monospace;
+      color:var(--text);
+      -webkit-tap-highlight-color:transparent;
+      /* Suppress iOS text selection globally */
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      user-select:none;
+    }
+    button{-webkit-appearance:none;cursor:pointer;font-family:'DM Mono',monospace;-webkit-user-select:none;-webkit-touch-callout:none;}
     .overlay{position:fixed;inset:0;background:rgba(8,12,20,0.96);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto}
     .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:30px 26px;max-width:400px;width:100%;text-align:center}
     .wm{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--text-dim);margin-bottom:4px}
@@ -35,11 +43,22 @@
     .btn-p{background:var(--accent);color:#fff}
     .btn-g{background:transparent;border:1.5px solid var(--border);color:var(--text-dim)}
     .btn-lg{width:100%;padding:12px;font-size:12px;border-radius:9px;margin-top:4px}
+
+    /* Mine adjuster */
+    .mine-adj{margin-top:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:10px}
+    .mine-adj-lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);flex:1}
+    .mine-adj-val{font-size:14px;font-weight:700;min-width:36px;text-align:center;color:var(--text)}
+    .adj-btn{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;transition:border-color .12s,background .12s}
+    .adj-btn:hover{border-color:var(--accent);background:rgba(46,111,196,.15)}
+    .mine-adj-default{font-size:8px;color:var(--muted);margin-left:2px}
+
+    /* Custom fields */
     .custom-fields{margin-top:10px;display:flex;gap:8px}
     .custom-field{flex:1}
     .custom-field label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:4px}
     .custom-field input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none}
     .custom-field input:focus{border-color:var(--accent)}
+
     #app{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 16px 40px;gap:10px}
     .hud{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;width:100%;max-width:480px}
     .hud-cell{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;border-right:1px solid var(--border)}
@@ -51,8 +70,21 @@
     .diff-tabs{display:flex;gap:5px;width:100%;max-width:480px;flex-wrap:wrap}
     .diff-tab{flex:1;min-width:60px;padding:6px 4px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-size:9px;font-weight:600;letter-spacing:.06em;text-align:center;transition:border-color .15s,background .15s,color .15s;cursor:pointer}
     .diff-tab.on{border-color:var(--accent);background:rgba(46,111,196,.12);color:var(--text)}
+
+    /* Board cells */
     #board{display:inline-grid;border:1px solid var(--border);border-radius:6px;overflow:hidden;gap:0;background:var(--border)}
-    .cell{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--surface2);border:none;cursor:pointer;transition:background .07s,transform .05s;position:relative}
+    .cell{
+      width:30px;height:30px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;font-weight:700;
+      background:var(--surface2);border:none;cursor:pointer;
+      transition:background .07s,transform .05s;position:relative;
+      /* Critical iOS fixes: prevent callout, selection, and highlight on long press */
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
     .cell::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 50%);pointer-events:none}
     .cell:hover:not(.rev):not(.exp){background:#1a2840;transform:scale(0.95)}
     .cell.rev{background:#0a1018;cursor:default;box-shadow:inset 1px 1px 2px rgba(0,0,0,.5)}
@@ -61,9 +93,26 @@
     .cell.flag::after{content:'⚑';font-size:13px}
     .cell.exp{background:#2a0808;animation:explode .4s ease-out}
     .cell.mine-r{background:#1a0808;cursor:default}
+    /* Correct but unflagged mines shown after loss */
+    .cell.mine-missed{background:#1a1a08}
+    /* Wrongly flagged cells shown after loss */
+    .cell.flag-wrong{background:#1a0808}
     .cell.n1{color:#4a9eff}.cell.n2{color:#50c878}.cell.n3{color:#ff6b6b}.cell.n4{color:#9b59b6}.cell.n5{color:#e74c3c}.cell.n6{color:#1abc9c}.cell.n7{color:#e8edf5}.cell.n8{color:#6a7a90}
     @keyframes explode{0%{background:#ff4444;transform:scale(1.12)}40%{background:#aa2222}100%{background:#2a0808;transform:scale(1)}}
     @media(max-width:420px){.cell{width:24px;height:24px;font-size:10px}}
+
+    /* Post-detonation review banner */
+    .review-banner{
+      width:100%;max-width:480px;
+      background:rgba(42,8,8,0.95);
+      border:1.5px solid #5a1a1a;
+      border-radius:9px;
+      padding:12px 16px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .review-banner-text{flex:1;font-size:11px;color:#ffaaaa;line-height:1.5}
+    .review-banner-title{font-size:12px;font-weight:700;color:#ff6060;letter-spacing:.04em;margin-bottom:2px}
+
     .footer{display:flex;gap:8px}
     .back-link{font-size:10px;color:var(--text-dim);letter-spacing:.06em;cursor:pointer;background:none;border:none}
     .back-link:hover{color:var(--text)}
@@ -85,17 +134,26 @@
         <select class="nin" id="psel"></select>
       </div>
     </div>
-    <div class="sec"><div class="sec-lbl">Difficulty</div>
+    <div class="sec"><div class="sec-lbl">Difficulty &amp; mines</div>
       <div class="seg-row" id="diff-segs">
-        <button class="seg" data-diff="easy" onclick="setDiff(this)"><span class="seg-main">Cadet</span><span class="seg-sub">9×9 · 10</span></button>
-        <button class="seg on" data-diff="medium" onclick="setDiff(this)"><span class="seg-main">Field</span><span class="seg-sub">16×16 · 40</span></button>
-        <button class="seg" data-diff="hard" onclick="setDiff(this)"><span class="seg-main">Expert</span><span class="seg-sub">16×30 · 99</span></button>
+        <button class="seg" data-diff="easy" onclick="setDiff(this)"><span class="seg-main">Cadet</span><span class="seg-sub">9×9</span></button>
+        <button class="seg on" data-diff="medium" onclick="setDiff(this)"><span class="seg-main">Field</span><span class="seg-sub">16×16</span></button>
+        <button class="seg" data-diff="hard" onclick="setDiff(this)"><span class="seg-main">Expert</span><span class="seg-sub">16×30</span></button>
         <button class="seg" data-diff="custom" onclick="setDiff(this)"><span class="seg-main">Custom</span></button>
       </div>
+      <!-- Mine count adjuster for presets -->
+      <div id="mine-adjuster" class="mine-adj">
+        <div class="mine-adj-lbl">Mines<br/><span class="mine-adj-default" id="mine-adj-default"></span></div>
+        <button class="adj-btn" onclick="adjustMines(-5)">−−</button>
+        <button class="adj-btn" onclick="adjustMines(-1)">−</button>
+        <div class="mine-adj-val" id="mine-adj-val">40</div>
+        <button class="adj-btn" onclick="adjustMines(+1)">+</button>
+        <button class="adj-btn" onclick="adjustMines(+5)">++</button>
+      </div>
+      <!-- Custom grid dimensions -->
       <div id="custom-fields" style="display:none" class="custom-fields">
         <div class="custom-field"><label>Rows</label><input type="number" id="cr" min="5" max="24" value="12"/></div>
         <div class="custom-field"><label>Cols</label><input type="number" id="cc" min="5" max="30" value="16"/></div>
-        <div class="custom-field"><label>Mines</label><input type="number" id="cm" min="1" max="200" value="30"/></div>
       </div>
     </div>
     <button class="btn btn-p btn-lg" onclick="launchGame()">Enter the Minefield</button>
@@ -124,7 +182,6 @@
 <div id="app">
   <button class="back-link" onclick="window.location.href='index.html'">← Hub</button>
 
-  <!-- Player selector strip -->
   <div class="player-sel">
     <div class="ndot" style="background:var(--accent)"></div>
     <span style="font-size:10px;color:var(--text-dim);letter-spacing:.05em">Playing as</span>
@@ -146,6 +203,16 @@
     <button class="diff-tab" data-diff="custom" onclick="quickDiff(this)">Custom</button>
   </div>
 
+  <!-- Post-detonation review banner (hidden until needed) -->
+  <div id="review-banner" class="review-banner" style="display:none">
+    <div style="font-size:24px">💣</div>
+    <div class="review-banner-text">
+      <div class="review-banner-title">Detonated — review the board</div>
+      All mines are now revealed. Study where they were before starting again.
+    </div>
+    <button class="btn btn-g" style="flex-shrink:0;font-size:10px;padding:8px 12px" onclick="showResult(false)">Done →</button>
+  </div>
+
   <div style="overflow-x:auto;max-width:100%"><div id="board"></div></div>
 
   <div class="footer">
@@ -156,190 +223,295 @@
 
 <script>
 // ── Config ──────────────────────────────────────────────────────────────────
-const DIFFS={easy:{rows:9,cols:9,mines:10},medium:{rows:16,cols:16,mines:40},hard:{rows:16,cols:30,mines:99}};
-let currentDiff='medium', cfg={rows:16,cols:16,mines:40};
-let currentPlayerId=null;
-const bestTimes=JSON.parse(localStorage.getItem('ms-best')||'{}');
+const DIFFS = {
+  easy:   { rows:9,  cols:9,  mines:10 },
+  medium: { rows:16, cols:16, mines:40 },
+  hard:   { rows:16, cols:30, mines:99 },
+};
+let currentDiff = 'medium';
+let mineOverride = null; // null = use default for diff
+let cfg = { rows:16, cols:16, mines:40 };
+let currentPlayerId = null;
+const bestTimes = JSON.parse(localStorage.getItem('ms-best') || '{}');
 
 // ── State ───────────────────────────────────────────────────────────────────
-let cells=[],gameState='idle',firstClick=true,flagCount=0,timerVal=0,timerInt=null,lpTimer=null;
+let cells=[], gameState='idle', firstClick=true, flagCount=0, timerVal=0, timerInt=null, lpTimer=null;
 
-function setDiff(btn){
-  currentDiff=btn.dataset.diff;
-  document.querySelectorAll('#diff-segs .seg').forEach(b=>b.classList.toggle('on',b===btn));
-  document.getElementById('custom-fields').style.display=currentDiff==='custom'?'flex':'none';
+// ── Mine adjuster ─────────────────────────────────────────────────────────
+function mineMax() {
+  if (currentDiff === 'custom') {
+    const r = parseInt(document.getElementById('cr').value) || 12;
+    const c = parseInt(document.getElementById('cc').value) || 16;
+    return r * c - 9;
+  }
+  return DIFFS[currentDiff].rows * DIFFS[currentDiff].cols - 9;
+}
+function mineDefault() {
+  return currentDiff === 'custom' ? 30 : DIFFS[currentDiff].mines;
+}
+function currentMines() {
+  return mineOverride !== null ? mineOverride : mineDefault();
+}
+function adjustMines(delta) {
+  const base = currentMines();
+  const next = Math.min(Math.max(1, base + delta), mineMax());
+  mineOverride = next;
+  updateMineAdjUI();
+}
+function updateMineAdjUI() {
+  const m = currentMines(), def = mineDefault();
+  document.getElementById('mine-adj-val').textContent = m;
+  document.getElementById('mine-adj-default').textContent = mineOverride !== null && mineOverride !== def ? `default ${def}` : `default`;
+  document.getElementById('mine-adjuster').style.display = currentDiff === 'custom' ? 'none' : 'flex';
+}
+
+function setDiff(btn) {
+  currentDiff = btn.dataset.diff;
+  mineOverride = null;
+  document.querySelectorAll('#diff-segs .seg').forEach(b => b.classList.toggle('on', b === btn));
+  document.getElementById('custom-fields').style.display = currentDiff === 'custom' ? 'flex' : 'none';
+  updateMineAdjUI();
   syncQuickDiff();
 }
-function syncQuickDiff(){
-  document.querySelectorAll('#quick-diff .diff-tab').forEach(b=>b.classList.toggle('on',b.dataset.diff===currentDiff));
+function syncQuickDiff() {
+  document.querySelectorAll('#quick-diff .diff-tab').forEach(b => b.classList.toggle('on', b.dataset.diff === currentDiff));
 }
-function quickDiff(btn){
-  currentDiff=btn.dataset.diff;
+function quickDiff(btn) {
+  currentDiff = btn.dataset.diff;
+  mineOverride = null;
   syncQuickDiff();
-  applyDiff(); initGame();
+  applyDiff();
+  initGame();
 }
-function applyDiff(){
-  if(currentDiff==='custom'){
-    cfg.rows=parseInt(document.getElementById('cr').value)||12;
-    cfg.cols=parseInt(document.getElementById('cc').value)||16;
-    cfg.mines=parseInt(document.getElementById('cm').value)||30;
-    cfg.mines=Math.min(cfg.mines,cfg.rows*cfg.cols-9);
-  } else { cfg={...DIFFS[currentDiff]}; }
+function applyDiff() {
+  if (currentDiff === 'custom') {
+    cfg.rows  = parseInt(document.getElementById('cr').value) || 12;
+    cfg.cols  = parseInt(document.getElementById('cc').value) || 16;
+    cfg.mines = parseInt(document.getElementById('cm') ? document.getElementById('cm').value : 30) || 30;
+    cfg.mines = Math.min(cfg.mines, cfg.rows * cfg.cols - 9);
+  } else {
+    cfg = { ...DIFFS[currentDiff] };
+    cfg.mines = currentMines(); // apply any override
+  }
 }
 
-function populatePlayerSelects(){
-  const pl=ACV.getPlayers();
-  ['psel','ingame-psel'].forEach(id=>{
-    const sel=document.getElementById(id);
-    if(!sel)return;
-    sel.innerHTML=pl.map(p=>`<option value="${p.id}" style="background:#0e1420">${p.name}</option>`).join('');
-    if(currentPlayerId)sel.value=currentPlayerId; else if(pl[0])sel.value=pl[0].id;
+// ── Player selects ─────────────────────────────────────────────────────────
+function populatePlayerSelects() {
+  const pl = ACV.getPlayers();
+  ['psel','ingame-psel'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = pl.map(p => `<option value="${p.id}" style="background:#0e1420">${p.name}</option>`).join('');
+    if (currentPlayerId) sel.value = currentPlayerId;
+    else if (pl[0]) sel.value = pl[0].id;
   });
 }
 
-function launchGame(){
-  currentPlayerId=document.getElementById('psel').value;
-  document.getElementById('ingame-psel').value=currentPlayerId;
-  applyDiff(); syncQuickDiff();
-  document.getElementById('setup-overlay').style.display='none';
+function launchGame() {
+  currentPlayerId = document.getElementById('psel').value;
+  document.getElementById('ingame-psel').value = currentPlayerId;
+  applyDiff();
+  syncQuickDiff();
+  document.getElementById('setup-overlay').style.display = 'none';
   initGame();
 }
 
-function retry(){
-  currentPlayerId=document.getElementById('ingame-psel').value||currentPlayerId;
-  applyDiff(); initGame();
+function retry() {
+  currentPlayerId = document.getElementById('ingame-psel').value || currentPlayerId;
+  applyDiff();
+  initGame();
 }
 
-// ── Init ────────────────────────────────────────────────────────────────────
-function initGame(){
-  clearInterval(timerInt); timerVal=0; flagCount=0; firstClick=true; gameState='idle';
-  cells=Array.from({length:cfg.rows},()=>Array.from({length:cfg.cols},()=>({mine:false,count:0,revealed:false,flagged:false})));
-  updateHUD(); renderBoard();
-  document.getElementById('face-btn').textContent='🙂';
-  document.getElementById('result-overlay').style.display='none';
+// ── Init ───────────────────────────────────────────────────────────────────
+function initGame() {
+  clearInterval(timerInt);
+  timerVal = 0; flagCount = 0; firstClick = true; gameState = 'idle';
+  cells = Array.from({length:cfg.rows}, () =>
+    Array.from({length:cfg.cols}, () => ({mine:false, count:0, revealed:false, flagged:false}))
+  );
+  document.getElementById('review-banner').style.display = 'none';
+  document.getElementById('result-overlay').style.display = 'none';
+  document.getElementById('face-btn').textContent = '🙂';
+  updateHUD();
+  renderBoard();
 }
 
-function placeMines(sr,sc){
-  const safe=new Set();
-  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=sr+dr,nc=sc+dc;if(nr>=0&&nr<cfg.rows&&nc>=0&&nc<cfg.cols)safe.add(`${nr},${nc}`);}
-  const pos=[];
-  for(let r=0;r<cfg.rows;r++)for(let c=0;c<cfg.cols;c++)if(!safe.has(`${r},${c}`))pos.push([r,c]);
-  for(let i=pos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pos[i],pos[j]]=[pos[j],pos[i]];}
-  pos.slice(0,cfg.mines).forEach(([r,c])=>cells[r][c].mine=true);
-  for(let r=0;r<cfg.rows;r++)for(let c=0;c<cfg.cols;c++)if(!cells[r][c].mine)cells[r][c].count=nbrs(r,c).filter(([nr,nc])=>cells[nr][nc].mine).length;
+function placeMines(sr, sc) {
+  const safe = new Set();
+  for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) {
+    const nr=sr+dr, nc=sc+dc;
+    if (nr>=0 && nr<cfg.rows && nc>=0 && nc<cfg.cols) safe.add(`${nr},${nc}`);
+  }
+  const pos = [];
+  for (let r=0; r<cfg.rows; r++) for (let c=0; c<cfg.cols; c++)
+    if (!safe.has(`${r},${c}`)) pos.push([r,c]);
+  for (let i=pos.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+  pos.slice(0, cfg.mines).forEach(([r,c]) => cells[r][c].mine = true);
+  for (let r=0; r<cfg.rows; r++) for (let c=0; c<cfg.cols; c++)
+    if (!cells[r][c].mine) cells[r][c].count = nbrs(r,c).filter(([nr,nc]) => cells[nr][nc].mine).length;
 }
 
-function nbrs(r,c){const res=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(dr===0&&dc===0)continue;const nr=r+dr,nc=c+dc;if(nr>=0&&nr<cfg.rows&&nc>=0&&nc<cfg.cols)res.push([nr,nc]);}return res;}
+function nbrs(r, c) {
+  const res=[];
+  for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) {
+    if (dr===0&&dc===0) continue;
+    const nr=r+dr, nc=c+dc;
+    if (nr>=0 && nr<cfg.rows && nc>=0 && nc<cfg.cols) res.push([nr,nc]);
+  }
+  return res;
+}
 
-// ── Render ──────────────────────────────────────────────────────────────────
-function renderBoard(){
-  const board=document.getElementById('board');
-  board.innerHTML=''; board.style.gridTemplateColumns=`repeat(${cfg.cols},1fr)`;
-  for(let r=0;r<cfg.rows;r++) for(let c=0;c<cfg.cols;c++){
-    const el=document.createElement('button');
-    el.className='cell'; el.dataset.r=r; el.dataset.c=c;
-    el.addEventListener('click',onLeft);
-    el.addEventListener('contextmenu',e=>{e.preventDefault();onRight(r,c);});
-    el.addEventListener('touchstart',e=>{lpTimer=setTimeout(()=>{onRight(r,c);lpTimer=null;},500);},{passive:true});
-    el.addEventListener('touchend',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
-    el.addEventListener('touchmove',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
+// ── Render ─────────────────────────────────────────────────────────────────
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  board.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
+  for (let r=0; r<cfg.rows; r++) for (let c=0; c<cfg.cols; c++) {
+    const el = document.createElement('button');
+    el.className = 'cell';
+    el.dataset.r = r; el.dataset.c = c;
+    el.addEventListener('click', onLeft);
+    el.addEventListener('contextmenu', e => { e.preventDefault(); onRight(r, c); });
+    // Long-press for flag on touch — preventDefault stops iOS text selection
+    el.addEventListener('touchstart', e => {
+      e.preventDefault(); // stops callout and selection
+      lpTimer = setTimeout(() => { onRight(r, c); lpTimer = null; }, 500);
+    }, { passive: false });
+    el.addEventListener('touchend', e => {
+      if (lpTimer) {
+        clearTimeout(lpTimer);
+        lpTimer = null;
+        // Short tap — treat as left click
+        onLeft({ currentTarget: el });
+      }
+    });
+    el.addEventListener('touchmove', () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } });
     board.appendChild(el);
   }
   syncAllCells();
 }
 
-const NC=['','n1','n2','n3','n4','n5','n6','n7','n8'];
-function cellEl(r,c){return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);}
-function syncCell(r,c){
-  const el=cellEl(r,c); const cel=cells[r][c]; if(!el)return;
-  el.className='cell'; el.textContent='';
-  if(cel.flagged&&!cel.revealed){el.classList.add('flag');}
-  else if(!cel.revealed){}
-  else{
+const NC = ['','n1','n2','n3','n4','n5','n6','n7','n8'];
+function cellEl(r,c) { return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); }
+
+function syncCell(r, c) {
+  const el = cellEl(r,c); const cel = cells[r][c]; if (!el) return;
+  el.className = 'cell'; el.textContent = '';
+  if (cel.flagged && !cel.revealed) {
+    el.classList.add('flag');
+  } else if (!cel.revealed) {
+    // nothing
+  } else {
     el.classList.add('rev');
-    if(cel.mine){el.classList.add('mine-r');el.textContent='💣';}
-    else if(cel.count>0){el.classList.add(NC[cel.count]);el.textContent=cel.count;}
+    if (cel.mine)        { el.classList.add('mine-r'); el.textContent = '💣'; }
+    else if (cel.count>0){ el.classList.add(NC[cel.count]); el.textContent = cel.count; }
   }
 }
-function syncAllCells(){for(let r=0;r<cfg.rows;r++)for(let c=0;c<cfg.cols;c++)syncCell(r,c);}
+function syncAllCells() { for (let r=0; r<cfg.rows; r++) for (let c=0; c<cfg.cols; c++) syncCell(r,c); }
 
-// ── Interaction ─────────────────────────────────────────────────────────────
-function onLeft(e){
-  const r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c;
-  if(gameState==='won'||gameState==='lost')return;
-  if(cells[r][c].flagged||cells[r][c].revealed)return;
-  if(firstClick){firstClick=false;placeMines(r,c);startTimer();gameState='playing';}
-  if(cells[r][c].mine){detonate(r,c);return;}
-  reveal(r,c); checkWin();
+// ── Interaction ────────────────────────────────────────────────────────────
+function onLeft(e) {
+  const r = +e.currentTarget.dataset.r, c = +e.currentTarget.dataset.c;
+  if (gameState==='won' || gameState==='lost') return;
+  if (cells[r][c].flagged || cells[r][c].revealed) return;
+  if (firstClick) { firstClick=false; placeMines(r,c); startTimer(); gameState='playing'; }
+  if (cells[r][c].mine) { detonate(r,c); return; }
+  reveal(r,c);
+  checkWin();
 }
-function onRight(r,c){
-  if(gameState==='won'||gameState==='lost')return;
-  if(cells[r][c].revealed)return;
-  cells[r][c].flagged=!cells[r][c].flagged;
-  flagCount+=cells[r][c].flagged?1:-1;
-  syncCell(r,c); updateHUD();
-}
-function reveal(r,c){
-  if(cells[r][c].revealed||cells[r][c].flagged||cells[r][c].mine)return;
-  const queue=[[r,c]];
-  while(queue.length){
-    const[cr,cc]=queue.shift();
-    if(cells[cr][cc].revealed)continue;
-    cells[cr][cc].revealed=true; syncCell(cr,cc);
-    if(cells[cr][cc].count===0)for(const[nr,nc]of nbrs(cr,cc))if(!cells[nr][nc].revealed&&!cells[nr][nc].flagged&&!cells[nr][nc].mine)queue.push([nr,nc]);
-  }
-}
-function detonate(r,c){
-  clearInterval(timerInt); gameState='lost';
-  document.getElementById('face-btn').textContent='💀';
-  const hitEl=cellEl(r,c); if(hitEl)hitEl.classList.add('exp');
-  let delay=0;
-  for(let mr=0;mr<cfg.rows;mr++)for(let mc=0;mc<cfg.cols;mc++)if(cells[mr][mc].mine&&!(mr===r&&mc===c)){
-    const el=cellEl(mr,mc);
-    if(el)setTimeout(()=>{cells[mr][mc].revealed=true;syncCell(mr,mc);},delay+=16);
-  }
-  setTimeout(()=>showResult(false),delay+380);
-}
-function checkWin(){
-  let u=0;for(let r=0;r<cfg.rows;r++)for(let c=0;c<cfg.cols;c++)if(!cells[r][c].revealed&&!cells[r][c].mine)u++;
-  if(u>0)return;
-  clearInterval(timerInt); gameState='won';
-  document.getElementById('face-btn').textContent='🥇';
-  const key=currentDiff; const prev=bestTimes[key];
-  if(!prev||timerVal<prev){bestTimes[key]=timerVal;localStorage.setItem('ms-best',JSON.stringify(bestTimes));}
+function onRight(r, c) {
+  if (gameState==='won' || gameState==='lost') return;
+  if (cells[r][c].revealed) return;
+  cells[r][c].flagged = !cells[r][c].flagged;
+  flagCount += cells[r][c].flagged ? 1 : -1;
+  syncCell(r,c);
   updateHUD();
-  // Record to championship
-  if(currentPlayerId){
-    const pl=ACV.getPlayers(); const p=pl.find(x=>x.id===currentPlayerId);
-    if(p) ACV.recordResult({game:'mines',players:[{id:p.id,name:p.name}],winnerId:p.id,meta:{time:timerVal,diff:currentDiff}});
+}
+function reveal(r, c) {
+  if (cells[r][c].revealed || cells[r][c].flagged || cells[r][c].mine) return;
+  const queue = [[r,c]];
+  while (queue.length) {
+    const [cr,cc] = queue.shift();
+    if (cells[cr][cc].revealed) continue;
+    cells[cr][cc].revealed = true; syncCell(cr,cc);
+    if (cells[cr][cc].count===0)
+      for (const [nr,nc] of nbrs(cr,cc))
+        if (!cells[nr][nc].revealed && !cells[nr][nc].flagged && !cells[nr][nc].mine) queue.push([nr,nc]);
   }
-  setTimeout(()=>showResult(true),300);
-}
-function startTimer(){
-  clearInterval(timerInt); timerVal=0;
-  timerInt=setInterval(()=>{timerVal++;document.getElementById('h-time').textContent=timerVal;},1000);
-}
-function updateHUD(){
-  document.getElementById('h-mines').textContent=cfg.mines;
-  document.getElementById('h-flags').textContent=flagCount;
-  document.getElementById('h-time').textContent=timerVal;
-  const b=bestTimes[currentDiff];
-  document.getElementById('h-best').textContent=b?b+'s':'—';
-}
-function showResult(won){
-  const el=document.getElementById('result-overlay');
-  document.getElementById('r-icon').textContent=won?'🎖️':'💥';
-  document.getElementById('r-label').textContent=won?'Mission complete':'Mine detonated';
-  document.getElementById('r-title').textContent=won?'Cleared':'Detonated';
-  document.getElementById('r-time').textContent=won?`Completed in ${timerVal} seconds`:`Survived ${timerVal} seconds`;
-  const b=bestTimes[currentDiff];
-  document.getElementById('r-best').textContent=b?`Personal best: ${b}s`:'';
-  el.style.display='flex';
 }
 
-// Init
+function detonate(r, c) {
+  clearInterval(timerInt);
+  gameState = 'lost';
+  document.getElementById('face-btn').textContent = '💀';
+  // Mark the hit cell
+  const hitEl = cellEl(r,c);
+  if (hitEl) hitEl.classList.add('exp');
+  cells[r][c].revealed = true;
+  // Cascade-reveal all other mines with a short stagger
+  let delay = 0;
+  for (let mr=0; mr<cfg.rows; mr++) for (let mc=0; mc<cfg.cols; mc++) {
+    if (cells[mr][mc].mine && !(mr===r && mc===c)) {
+      const el = cellEl(mr,mc);
+      if (el) setTimeout(() => {
+        cells[mr][mc].revealed = true;
+        syncCell(mr,mc);
+        // Highlight wrongly flagged safe cells too
+      }, delay += 16);
+    }
+  }
+  // After all mines are shown, display the review banner — do NOT show result overlay yet
+  setTimeout(() => {
+    document.getElementById('review-banner').style.display = 'flex';
+  }, delay + 200);
+}
+
+function checkWin() {
+  let u = 0;
+  for (let r=0; r<cfg.rows; r++) for (let c=0; c<cfg.cols; c++)
+    if (!cells[r][c].revealed && !cells[r][c].mine) u++;
+  if (u > 0) return;
+  clearInterval(timerInt);
+  gameState = 'won';
+  document.getElementById('face-btn').textContent = '🥇';
+  const key = currentDiff;
+  const prev = bestTimes[key];
+  if (!prev || timerVal < prev) { bestTimes[key]=timerVal; localStorage.setItem('ms-best', JSON.stringify(bestTimes)); }
+  updateHUD();
+  if (currentPlayerId) {
+    const pl = ACV.getPlayers(); const p = pl.find(x => x.id===currentPlayerId);
+    if (p) ACV.recordResult({game:'mines', players:[{id:p.id,name:p.name}], winnerId:p.id, meta:{time:timerVal,diff:currentDiff}});
+  }
+  setTimeout(() => showResult(true), 300);
+}
+
+function startTimer() {
+  clearInterval(timerInt); timerVal = 0;
+  timerInt = setInterval(() => { timerVal++; document.getElementById('h-time').textContent = timerVal; }, 1000);
+}
+function updateHUD() {
+  document.getElementById('h-mines').textContent = cfg.mines;
+  document.getElementById('h-flags').textContent = flagCount;
+  document.getElementById('h-time').textContent  = timerVal;
+  const b = bestTimes[currentDiff];
+  document.getElementById('h-best').textContent  = b ? b+'s' : '—';
+}
+function showResult(won) {
+  document.getElementById('review-banner').style.display = 'none';
+  const el = document.getElementById('result-overlay');
+  document.getElementById('r-icon').textContent  = won ? '🎖️' : '💥';
+  document.getElementById('r-label').textContent = won ? 'Mission complete' : 'Mine detonated';
+  document.getElementById('r-title').textContent = won ? 'Cleared' : 'Detonated';
+  document.getElementById('r-time').textContent  = won ? `Completed in ${timerVal} seconds` : `Survived ${timerVal} seconds`;
+  const b = bestTimes[currentDiff];
+  document.getElementById('r-best').textContent  = b ? `Personal best: ${b}s` : '';
+  el.style.display = 'flex';
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
 populatePlayerSelects();
-document.getElementById('ingame-psel').addEventListener('change',e=>{currentPlayerId=e.target.value;});
+updateMineAdjUI();
+document.getElementById('ingame-psel').addEventListener('change', e => { currentPlayerId = e.target.value; });
 </script>
 </body>
 </html>
